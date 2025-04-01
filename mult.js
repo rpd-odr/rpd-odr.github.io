@@ -13,7 +13,6 @@
             var onError = arguments.length > 2 ? arguments[2] : undefined;
             var partsLimit = 6;
 
-            var apiKey = Lampa.Storage.get("tmdb_key", "");
             var tmdbBaseUrl = "https://api.themoviedb.org/3";
             var ratingFilter = 'certification_country=US&certification.lte=PG-13';
 
@@ -29,28 +28,28 @@
             var partsData = [
                 function (callback) {
                     createRequest(
-                        `${tmdbBaseUrl}/trending/movie/week?api_key=${apiKey}&with_genres=16`,
+                        `${tmdbBaseUrl}/trending/movie/week?with_genres=16`,
                         'Популярные мультфильмы',
                         callback
                     );
                 },
                 function (callback) {
                     createRequest(
-                        `${tmdbBaseUrl}/movie/upcoming?api_key=${apiKey}&with_genres=16`,
+                        `${tmdbBaseUrl}/movie/upcoming?with_genres=16`,
                         'Новые мультфильмы',
                         callback
                     );
                 },
                 function (callback) {
                     createRequest(
-                        `${tmdbBaseUrl}/trending/tv/week?api_key=${apiKey}&with_genres=16`,
+                        `${tmdbBaseUrl}/trending/tv/week?with_genres=16`,
                         'Популярные мультсериалы',
                         callback
                     );
                 },
                 function (callback) {
                     createRequest(
-                        `${tmdbBaseUrl}/tv/on_the_air?api_key=${apiKey}&with_genres=16`,
+                        `${tmdbBaseUrl}/tv/on_the_air?with_genres=16`,
                         'Новые мультсериалы',
                         callback
                     );
@@ -67,7 +66,7 @@
 
                     let promises = viewedIds.map(id => {
                         let item = viewed[id];
-                        let url = `${tmdbBaseUrl}/${item.type}/${id}?api_key=${apiKey}&language=ru-RU`;
+                        let url = `${tmdbBaseUrl}/${item.type}/${id}?language=ru-RU`;
                         return Lampa.TMDB.get(url).then(data => {
                             if (data.genres && data.genres.some(g => g.id === 16)) {
                                 if (data.certifications && data.certifications.US && data.certifications.US.certification) {
