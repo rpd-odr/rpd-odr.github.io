@@ -16,7 +16,7 @@
             menuItem.on('hover:enter', function () {
                 console.log("Открытие каталога 'Мультфильмы'...");
                 Lampa.Activity.push({
-                    url: 'discover/movie?with_genres=16&sort_by=popularity.desc',
+                    url: 'discover/movie?with_genres=16&sort_by=popularity.desc&certification_country=US&certification.lte=PG-13',
                     title: 'Мультфильмы',
                     component: 'category_full',
                     source: 'tmdb',
