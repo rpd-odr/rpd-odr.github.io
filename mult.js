@@ -38,12 +38,12 @@
         }
     }
 
-    // Ожидание полной загрузки Lampa
+    // Запуск плагина после готовности приложения
     if (window.appready) {
         initPlugin();
     } else {
         Lampa.Listener.follow('app', function (e) {
-            if (e.type === 'app_ready') {
+            if (e.type === 'ready') {
                 initPlugin();
             }
         });
