@@ -34,6 +34,7 @@
 
         // Универсальная функция для добавления подборок
         function addComponent(name, title, url, type) {
+            console.log(`Регистрация подборки: ${title}`);
             Lampa.Component.add(name, {
                 title: title,
                 source: function (params, oncomplete) {
@@ -65,10 +66,14 @@
         addComponent('animation_on_air', "Новые мультсериалы", 
             `${tmdbBaseUrl}/tv/on_the_air?api_key=${apiKey}&language=ru-RU&with_genres=16&certification_country=US&certification.lte=PG-13`, "series");
 
-        // Подборка "Вы смотрели" с фильтром по анимации
+        // Подборка "Вы смотрели"
+        addComponent('animation_viewed', "Вы смотрели", 
+            null, // URL не нужен, так как данные из истории
+            null); // Тип тоже не нужен
         Lampa.Component.add('animation_viewed', {
             title: "Вы смотрели",
             source: function (params, oncomplete) {
+                console.log("Загрузка 'Вы смотрели'...");
                 let viewed = Lampa.Storage.get("viewed", "{}");
                 let viewedIds = Object.keys(viewed);
 
@@ -82,7 +87,6 @@
                     let url = `${tmdbBaseUrl}/${item.type}/${id}?api_key=${apiKey}&language=ru-RU`;
                     return Lampa.TMDB.get(url).then(data => {
                         if (data.genres && data.genres.some(g => g.id === 16)) {
-                            // Проверяем рейтинг вручную (до PG-13)
                             if (data.certifications && data.certifications.US && data.certifications.US.certification) {
                                 let rating = data.certifications.US.certification;
                                 if (rating === "R" || rating === "NC-17") return null;
@@ -112,21 +116,29 @@
 
         // Рендеринг страницы с подборками
         Lampa.Listener.follow('activity', function (e) {
+            console.log("Событие activity сработало:", e.activity);
             if (e.activity && e.activity.title === 'Мультфильмы' && e.activity.component === 'main') {
                 console.log("Рендеринг страницы 'Мультфильмы'...");
                 setTimeout(() => {
-                    let $content = $('.page__content') || $('.scroll__content');
+                    let $content = $('.scroll'); // Пробуем контейнер главной страницы
                     if ($content.length === 0) {
-                        console.error("Контейнер для контента не найден.");
+                        $content = $('.page__content');
+                    }
+                    if ($content.length === 0) {
+                        $content = $('.scroll__content');
+                    }
+                    if ($content.length === 0) {
+                        console.error("Контейнер для контента не найден. Доступные классы:", document.querySelectorAll('.scroll, .page__content, .scroll__content'));
                         return;
                     }
+                    console.log("Найден контейнер:", $content.attr('class'));
                     $content.empty();
                     Lampa.Component.render('animation_trending_movies', $content);
                     Lampa.Component.render('animation_upcoming', $content);
                     Lampa.Component.render('animation_trending_series', $content);
                     Lampa.Component.render('animation_on_air', $content);
                     Lampa.Component.render('animation_viewed', $content);
-                    console.log("Подборки успешно отрендерены.");
+                    console.log("Подборки отрендерены в контейнер:", $content.attr('class'));
                 }, 500);
             }
         });
