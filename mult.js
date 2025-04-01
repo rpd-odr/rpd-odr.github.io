@@ -6,18 +6,19 @@
         return;
     }
 
-    // Используем встроенный API-ключ Lampa
-    var apiKey = Lampa.Storage.get("tmdb_key");
+    // Получение API-ключа
+    var apiKey = Lampa.Storage.get("tmdb_key", "");
     if (!apiKey) {
-        console.error("TMDB API-ключ не найден в настройках Lampa.");
+        console.error("TMDB API-ключ не найден в настройках Lampa. Зайдите в настройки и укажите ключ.");
+        Lampa.Noty.show("Ошибка: TMDB API-ключ не задан. Укажите его в настройках Lampa.");
         return;
     }
     var tmdbBaseUrl = "https://api.themoviedb.org/3";
 
-    // --- Иконка для меню (заменяем на встроенную, если loadInlineSVG недоступен) ---
+    // Иконка для меню
     var multIcon = '<svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9v-2h2v2zm0-4H9V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
 
-    // --- Добавление пункта "Мультфильмы" в меню ---
+    // Добавление пункта "Мультфильмы" в меню
     function addMultMenu() {
         try {
             const menuItem = $(
@@ -26,7 +27,6 @@
                 '<div class="menu__text">Мультфильмы</div>' +
                 '</li>'
             );
-            // Проверяем наличие loadInlineSVG, иначе используем прямую вставку
             if (typeof loadInlineSVG === "function") {
                 loadInlineSVG(multIcon, menuItem.find('.menu__ico'));
             } else {
@@ -46,12 +46,12 @@
         }
     }
 
-    // --- Подборки ---
+    // Универсальная функция для добавления подборок
     function addComponent(name, title, url, type) {
         Lampa.Component.add(name, {
             title: title,
             source: function (params, oncomplete) {
-                $.get(url, function (data) {
+                Lampa.TMDB.get(url).then(function (data) {
                     var items = data.results.map(item => ({
                         title: item.title || item.name,
                         poster: "https://image.tmdb.org/t/p/w300" + item.poster_path,
@@ -61,8 +61,8 @@
                         type: type
                     }));
                     oncomplete(items.slice(0, 10));
-                }).fail(function () {
-                    console.error(`Ошибка загрузки ${title}`);
+                }).catch(function (e) {
+                    console.error(`Ошибка загрузки ${title}:`, e);
                     oncomplete([]);
                 });
             }
@@ -85,7 +85,6 @@
         source: function (params, oncomplete) {
             try {
                 var viewed = Lampa.Storage.get("viewed", "{}");
-                var items = [];
                 var viewedIds = Object.keys(viewed);
 
                 if (viewedIds.length === 0) {
@@ -93,27 +92,26 @@
                     return;
                 }
 
-                // Асинхронная обработка истории
                 var promises = viewedIds.map(id => {
                     var item = viewed[id];
-                    return $.get(`${tmdbBaseUrl}/${item.type}/${id}?api_key=${apiKey}&language=ru-RU`)
-                        .then(data => {
-                            if (data.genres && data.genres.some(g => g.id === 16)) {
-                                return {
-                                    title: data.title || data.name,
-                                    poster: "https://image.tmdb.org/t/p/w300" + data.poster_path,
-                                    id: data.id,
-                                    year: (data.release_date || data.first_air_date)?.split("-")[0] || "",
-                                    vote_average: data.vote_average,
-                                    type: item.type
-                                };
-                            }
-                            return null;
-                        });
+                    var url = `${tmdbBaseUrl}/${item.type}/${id}?api_key=${apiKey}&language=ru-RU`;
+                    return Lampa.TMDB.get(url).then(data => {
+                        if (data.genres && data.genres.some(g => g.id === 16)) {
+                            return {
+                                title: data.title || data.name,
+                                poster: "https://image.tmdb.org/t/p/w300" + data.poster_path,
+                                id: data.id,
+                                year: (data.release_date || data.first_air_date)?.split("-")[0] || "",
+                                vote_average: data.vote_average,
+                                type: item.type
+                            };
+                        }
+                        return null;
+                    }).catch(() => null); // Игнорируем ошибки для отдельных элементов
                 });
 
                 Promise.all(promises).then(results => {
-                    items = results.filter(item => item !== null).slice(0, 10);
+                    var items = results.filter(item => item !== null).slice(0, 10);
                     oncomplete(items);
                 }).catch(e => {
                     console.error("Ошибка при загрузке 'Вы смотрели':", e);
@@ -126,14 +124,14 @@
         }
     });
 
-    // --- Рендеринг страницы ---
+    // Рендеринг страницы
     Lampa.Listener.follow('activity', function (e) {
         if (e.activity && e.activity.title === 'Мультфильмы' && e.activity.component === 'main') {
             setTimeout(() => {
                 try {
-                    var $content = $('.scroll__content'); // Проверь селектор в DOM
+                    var $content = $('.scroll__content');
                     if ($content.length === 0) {
-                        console.error("Контейнер .scroll__content не найден.");
+                        console.error("Контейнер .scroll__content не найден. Проверь DOM.");
                         return;
                     }
                     $content.empty();
@@ -149,7 +147,7 @@
         }
     });
 
-    // --- Инициализация ---
+    // Инициализация
     addMultMenu();
     console.log("Плагин для мультфильмов с подборками загружен!");
 })();
