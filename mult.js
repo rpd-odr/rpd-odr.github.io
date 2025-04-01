@@ -4,9 +4,9 @@
 
     // Ждём полной загрузки Lampa
     function initPlugin() {
-        console.log("Инициализация минимального плагина для мультфильмов...");
+        console.log("Инициализация плагина для мультфильмов...");
 
-        // Добавление пункта "Мультфильмы" в меню (без иконки)
+        // Добавление пункта "Мультфильмы" в меню
         try {
             const menuItem = $(
                 '<li class="menu__item selector" data-action="mult">' +
@@ -14,11 +14,13 @@
                 '</li>'
             );
             menuItem.on('hover:enter', function () {
-                console.log("Открытие страницы 'Мультфильмы'...");
+                console.log("Открытие каталога 'Мультфильмы'...");
                 Lampa.Activity.push({
-                    url: '',
+                    url: 'discover/movie?with_genres=16&sort_by=popularity.desc',
                     title: 'Мультфильмы',
-                    component: 'main',
+                    component: 'category_full',
+                    source: 'tmdb',
+                    genres: 16,
                     page: 1
                 });
                 console.log("Активность 'Мультфильмы' запущена.");
