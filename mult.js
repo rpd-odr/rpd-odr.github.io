@@ -17,11 +17,13 @@
                 '</li>'
             );
             menuItem.on('hover:enter', function () {
-                console.log("Открытие страницы 'Мультфильмы'...");
+                console.log("Открытие каталога 'Мультфильмы'...");
                 Lampa.Activity.push({
-                    url: '',
+                    url: 'discover/movie?with_genres=16&sort_by=popularity.desc&certification_country=US&certification.lte=PG-13',
                     title: 'Мультфильмы',
-                    component: 'main',
+                    component: 'category_full',
+                    source: 'tmdb',
+                    genres: 16,
                     page: 1
                 });
                 console.log("Активность 'Мультфильмы' запущена.");
@@ -56,7 +58,7 @@
             });
         }
 
-        // Регистрация подборок с фильтром до PG-13
+        // Регистрация подборок
         addComponent('animation_trending_movies', "Популярные мультфильмы", 
             `${tmdbBaseUrl}/trending/movie/week?api_key=${apiKey}&language=ru-RU&with_genres=16&certification_country=US&certification.lte=PG-13`, "movie");
         addComponent('animation_upcoming', "Новые мультфильмы", 
@@ -67,9 +69,6 @@
             `${tmdbBaseUrl}/tv/on_the_air?api_key=${apiKey}&language=ru-RU&with_genres=16&certification_country=US&certification.lte=PG-13`, "series");
 
         // Подборка "Вы смотрели"
-        addComponent('animation_viewed', "Вы смотрели", 
-            null, // URL не нужен, так как данные из истории
-            null); // Тип тоже не нужен
         Lampa.Component.add('animation_viewed', {
             title: "Вы смотрели",
             source: function (params, oncomplete) {
@@ -114,31 +113,27 @@
             }
         });
 
-        // Рендеринг страницы с подборками
+        // Рендеринг подборок поверх category_full
         Lampa.Listener.follow('activity', function (e) {
             console.log("Событие activity сработало:", e.activity);
-            if (e.activity && e.activity.title === 'Мультфильмы' && e.activity.component === 'main') {
-                console.log("Рендеринг страницы 'Мультфильмы'...");
+            if (e.activity && e.activity.title === 'Мультфильмы' && e.activity.component === 'category_full') {
+                console.log("Рендеринг подборок для 'Мультфильмы'...");
                 setTimeout(() => {
-                    let $content = $('.scroll'); // Пробуем контейнер главной страницы
+                    let $content = $('.category-full');
                     if ($content.length === 0) {
-                        $content = $('.page__content');
-                    }
-                    if ($content.length === 0) {
-                        $content = $('.scroll__content');
-                    }
-                    if ($content.length === 0) {
-                        console.error("Контейнер для контента не найден. Доступные классы:", document.querySelectorAll('.scroll, .page__content, .scroll__content'));
+                        console.error("Контейнер .category-full не найден. Доступные классы:", document.querySelectorAll('.category-full, .scroll, .page__content'));
                         return;
                     }
                     console.log("Найден контейнер:", $content.attr('class'));
-                    $content.empty();
-                    Lampa.Component.render('animation_trending_movies', $content);
-                    Lampa.Component.render('animation_upcoming', $content);
-                    Lampa.Component.render('animation_trending_series', $content);
-                    Lampa.Component.render('animation_on_air', $content);
-                    Lampa.Component.render('animation_viewed', $content);
-                    console.log("Подборки отрендерены в контейнер:", $content.attr('class'));
+                    // Вставляем подборки перед основным каталогом
+                    let $customContent = $('<div class="custom-podborki"></div>');
+                    $content.prepend($customContent);
+                    Lampa.Component.render('animation_trending_movies', $customContent);
+                    Lampa.Component.render('animation_upcoming', $customContent);
+                    Lampa.Component.render('animation_trending_series', $customContent);
+                    Lampa.Component.render('animation_on_air', $customContent);
+                    Lampa.Component.render('animation_viewed', $customContent);
+                    console.log("Подборки отрендерены в контейнер:", $customContent.attr('class'));
                 }, 500);
             }
         });
