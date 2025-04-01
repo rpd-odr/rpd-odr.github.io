@@ -1,162 +1,155 @@
 // animation_plugin.js
 (function () {
+    // Проверка доступности Lampa
+    if (!window.Lampa) {
+        console.error("Lampa не найдена. Плагин не может быть загружен.");
+        return;
+    }
+
     // Используем встроенный API-ключ Lampa
     var apiKey = Lampa.Storage.get("tmdb_key");
+    if (!apiKey) {
+        console.error("TMDB API-ключ не найден в настройках Lampa.");
+        return;
+    }
     var tmdbBaseUrl = "https://api.themoviedb.org/3";
 
-    // --- Иконка для меню (SVG, можно заменить на встроенную) ---
+    // --- Иконка для меню (заменяем на встроенную, если loadInlineSVG недоступен) ---
     var multIcon = '<svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9v-2h2v2zm0-4H9V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
 
     // --- Добавление пункта "Мультфильмы" в меню ---
     function addMultMenu() {
-        const menuItem = $(
-            '<li class="menu__item selector" data-action="mult">' +
-            '<div class="menu__ico"></div>' +
-            '<div class="menu__text">Мультфильмы</div>' +
-            '</li>'
-        );
-        loadInlineSVG(multIcon, menuItem.find('.menu__ico'));
-        menuItem.on('hover:enter', function () {
-            Lampa.Activity.push({
-                url: '',
-                title: 'Мультфильмы',
-                component: 'main', // Используем main для кастомной страницы
-                page: 1
+        try {
+            const menuItem = $(
+                '<li class="menu__item selector" data-action="mult">' +
+                '<div class="menu__ico"></div>' +
+                '<div class="menu__text">Мультфильмы</div>' +
+                '</li>'
+            );
+            // Проверяем наличие loadInlineSVG, иначе используем прямую вставку
+            if (typeof loadInlineSVG === "function") {
+                loadInlineSVG(multIcon, menuItem.find('.menu__ico'));
+            } else {
+                menuItem.find('.menu__ico').html(multIcon);
+            }
+            menuItem.on('hover:enter', function () {
+                Lampa.Activity.push({
+                    url: '',
+                    title: 'Мультфильмы',
+                    component: 'main',
+                    page: 1
+                });
             });
-        });
-        $('.menu .menu__list').eq(0).append(menuItem);
+            $('.menu .menu__list').eq(0).append(menuItem);
+        } catch (e) {
+            console.error("Ошибка при добавлении пункта меню:", e);
+        }
     }
 
     // --- Подборки ---
-    // 1. Популярные мультфильмы
-    Lampa.Component.add('animation_trending_movies', {
-        title: "Популярные мультфильмы",
-        source: function (params, oncomplete) {
-            var url = `${tmdbBaseUrl}/trending/movie/week?api_key=${apiKey}&language=ru-RU&with_genres=16`;
-            $.get(url, function (data) {
-                var items = data.results.map(item => ({
-                    title: item.title,
-                    poster: "https://image.tmdb.org/t/p/w300" + item.poster_path,
-                    id: item.id,
-                    year: item.release_date ? item.release_date.split("-")[0] : "",
-                    vote_average: item.vote_average,
-                    type: "movie"
-                }));
-                oncomplete(items.slice(0, 10));
-            });
-        }
-    });
+    function addComponent(name, title, url, type) {
+        Lampa.Component.add(name, {
+            title: title,
+            source: function (params, oncomplete) {
+                $.get(url, function (data) {
+                    var items = data.results.map(item => ({
+                        title: item.title || item.name,
+                        poster: "https://image.tmdb.org/t/p/w300" + item.poster_path,
+                        id: item.id,
+                        year: (item.release_date || item.first_air_date)?.split("-")[0] || "",
+                        vote_average: item.vote_average,
+                        type: type
+                    }));
+                    oncomplete(items.slice(0, 10));
+                }).fail(function () {
+                    console.error(`Ошибка загрузки ${title}`);
+                    oncomplete([]);
+                });
+            }
+        });
+    }
 
-    // 2. Новые мультфильмы
-    Lampa.Component.add('animation_upcoming', {
-        title: "Новые мультфильмы",
-        source: function (params, oncomplete) {
-            var url = `${tmdbBaseUrl}/movie/upcoming?api_key=${apiKey}&language=ru-RU&with_genres=16`;
-            $.get(url, function (data) {
-                var items = data.results.map(item => ({
-                    title: item.title,
-                    poster: "https://image.tmdb.org/t/p/w300" + item.poster_path,
-                    id: item.id,
-                    year: item.release_date ? item.release_date.split("-")[0] : "",
-                    vote_average: item.vote_average,
-                    type: "movie"
-                }));
-                oncomplete(items.slice(0, 10));
-            });
-        }
-    });
+    // Регистрация подборок
+    addComponent('animation_trending_movies', "Популярные мультфильмы", 
+        `${tmdbBaseUrl}/trending/movie/week?api_key=${apiKey}&language=ru-RU&with_genres=16`, "movie");
+    addComponent('animation_upcoming', "Новые мультфильмы", 
+        `${tmdbBaseUrl}/movie/upcoming?api_key=${apiKey}&language=ru-RU&with_genres=16`, "movie");
+    addComponent('animation_trending_series', "Популярные мультсериалы", 
+        `${tmdbBaseUrl}/trending/tv/week?api_key=${apiKey}&language=ru-RU&with_genres=16`, "series");
+    addComponent('animation_on_air', "Новые мультсериалы", 
+        `${tmdbBaseUrl}/tv/on_the_air?api_key=${apiKey}&language=ru-RU&with_genres=16`, "series");
 
-    // 3. Популярные мультсериалы
-    Lampa.Component.add('animation_trending_series', {
-        title: "Популярные мультсериалы",
-        source: function (params, oncomplete) {
-            var url = `${tmdbBaseUrl}/trending/tv/week?api_key=${apiKey}&language=ru-RU&with_genres=16`;
-            $.get(url, function (data) {
-                var items = data.results.map(item => ({
-                    title: item.name,
-                    poster: "https://image.tmdb.org/t/p/w300" + item.poster_path,
-                    id: item.id,
-                    year: item.first_air_date ? item.first_air_date.split("-")[0] : "",
-                    vote_average: item.vote_average,
-                    type: "series"
-                }));
-                oncomplete(items.slice(0, 10));
-            });
-        }
-    });
-
-    // 4. Новые мультсериалы
-    Lampa.Component.add('animation_on_air', {
-        title: "Новые мультсериалы",
-        source: function (params, oncomplete) {
-            var url = `${tmdbBaseUrl}/tv/on_the_air?api_key=${apiKey}&language=ru-RU&with_genres=16`;
-            $.get(url, function (data) {
-                var items = data.results.map(item => ({
-                    title: item.name,
-                    poster: "https://image.tmdb.org/t/p/w300" + item.poster_path,
-                    id: item.id,
-                    year: item.first_air_date ? item.first_air_date.split("-")[0] : "",
-                    vote_average: item.vote_average,
-                    type: "series"
-                }));
-                oncomplete(items.slice(0, 10));
-            });
-        }
-    });
-
-    // 5. Вы смотрели (история просмотров с фильтром по анимации)
+    // Подборка "Вы смотрели"
     Lampa.Component.add('animation_viewed', {
         title: "Вы смотрели",
         source: function (params, oncomplete) {
-            var viewed = Lampa.Storage.get("viewed", "{}"); // Получаем историю просмотров
-            var items = [];
-            
-            // Проходим по просмотренным элементам
-            for (var id in viewed) {
-                var item = viewed[id];
-                // Проверяем, является ли элемент анимацией (нужен запрос к TMDB)
-                var url = `${tmdbBaseUrl}/${item.type}/${id}?api_key=${apiKey}&language=ru-RU`;
-                $.ajax({
-                    url: url,
-                    async: false, // Синхронно, чтобы собрать данные
-                    success: function (data) {
-                        if (data.genres && data.genres.some(g => g.id === 16)) {
-                            items.push({
-                                title: data.title || data.name,
-                                poster: "https://image.tmdb.org/t/p/w300" + data.poster_path,
-                                id: data.id,
-                                year: (data.release_date || data.first_air_date)?.split("-")[0] || "",
-                                vote_average: data.vote_average,
-                                type: item.type
-                            });
-                        }
-                    }
+            try {
+                var viewed = Lampa.Storage.get("viewed", "{}");
+                var items = [];
+                var viewedIds = Object.keys(viewed);
+
+                if (viewedIds.length === 0) {
+                    oncomplete([]);
+                    return;
+                }
+
+                // Асинхронная обработка истории
+                var promises = viewedIds.map(id => {
+                    var item = viewed[id];
+                    return $.get(`${tmdbBaseUrl}/${item.type}/${id}?api_key=${apiKey}&language=ru-RU`)
+                        .then(data => {
+                            if (data.genres && data.genres.some(g => g.id === 16)) {
+                                return {
+                                    title: data.title || data.name,
+                                    poster: "https://image.tmdb.org/t/p/w300" + data.poster_path,
+                                    id: data.id,
+                                    year: (data.release_date || data.first_air_date)?.split("-")[0] || "",
+                                    vote_average: data.vote_average,
+                                    type: item.type
+                                };
+                            }
+                            return null;
+                        });
                 });
+
+                Promise.all(promises).then(results => {
+                    items = results.filter(item => item !== null).slice(0, 10);
+                    oncomplete(items);
+                }).catch(e => {
+                    console.error("Ошибка при загрузке 'Вы смотрели':", e);
+                    oncomplete([]);
+                });
+            } catch (e) {
+                console.error("Ошибка в 'Вы смотрели':", e);
+                oncomplete([]);
             }
-            oncomplete(items.slice(0, 10)); // Ограничим до 10 элементов
         }
     });
 
-    // --- Перехват открытия страницы и рендеринг подборок ---
-    if (window.Lampa) {
-        addMultMenu();
+    // --- Рендеринг страницы ---
+    Lampa.Listener.follow('activity', function (e) {
+        if (e.activity && e.activity.title === 'Мультфильмы' && e.activity.component === 'main') {
+            setTimeout(() => {
+                try {
+                    var $content = $('.scroll__content'); // Проверь селектор в DOM
+                    if ($content.length === 0) {
+                        console.error("Контейнер .scroll__content не найден.");
+                        return;
+                    }
+                    $content.empty();
+                    Lampa.Component.render('animation_trending_movies', $content);
+                    Lampa.Component.render('animation_upcoming', $content);
+                    Lampa.Component.render('animation_trending_series', $content);
+                    Lampa.Component.render('animation_on_air', $content);
+                    Lampa.Component.render('animation_viewed', $content);
+                } catch (e) {
+                    console.error("Ошибка при рендеринге страницы:", e);
+                }
+            }, 500);
+        }
+    });
 
-        Lampa.Listener.follow('activity', function (e) {
-            if (e.activity && e.activity.title === 'Мультфильмы' && e.activity.component === 'main') {
-                setTimeout(() => {
-                    // Очищаем страницу и добавляем подборки
-                    $('.scroll__content').empty();
-                    Lampa.Component.render('animation_trending_movies', '.scroll__content');
-                    Lampa.Component.render('animation_upcoming', '.scroll__content');
-                    Lampa.Component.render('animation_trending_series', '.scroll__content');
-                    Lampa.Component.render('animation_on_air', '.scroll__content');
-                    Lampa.Component.render('animation_viewed', '.scroll__content');
-                }, 500); // Задержка для загрузки страницы
-            }
-        });
-
-        console.log("Плагин для мультфильмов с подборками загружен!");
-    } else {
-        console.error("Lampa не найдена. Убедись, что плагин загружается после инициализации.");
-    }
+    // --- Инициализация ---
+    addMultMenu();
+    console.log("Плагин для мультфильмов с подборками загружен!");
 })();
