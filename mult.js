@@ -6,22 +6,13 @@
     function initPlugin() {
         console.log("Инициализация минимального плагина для мультфильмов...");
 
-        // Иконка для меню
-        let multIcon = '<svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9v-2h2v2zm0-4H9V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
-
-        // Добавление пункта "Мультфильмы" в меню
+        // Добавление пункта "Мультфильмы" в меню (без иконки)
         try {
             const menuItem = $(
                 '<li class="menu__item selector" data-action="mult">' +
-                '<div class="menu__ico"></div>' +
                 '<div class="menu__text">Мультфильмы</div>' +
                 '</li>'
             );
-            if (typeof loadInlineSVG === "function") {
-                loadInlineSVG(multIcon, menuItem.find('.menu__ico'));
-            } else {
-                menuItem.find('.menu__ico').html(multIcon);
-            }
             menuItem.on('hover:enter', function () {
                 console.log("Открытие страницы 'Мультфильмы'...");
                 Lampa.Activity.push({
@@ -30,6 +21,7 @@
                     component: 'main',
                     page: 1
                 });
+                console.log("Активность 'Мультфильмы' запущена.");
             });
             $('.menu .menu__list').eq(0).append(menuItem);
             console.log("Пункт меню 'Мультфильмы' успешно добавлен.");
@@ -40,10 +32,13 @@
 
     // Запуск плагина после готовности приложения
     if (window.appready) {
+        console.log("Lampa уже готова, запускаем плагин...");
         initPlugin();
     } else {
+        console.log("Ожидаем готовности Lampa...");
         Lampa.Listener.follow('app', function (e) {
             if (e.type === 'ready') {
+                console.log("Lampa готова, запускаем плагин...");
                 initPlugin();
             }
         });
