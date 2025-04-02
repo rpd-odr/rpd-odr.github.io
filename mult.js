@@ -21,7 +21,7 @@ function filterOutAnime(results) {
         menuItem.addEventListener("click", function() {
             Lampa.Activity.push({
                 title: "Детская анимация",
-                component: "main",
+                component: "category_full",
                 source: "animation_kids",
                 back: true
             });
