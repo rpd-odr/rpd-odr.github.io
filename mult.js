@@ -2,7 +2,6 @@
 (function () {
     'use strict';
 
-    // Источник для мультфильмов
     var SourceTMDBAnimation = function (parent) {
         this.network = new Lampa.Reguest();
 
@@ -16,46 +15,31 @@
             var tmdbBaseUrl = "https://api.themoviedb.org/3";
             var ratingFilter = 'certification_country=US&certification.lte=PG-13';
 
-            // Функция для создания запроса
             function createRequest(endpoint, title, callback) {
-                let fullUrl = endpoint + '&' + ratingFilter + '&language=ru-RU';
-                console.log("Запрос к TMDB:", fullUrl); // Лог для отладки
+                let fullUrl = `${endpoint}&${ratingFilter}&language=ru-RU`;
+                console.log("Запрос к TMDB:", fullUrl);
 
                 owner.get(fullUrl, params, function (json) {
                     json.title = Lampa.Lang.translate(title);
+                    json.results = json.results.filter(item => 
+                        item.genre_ids && !item.genre_ids.includes(16) // Исключаем аниме
+                    );
                     callback(json);
                 }, callback);
             }
 
-            // Массив подборок
             var partsData = [
                 function (callback) {
-                    createRequest(
-                        `${tmdbBaseUrl}/trending/movie/week`,
-                        'Популярные мультфильмы',
-                        callback
-                    );
+                    createRequest(`${tmdbBaseUrl}/trending/movie/week`, 'Популярные мультфильмы', callback);
                 },
                 function (callback) {
-                    createRequest(
-                        `${tmdbBaseUrl}/movie/upcoming`,
-                        'Новые мультфильмы',
-                        callback
-                    );
+                    createRequest(`${tmdbBaseUrl}/movie/upcoming`, 'Новые мультфильмы', callback);
                 },
                 function (callback) {
-                    createRequest(
-                        `${tmdbBaseUrl}/trending/tv/week`,
-                        'Популярные мультсериалы',
-                        callback
-                    );
+                    createRequest(`${tmdbBaseUrl}/trending/tv/week`, 'Популярные мультсериалы', callback);
                 },
                 function (callback) {
-                    createRequest(
-                        `${tmdbBaseUrl}/tv/on_the_air`,
-                        'Новые мультсериалы',
-                        callback
-                    );
+                    createRequest(`${tmdbBaseUrl}/tv/on_the_air`, 'Новые мультсериалы', callback);
                 },
                 function (callback) {
                     console.log("Загрузка 'Вы смотрели'...");
@@ -72,20 +56,15 @@
                         let url = `${tmdbBaseUrl}/${item.type}/${id}`;
 
                         return Lampa.TMDB.get(url, { language: 'ru-RU' }).then(data => {
-                            if (data.genres && data.genres.some(g => g.id === 16)) {
-                                let rating = data.certifications?.US?.certification;
-                                if (rating && (rating === "R" || rating === "NC-17")) return null;
-
-                                return {
-                                    title: data.title || data.name,
-                                    poster_path: data.poster_path,
-                                    id: data.id,
-                                    release_date: data.release_date || data.first_air_date,
-                                    vote_average: data.vote_average,
-                                    type: item.type
-                                };
-                            }
-                            return null;
+                            if (data.genres && data.genres.some(g => g.id === 16)) return null; // Исключаем аниме
+                            return {
+                                title: data.title || data.name,
+                                poster_path: data.poster_path,
+                                id: data.id,
+                                release_date: data.release_date || data.first_air_date,
+                                vote_average: data.vote_average,
+                                type: item.type
+                            };
                         }).catch(err => {
                             console.error("Ошибка загрузки элемента 'Вы смотрели':", err);
                             return null;
@@ -102,7 +81,6 @@
                 }
             ];
 
-            // Загрузка частей данных
             function loadPart(partLoaded, partEmpty) {
                 Lampa.Api.partNext(partsData, partsLimit, partLoaded, partEmpty);
             }
@@ -112,15 +90,12 @@
         };
     };
 
-    // Функция добавления плагина
     function add() {
         console.log("Добавление источника ANIMATION...");
 
-        // Создаём источник
         var animationSource = Object.assign({}, Lampa.Api.sources.tmdb, new SourceTMDBAnimation(Lampa.Api.sources.tmdb));
         Lampa.Api.sources.animation = animationSource;
 
-        // Добавляем пункт меню
         try {
             let menuList = $('.menu .menu__list').eq(0);
             if (menuList.length) {
@@ -148,13 +123,11 @@
             console.error("Ошибка при добавлении пункта меню:", e);
         }
 
-        // Добавляем источник в настройки
         Lampa.Params.select('source', Object.assign({}, Lampa.Params.values['source'], {
             'animation': 'ANIMATION'
         }), 'tmdb');
     }
 
-    // Запуск плагина
     if (window.appready) {
         add();
     } else {
