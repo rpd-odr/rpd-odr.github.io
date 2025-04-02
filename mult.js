@@ -21,7 +21,7 @@ function filterOutAnime(results) {
         menuItem.addEventListener("click", function() {
             Lampa.Activity.push({
                 title: "Детская анимация",
-                component: "category_full",
+                component: "main",
                 source: "animation_kids",
                 back: true
             });
@@ -155,7 +155,7 @@ function filterOutAnime(results) {
             var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
             var onComplete = arguments.length > 1 ? arguments[1] : undefined;
             var onError = arguments.length > 2 ? arguments[2] : undefined;
-            var partsLimit = 6;
+            var partsLimit = 8; // Количество подборок на странице
 
             var sortOptions = [
                 { key: 'popularity.desc', title: 'Популярные' },
@@ -165,7 +165,9 @@ function filterOutAnime(results) {
 
             var kidsGenres = [
                 { id: 16, title: 'мультфильмы' },
-                { id: 10751, title: 'семейные' }
+                { id: 10751, title: 'семейные' },
+                { id: 14, title: 'фэнтези' },
+                { id: 12, title: 'приключения' }
             ];
 
             var kidsStudios = [
@@ -184,6 +186,7 @@ function filterOutAnime(results) {
                     var j = Math.floor(Math.random() * (i + 1));
                     [array[i], array[j]] = [array[j], array[i]];
                 }
+                return array;
             }
 
             function createRequest(endpoint, titleSuffix, callback) {
@@ -207,36 +210,64 @@ function filterOutAnime(results) {
                 };
             }
 
+            // Создаем массив подборок
             var partsData = [
                 function(callback) {
                     createRequest('discover/movie?with_genres=16,10751', 'мультфильмы для детей', callback);
                 },
                 function(callback) {
                     createRequest('discover/tv?with_genres=16,10751', 'мультсериалы для детей', callback);
+                },
+                function(callback) {
+                    createRequest('trending/movie/week?with_genres=16,10751', 'популярные на неделе', callback);
+                },
+                function(callback) {
+                    createRequest('movie/top_rated?with_genres=16,10751', 'лучшие мультфильмы', callback);
                 }
             ];
 
+            // Добавляем подборки по студиям
             kidsStudios.forEach(function(studio) {
                 partsData.push(getStudioMovies(studio.title, studio.id));
             });
 
+            // Добавляем подборки по жанрам
             kidsGenres.forEach(function(genre) {
                 partsData.push(function(callback) {
                     createRequest('discover/movie?with_genres=' + genre.id, genre.title, callback);
                 });
+                partsData.push(function(callback) {
+                    createRequest('discover/tv?with_genres=' + genre.id, genre.title + ' сериалы', callback);
+                });
             });
 
-            function randomWideFlag() {
-                return Math.random() < 0.2;
+            // Добавляем подборки по годам
+            var currentYear = new Date().getFullYear();
+            for (var i = 0; i < 3; i++) {
+                (function(year) {
+                    partsData.push(function(callback) {
+                        createRequest(
+                            'discover/movie?with_genres=16,10751&primary_release_year=' + year,
+                            'за ' + year + ' год',
+                            callback
+                        );
+                    });
+                })(currentYear - i);
             }
 
+            // Перемешиваем подборки
+            partsData = shuffleArray(partsData);
+
+            // Ограничиваем общее количество подборок
+            partsData = partsData.slice(0, 15);
+
+            // Добавляем широкие карточки
             function wrapWithWideFlag(requestFunc) {
                 return function(callback) {
                     requestFunc(function(json) {
-                        if (randomWideFlag()) {
+                        if (Math.random() < 0.3) { // 30% chance for wide card
                             json.small = true;
                             json.wide = true;
-
                             if (Array.isArray(json.results)) {
                                 json.results.forEach(function(card) {
                                     card.promo = card.overview;
@@ -250,8 +281,8 @@ function filterOutAnime(results) {
             }
 
             partsData = partsData.map(wrapWithWideFlag);
-            shuffleArray(partsData);
 
+            // Загружаем несколько подборок
             function loadPart(partLoaded, partEmpty) {
                 Lampa.Api.partNext(partsData, partsLimit, partLoaded, partEmpty);
             }
