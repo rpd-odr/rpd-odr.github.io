@@ -9,7 +9,34 @@ function filterOutAnime(results) {
     'use strict';
 
     function startPlugin() {
-        window.plugin_tmdb_mod_ready = true;
+        window.plugin_kuv_ready = true;
+
+        // Добавляем кнопку в меню
+        function addKuvButton() {
+            const menuItem = document.createElement("li");
+            menuItem.className = "menu__item selector";
+            menuItem.dataset.action = "kuv";
+            menuItem.innerHTML = `
+                <div class="menu__ico menu-mult"><svg></svg></div>
+                <div class="menu__text">Детские подборки</div>
+            `;
+            
+            menuItem.addEventListener("click", () => {
+                Lampa.Activity.push({
+                    title: 'KUV - Детские подборки',
+                    component: 'main',
+                    source: 'tmdb',
+                    params: {
+                        kuv_mode: true
+                    }
+                });
+            });
+
+            const menuList = document.querySelector(".menu .menu__list");
+            if (menuList && !document.querySelector('.menu__item[data-action="kuv"]')) {
+                menuList.appendChild(menuItem);
+            }
+        }
 
         var Episode = function (data) {
             var card = data.card || data;
@@ -108,24 +135,24 @@ function filterOutAnime(results) {
             };
         }
 
-        var SourceTMDBkids = function (parent) {
-            this.network = new Lampa.Reguest();
-            this.discovery = false;
+        // Модифицируем стандартный TMDB источник для детского режима
+        var originalTmdbMain = Lampa.Api.sources.tmdb.main;
 
-            var ratingLimit = 'PG';
-
-            this.main = function () {
+        Lampa.Api.sources.tmdb.main = function() {
+            var args = arguments;
+            var params = arguments[0] || {};
+            
+            // Если это вызов из нашей кнопки KUV
+            if (params.kuv_mode) {
                 var owner = this;
-                var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-                var onComplete = arguments.length > 1 ? arguments[1] : undefined;
-                var onError = arguments.length > 2 ? arguments[2] : undefined;
+                var onComplete = arguments[1];
+                var onError = arguments[2];
                 var partsLimit = 6;
 
                 var sortOptions = [
-                    { key: 'vote_count.desc', title: 'Много голосов' },
-                    { key: 'first_air_date.desc', title: 'Новинки' },
                     { key: 'popularity.desc', title: 'Популярные' },
-                    { key: 'revenue.desc', title: 'Интерес зрителей' }
+                    { key: 'first_air_date.desc', title: 'Новинки' },
+                    { key: 'revenue.desc', title: 'Интересное' }
                 ];
 
                 var kidsGenres = [
@@ -136,12 +163,6 @@ function filterOutAnime(results) {
                     { id: 35, title: 'комедии' },
                     { id: 12, title: 'приключения' },
                     { id: 878, title: 'фантастика' }
-                ];
-
-                var forKids = [
-                    { id: 101, title: 'Lego' },
-                    { id: 102, title: 'Том и джерри' },
-                    { id: 103, title: 'Микки маус' }
                 ];
 
                 var streamingServices = [
@@ -156,10 +177,18 @@ function filterOutAnime(results) {
                 var kidsStudios = [
                     { id: 2, title: 'Disney' },
                     { id: 3, title: 'Pixar' },
-                    { id: 521, title: 'DreamWorks Animation' }
+                    { id: 521, title: 'DreamWorks Animation' },
+                    { id: 6704, title: 'Illumination' },
+                    { id: 9383, title: 'Blue Sky Studios' },
+                    { id: 11106, title: 'Sony Pictures Animation' },
+                    { id: 11238, title: 'Studio Ghibli' },
+                    { id: 7576, title: 'Cartoon Network' },
+                    { id: 1701, title: 'Nickelodeon' },
+                    { id: 116645, title: 'Laika' },
+                    { id: 10210, title: 'Aardman Animations' }
                 ];
 
-                var ratingFilter = 'certification_country=US&certification.lte=' + ratingLimit;
+                var ratingFilter = 'certification_country=US&certification.lte=PG';
 
                 function shuffleArray(array) {
                     for (var i = array.length - 1; i > 0; i--) {
@@ -171,6 +200,9 @@ function filterOutAnime(results) {
                 function createRequest(endpoint, titleSuffix, callback) {
                     var sort = sortOptions[Math.floor(Math.random() * sortOptions.length)];
                     owner.get(endpoint + '&sort_by=' + sort.key + '&' + ratingFilter, params, function (json) {
+                        if (json.results) {
+                            json.results = filterOutAnime(json.results);
+                        }
                         json.title = Lampa.Lang.translate(sort.title + ' ' + titleSuffix);
                         callback(json);
                     }, callback);
@@ -202,15 +234,6 @@ function filterOutAnime(results) {
                             'Фильмы',
                             callback
                         );
-                    };
-                }
-
-                function searchByKeyword() {
-                    return function (callback) {
-                        forKids.forEach(function (keyword) {
-                            var endpoint = 'search/movie?query=' + encodeURIComponent(keyword.title);
-                            createRequest(endpoint, '(' + keyword.title + ')', callback);
-                        });
                     };
                 }
 
@@ -261,10 +284,7 @@ function filterOutAnime(results) {
                 }
 
                 partsData = partsData.map(wrapWithWideFlag);
-
-                partsData.push(searchByKeyword());
                 partsData.push(getMoviesWithoutGenre());
-
                 shuffleArray(partsData);
 
                 function loadPart(partLoaded, partEmpty) {
@@ -273,32 +293,28 @@ function filterOutAnime(results) {
 
                 loadPart(onComplete, onError);
                 return loadPart;
-            };
+            }
+            else {
+                // Стандартное поведение TMDB
+                return originalTmdbMain.apply(this, args);
+            }
         };
 
         function add() {
-            var tmdb_mod_kids = Object.assign({}, Lampa.Api.sources.tmdb, new SourceTMDBkids(Lampa.Api.sources.tmdb));
-
-            Lampa.Api.sources.tmdb_mod_kids = tmdb_mod_kids;
-
-            Object.defineProperty(Lampa.Api.sources, 'AVIAMOVIE KIDS', {
-                get: function () {
-                    return tmdb_mod_kids;
-                }
-            });
-
-            Lampa.Params.select('source', Object.assign({}, Lampa.Params.values['source'], {
-                'AVIAMOVIE KIDS': 'AVIAMOVIE KIDS'
-            }), 'tmdb');
+            // Добавляем кнопку в меню
+            if (window.appready) {
+                addKuvButton();
+            } else {
+                Lampa.Listener.follow('app', function (e) {
+                    if (e.type == 'ready') {
+                        addKuvButton();
+                    }
+                });
+            }
         }
 
-        if (window.appready) add();
-        else {
-            Lampa.Listener.follow('app', function (e) {
-                if (e.type == 'ready') { add(); }
-            });
-        }
+        if (!window.plugin_kuv_ready) startPlugin();
     }
 
-    if (!window.plugin_tmdb_mod_ready) startPlugin();
+    if (!window.plugin_kuv_ready) startPlugin();
 })();
