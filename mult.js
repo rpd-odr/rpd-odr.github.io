@@ -38,18 +38,18 @@
         moviesList.className = 'movies-list';
         pageContent.appendChild(moviesList);
 
-        // Добавляем страницу в активность
+        // Загружаем мультфильмы
+        fetchAnimationMovies(moviesList);
+
+        // Правильный вызов Lampa.Activity.push с компонентом "category_full"
         Lampa.Activity.push({
             title: 'Мультфильмы',
-            component: 'category_full',  // Используем component: 'category_full'
+            component: 'category_full',  // Это правильный компонент для отображения списка
             source: 'animation',
             genres: 16,
             page: 1,
-            content: pageContent // Добавляем наше содержимое
+            content: pageContent // Добавляем наше содержимое в активность
         });
-
-        // Загружаем мультфильмы
-        fetchAnimationMovies(moviesList);
     }
 
     // Функция для загрузки мультфильмов (пока заглушка)
@@ -72,7 +72,9 @@
         });
     }
 
-    // Добавление кнопки в меню
-    addAnimationButton();
+    // Дожидаемся события Lampa.Core.started, чтобы добавить кнопку в меню
+    Lampa.Core.started.then(function() {
+        addAnimationButton(); // Добавляем кнопку, когда приложение готово
+    });
 
 })();
