@@ -17,14 +17,19 @@
 
             // Исправленная функция создания запроса
             function createRequest(endpoint, title, callback) {
-                let fullUrl = `${tmdbBaseUrl}${endpoint}?${ratingFilter}&language=ru-RU`;  // Формируем URL корректно
+                let fullUrl = `${tmdbBaseUrl}${endpoint}?${ratingFilter}&language=ru-RU`;
                 console.log("Запрос к TMDB:", fullUrl);
 
                 owner.get(fullUrl, params, function (json) {
                     json.title = Lampa.Lang.translate(title);
-                    json.results = json.results.filter(item => 
-                        item.genre_ids && !item.genre_ids.includes(16) // Исключаем аниме
-                    );
+
+                    // Формируем ссылку на изображение
+                    json.results.forEach(item => {
+                        if (item.poster_path) {
+                            item.poster_url = `http://192.168.0.247:9118/tmdb/img/t/p/w500/${item.poster_path}?uid=114576`;
+                        }
+                    });
+
                     callback(json);
                 }, callback);
             }
@@ -57,7 +62,7 @@
                         let url = `${tmdbBaseUrl}/${item.type}/${id}`;
 
                         return Lampa.TMDB.get(url, { language: 'ru-RU' }).then(data => {
-                            if (data.genres && data.genres.some(g => g.id === 16)) return null; // Исключаем аниме
+                            if (data.genres && data.genres.some(g => g.id === 16)) return null;
                             return {
                                 title: data.title || data.name,
                                 poster_path: data.poster_path,
@@ -91,44 +96,40 @@
         };
     };
 
+    // Функция для добавления кнопки в боковом меню
     function add() {
         console.log("Добавление источника ANIMATION...");
 
+        // Создаем источник анимации, но не добавляем в настройки
         var animationSource = Object.assign({}, Lampa.Api.sources.tmdb, new SourceTMDBAnimation(Lampa.Api.sources.tmdb));
         Lampa.Api.sources.animation = animationSource;
 
+        // Добавляем кнопку в боковое меню
         try {
-            let menuList = $('.menu .menu__list').eq(0);
-            if (menuList.length) {
-                const menuItem = $('<li class="menu__item selector" data-action="mult">' +
-                    '<div class="menu__text">Мультфильмы</div>' +
-                    '</li>');
+            const menuItem = $('<li class="menu__item selector" data-action="mult">' +
+                '<div class="menu__text">Мультфильмы</div>' +
+                '</li>');
 
-                menuItem.on('hover:enter', function () {
-                    console.log("Открытие страницы 'Мультфильмы'...");
-                    Lampa.Activity.push({
-                        title: 'Мультфильмы',
-                        component: 'main',
-                        source: 'animation',
-                        page: 1
-                    });
-                    console.log("Активность 'Мультфильмы' запущена.");
+            menuItem.on('hover:enter', function () {
+                console.log("Открытие страницы 'Мультфильмы'...");
+                Lampa.Activity.push({
+                    title: 'Мультфильмы',
+                    component: 'main',
+                    source: 'animation',
+                    page: 1
                 });
+                console.log("Активность 'Мультфильмы' запущена.");
+            });
 
-                menuList.append(menuItem);
-                console.log("Пункт меню 'Мультфильмы' успешно добавлен.");
-            } else {
-                console.warn("Меню не найдено, не удалось добавить пункт 'Мультфильмы'.");
-            }
+            // Вставляем кнопку в меню
+            $('.menu .menu__list').eq(0).append(menuItem);
+            console.log("Пункт меню 'Мультфильмы' успешно добавлен.");
         } catch (e) {
             console.error("Ошибка при добавлении пункта меню:", e);
         }
-
-        Lampa.Params.select('source', Object.assign({}, Lampa.Params.values['source'], {
-            'animation': 'ANIMATION'
-        }), 'tmdb');
     }
 
+    // Проверяем готовность приложения и запускаем добавление
     if (window.appready) {
         add();
     } else {
