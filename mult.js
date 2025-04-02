@@ -73,8 +73,12 @@
     }
 
     // Дожидаемся события Lampa.Core.started, чтобы добавить кнопку в меню
-    Lampa.Core.started.then(function() {
-        addAnimationButton(); // Добавляем кнопку, когда приложение готово
-    });
+    if (Lampa.Core.started) {
+        Lampa.Core.started.then(function() {
+            addAnimationButton(); // Добавляем кнопку, когда приложение готово
+        });
+    } else {
+        addAnimationButton(); // Если событие уже прошло, сразу добавляем кнопку
+    }
 
 })();
