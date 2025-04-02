@@ -15,8 +15,9 @@
             var tmdbBaseUrl = "https://api.themoviedb.org/3";
             var ratingFilter = 'certification_country=US&certification.lte=PG-13';
 
+            // Исправленная функция создания запроса
             function createRequest(endpoint, title, callback) {
-                let fullUrl = `${endpoint}&${ratingFilter}&language=ru-RU`;
+                let fullUrl = `${tmdbBaseUrl}${endpoint}?${ratingFilter}&language=ru-RU`;  // Исправляем URL
                 console.log("Запрос к TMDB:", fullUrl);
 
                 owner.get(fullUrl, params, function (json) {
