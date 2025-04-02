@@ -18,7 +18,10 @@
 
             // Функция для создания запроса
             function createRequest(endpoint, title, callback) {
-                owner.get(endpoint + '&' + ratingFilter + '&language=ru-RU', params, function (json) {
+                let fullUrl = endpoint + '&' + ratingFilter + '&language=ru-RU';
+                console.log("Запрос к TMDB:", fullUrl); // Лог для отладки
+
+                owner.get(fullUrl, params, function (json) {
                     json.title = Lampa.Lang.translate(title);
                     callback(json);
                 }, callback);
@@ -28,35 +31,35 @@
             var partsData = [
                 function (callback) {
                     createRequest(
-                        `${tmdbBaseUrl}/trending/movie/week?with_genres=16`,
+                        `${tmdbBaseUrl}/trending/movie/week`,
                         'Популярные мультфильмы',
                         callback
                     );
                 },
                 function (callback) {
                     createRequest(
-                        `${tmdbBaseUrl}/movie/upcoming?with_genres=16`,
+                        `${tmdbBaseUrl}/movie/upcoming`,
                         'Новые мультфильмы',
                         callback
                     );
                 },
                 function (callback) {
                     createRequest(
-                        `${tmdbBaseUrl}/trending/tv/week?with_genres=16`,
+                        `${tmdbBaseUrl}/trending/tv/week`,
                         'Популярные мультсериалы',
                         callback
                     );
                 },
                 function (callback) {
                     createRequest(
-                        `${tmdbBaseUrl}/tv/on_the_air?with_genres=16`,
+                        `${tmdbBaseUrl}/tv/on_the_air`,
                         'Новые мультсериалы',
                         callback
                     );
                 },
                 function (callback) {
                     console.log("Загрузка 'Вы смотрели'...");
-                    let viewed = Lampa.Storage.get("viewed", "{}");
+                    let viewed = JSON.parse(Lampa.Storage.get("viewed", "{}"));
                     let viewedIds = Object.keys(viewed);
 
                     if (viewedIds.length === 0) {
@@ -66,13 +69,13 @@
 
                     let promises = viewedIds.map(id => {
                         let item = viewed[id];
-                        let url = `${tmdbBaseUrl}/${item.type}/${id}?language=ru-RU`;
-                        return Lampa.TMDB.get(url).then(data => {
+                        let url = `${tmdbBaseUrl}/${item.type}/${id}`;
+
+                        return Lampa.TMDB.get(url, { language: 'ru-RU' }).then(data => {
                             if (data.genres && data.genres.some(g => g.id === 16)) {
-                                if (data.certifications && data.certifications.US && data.certifications.US.certification) {
-                                    let rating = data.certifications.US.certification;
-                                    if (rating === "R" || rating === "NC-17") return null;
-                                }
+                                let rating = data.certifications?.US?.certification;
+                                if (rating && (rating === "R" || rating === "NC-17")) return null;
+
                                 return {
                                     title: data.title || data.name,
                                     poster_path: data.poster_path,
@@ -83,7 +86,10 @@
                                 };
                             }
                             return null;
-                        }).catch(() => null);
+                        }).catch(err => {
+                            console.error("Ошибка загрузки элемента 'Вы смотрели':", err);
+                            return null;
+                        });
                     });
 
                     Promise.all(promises).then(results => {
@@ -116,23 +122,28 @@
 
         // Добавляем пункт меню
         try {
-            const menuItem = $(
-                '<li class="menu__item selector" data-action="mult">' +
-                '<div class="menu__text">Мультфильмы</div>' +
-                '</li>'
-            );
-            menuItem.on('hover:enter', function () {
-                console.log("Открытие страницы 'Мультфильмы'...");
-                Lampa.Activity.push({
-                    title: 'Мультфильмы',
-                    component: 'main',
-                    source: 'animation',
-                    page: 1
+            let menuList = $('.menu .menu__list').eq(0);
+            if (menuList.length) {
+                const menuItem = $('<li class="menu__item selector" data-action="mult">' +
+                    '<div class="menu__text">Мультфильмы</div>' +
+                    '</li>');
+
+                menuItem.on('hover:enter', function () {
+                    console.log("Открытие страницы 'Мультфильмы'...");
+                    Lampa.Activity.push({
+                        title: 'Мультфильмы',
+                        component: 'main',
+                        source: 'animation',
+                        page: 1
+                    });
+                    console.log("Активность 'Мультфильмы' запущена.");
                 });
-                console.log("Активность 'Мультфильмы' запущена.");
-            });
-            $('.menu .menu__list').eq(0).append(menuItem);
-            console.log("Пункт меню 'Мультфильмы' успешно добавлен.");
+
+                menuList.append(menuItem);
+                console.log("Пункт меню 'Мультфильмы' успешно добавлен.");
+            } else {
+                console.warn("Меню не найдено, не удалось добавить пункт 'Мультфильмы'.");
+            }
         } catch (e) {
             console.error("Ошибка при добавлении пункта меню:", e);
         }
