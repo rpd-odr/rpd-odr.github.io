@@ -17,7 +17,7 @@
 
             // Исправленная функция создания запроса
             function createRequest(endpoint, title, callback) {
-                let fullUrl = `${tmdbBaseUrl}${endpoint}?${ratingFilter}&language=ru-RU`;  // Исправляем URL
+                let fullUrl = `${tmdbBaseUrl}${endpoint}?${ratingFilter}&language=ru-RU`;  // Формируем URL корректно
                 console.log("Запрос к TMDB:", fullUrl);
 
                 owner.get(fullUrl, params, function (json) {
@@ -31,16 +31,16 @@
 
             var partsData = [
                 function (callback) {
-                    createRequest(`${tmdbBaseUrl}/trending/movie/week`, 'Популярные мультфильмы', callback);
+                    createRequest(`/trending/movie/week`, 'Популярные мультфильмы', callback);
                 },
                 function (callback) {
-                    createRequest(`${tmdbBaseUrl}/movie/upcoming`, 'Новые мультфильмы', callback);
+                    createRequest(`/movie/upcoming`, 'Новые мультфильмы', callback);
                 },
                 function (callback) {
-                    createRequest(`${tmdbBaseUrl}/trending/tv/week`, 'Популярные мультсериалы', callback);
+                    createRequest(`/trending/tv/week`, 'Популярные мультсериалы', callback);
                 },
                 function (callback) {
-                    createRequest(`${tmdbBaseUrl}/tv/on_the_air`, 'Новые мультсериалы', callback);
+                    createRequest(`/tv/on_the_air`, 'Новые мультсериалы', callback);
                 },
                 function (callback) {
                     console.log("Загрузка 'Вы смотрели'...");
