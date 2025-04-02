@@ -1,63 +1,84 @@
-import { TMDB } from 'lampa/tmdb';
-import { Storage } from 'lampa/storage';
+(function(plugin) {
+  'use strict';
+  
+  // Конфигурация
+  const PLUGIN_NAME = 'KidsMult';
+  const VERSION = '1.0';
+  const ANIMATION_GENRE = 16;
+  
+  // Подборки
+  const COLLECTIONS = [
+    {
+      id: 'disney',
+      title: 'Дисней',
+      params: { with_companies: 2 }
+    },
+    {
+      id: 'pixar',
+      title: 'Пиксар', 
+      params: { with_companies: 3 }
+    }
+  ];
 
-export default function(lampa) {
-    // Конфиг плагина
-    const config = {
-        name: 'kuv-animation',
-        title: 'Детская анимация',
-        icon: 'animation',
-        adult: false,
-        genres: [16], // Анимация
-        sort: 'popularity.desc'
-    };
-
-    // Регистрация пункта меню
-    lampa.Menu.add({
-        name: config.name,
-        title: config.title,
-        icon: config.icon,
-        component: 'Lampa.TMDBGrid',
-        params: {
-            type: 'movie',
-            query: {
-                with_genres: config.genres.join(','),
-                include_adult: config.adult,
-                sort_by: config.sort,
-                with_original_language: 'ru'
-            }
-        }
-    });
-
-    // Фильтрация результатов
-    lampa.TMDB.onLoad((data, type) => {
-        if(type === 'movie' && data.query?.with_genres === config.genres.join(',')) {
-            return {
-                ...data,
-                items: data.items.filter(item => 
-                    config.genres.some(g => item.genre_ids.includes(g)) &&
-                    (config.adult ? true : !item.adult)
-                )
-            };
-        }
-        return data;
-    });
-
-    // Кеширование запросов
-    const cache = new Storage(config.name);
-    const originalGet = lampa.TMDB.get;
+  class KidsMultPlugin {
+    constructor() {
+      this.name = PLUGIN_NAME;
+      this.version = VERSION;
+    }
     
-    lampa.TMDB.get = async function(params) {
-        const key = JSON.stringify(params);
-        
-        if(cache.has(key)) {
-            return cache.get(key);
+    init() {
+      this._addMainSection();
+      this._addCollections();
+      this._patchAdultFilter();
+    }
+    
+    _addMainSection() {
+      Lampa.Menu.add({
+        name: 'kids_mult',
+        title: 'Детские мультфильмы',
+        icon: 'child',
+        page: {
+          component: 'list',
+          request: 'discover/movie',
+          params: {
+            with_genres: ANIMATION_GENRE,
+            include_adult: false
+          }
         }
-
-        const data = await originalGet.call(this, params);
-        cache.set(key, data, 3600); // Кеш на 1 час
-        return data;
-    };
-
-    console.log(`[${config.name}] Плагин успешно загружен`);
-}
+      });
+    }
+    
+    _addCollections() {
+      COLLECTIONS.forEach(collection => {
+        Lampa.Menu.add({
+          name: `kids_collection_${collection.id}`,
+          title: collection.title,
+          icon: 'collection',
+          page: {
+            component: 'list',
+            request: 'discover/movie',
+            params: {
+              with_genres: ANIMATION_GENRE,
+              ...collection.params,
+              include_adult: false
+            }
+          }
+        });
+      });
+    }
+    
+    _patchAdultFilter() {
+      const original = Lampa.TMDB.request;
+      Lampa.TMDB.request = function(url, params) {
+        params = Object.assign({}, params, { include_adult: false });
+        return original(url, params);
+      };
+    }
+  }
+  
+  // Регистрация
+  if (plugin && plugin.Plugin) {
+    plugin.Plugin.register(new KidsMultPlugin());
+  }
+  
+})(window.Lampa || {});
