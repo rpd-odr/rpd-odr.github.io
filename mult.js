@@ -12,11 +12,12 @@
             var onError = arguments.length > 2 ? arguments[2] : undefined;
             var partsLimit = 6;
 
-            var tmdbBaseUrl = "https://api.themoviedb.org/3";
+            var tmdbBaseUrl = "https://api.themoviedb.org/3";  // Базовый URL для TMDB
             var ratingFilter = 'certification_country=US&certification.lte=PG-13';
 
             // Исправленная функция создания запроса
             function createRequest(endpoint, title, callback) {
+                // Формируем корректный запрос к TMDB
                 let fullUrl = `${tmdbBaseUrl}${endpoint}?${ratingFilter}&language=ru-RU`;
                 console.log("Запрос к TMDB:", fullUrl);
 
