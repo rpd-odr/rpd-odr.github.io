@@ -8,7 +8,7 @@
     "open--search": { main: "https://rpd-odr.github.io/kuv/icons/magnifying-glass-duotone.svg" },
     "n-search": { main: "https://rpd-odr.github.io/kuv/icons/magnifying-glass-duotone.svg" },
     "-settings": { main: "/plugins/kuv/icons/gear-duotone.svg" },
-    "reload-icon": { main: "/plugins/kuv/icons/arrows-clockwise-duotone.svg" },
+    "reload-icon": { main: gitpath + "icons/arrows-clockwise-duotone.svg" },
     "full-screen": { main: "/plugins/kuv/icons/arrows-out-simple-duotone.svg" },
     "head__menu-icon": { main: "/plugins/kuv/icons/list-bullets-duotone.svg" },
     "-main": { main: "/plugins/kuv/icons/house-duotone.svg" },
