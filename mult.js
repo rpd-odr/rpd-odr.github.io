@@ -1,10 +1,3 @@
-// Фильтр для исключения аниме (id жанра 16)
-function filterOutAnime(results) {
-    return results.filter(function (item) {
-        return !(item.genre_ids && item.genre_ids.includes(16));
-    });
-}
-
 (function () {
     'use strict';
 
@@ -38,113 +31,109 @@ function filterOutAnime(results) {
         this.network = new Lampa.Reguest();
         this.discovery = false;
 
-        var ratingLimit = 'PG';
+        this.get = function(url, params, onSuccess, onError) {
+            return parent.get(url, params, onSuccess, onError || function(){});
+        };
 
-        this.main = function() {
+        this.main = function(params, onComplete, onError) {
             var owner = this;
-            var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-            var onComplete = arguments.length > 1 ? arguments[1] : undefined;
-            var onError = arguments.length > 2 ? arguments[2] : undefined;
-            var partsLimit = 8; // Фиксированное количество подборок
+            var partsLimit = 8;
+            var loadedParts = 0;
+            var results = [];
 
-            var sortOptions = [
-                { key: 'popularity.desc', title: 'Популярные' },
-                { key: 'vote_average.desc', title: 'С лучшим рейтингом' },
-                { key: 'release_date.desc', title: 'Новинки' }
+            // Основные параметры фильтрации
+            var baseParams = {
+                with_genres: '16', // Только анимация
+                without_genres: '10751', // Исключаем семейное кино
+                certification_country: 'US',
+                certification: 'PG',
+                sort_by: 'popularity.desc'
+            };
+
+            // Список студий анимации
+            var studios = [
+                {id: 2, name: 'Disney'},
+                {id: 3, name: 'Pixar'},
+                {id: 521, name: 'DreamWorks'},
+                {id: 6704, name: 'Illumination'},
+                {id: 9383, name: 'Blue Sky'},
+                {id: 11106, name: 'Sony Animation'}
             ];
-
-            // Список анимационных студий
-            var animationStudios = [
-                { id: 2, title: 'Disney' },
-                { id: 3, title: 'Pixar' },
-                { id: 521, title: 'DreamWorks' },
-                { id: 6704, title: 'Illumination' },
-                { id: 9383, title: 'Blue Sky' },
-                { id: 11106, title: 'Sony Animation' }
-            ];
-
-            // Базовый фильтр
-            var baseFilter = [
-                'certification_country=US',
-                'certification.lte=' + ratingLimit,
-                'with_genres=16', // Только мультфильмы
-                'without_genres=10751' // Исключаем семейное кино
-            ].join('&');
 
             // Создаем подборки
-            var partsData = [];
+            var parts = [];
             
             // Подборки по студиям
-            animationStudios.forEach(function(studio) {
-                partsData.push(function(callback) {
-                    owner.get(
-                        'discover/movie?with_companies=' + studio.id + '&' + baseFilter,
-                        params,
-                        function(json) {
-                            if (json.results) {
-                                json.results = filterOutAnime(json.results);
-                            }
-                            json.title = studio.title;
+            studios.forEach(function(studio) {
+                parts.push(function(callback) {
+                    var params = Object.assign({}, baseParams, {
+                        with_companies: studio.id
+                    });
+                    owner.get('discover/movie', params, function(json) {
+                        if (json.results && json.results.length > 0) {
+                            json.title = studio.name;
                             callback(json);
-                        },
-                        callback
-                    );
+                        } else {
+                            callback({results: []});
+                        }
+                    });
                 });
             });
 
             // Общие подборки
-            partsData.push(
+            parts.push(
                 function(callback) {
-                    owner.get(
-                        'discover/movie?' + baseFilter + '&sort_by=popularity.desc',
-                        params,
-                        function(json) {
-                            if (json.results) {
-                                json.results = filterOutAnime(json.results);
-                            }
-                            json.title = 'Популярные мультфильмы';
-                            callback(json);
-                        },
-                        callback
-                    );
+                    owner.get('discover/movie', baseParams, function(json) {
+                        json.title = 'Популярные';
+                        callback(json);
+                    });
                 },
                 function(callback) {
-                    owner.get(
-                        'discover/movie?' + baseFilter + '&sort_by=vote_average.desc&vote_count.gte=100',
-                        params,
-                        function(json) {
-                            if (json.results) {
-                                json.results = filterOutAnime(json.results);
-                            }
-                            json.title = 'Лучшие мультфильмы';
-                            callback(json);
-                        },
-                        callback
-                    );
+                    var params = Object.assign({}, baseParams, {
+                        sort_by: 'vote_average.desc',
+                        'vote_count.gte': 100
+                    });
+                    owner.get('discover/movie', params, function(json) {
+                        json.title = 'Лучшие';
+                        callback(json);
+                    });
                 },
                 function(callback) {
-                    owner.get(
-                        'discover/movie?' + baseFilter + '&sort_by=release_date.desc',
-                        params,
-                        function(json) {
-                            if (json.results) {
-                                json.results = filterOutAnime(json.results);
-                            }
-                            json.title = 'Новые мультфильмы';
-                            callback(json);
-                        },
-                        callback
-                    );
+                    var params = Object.assign({}, baseParams, {
+                        sort_by: 'release_date.desc',
+                        'primary_release_date.lte': new Date().toISOString().split('T')[0]
+                    });
+                    owner.get('discover/movie', params, function(json) {
+                        json.title = 'Новинки';
+                        callback(json);
+                    });
                 }
             );
 
-            // Загрузка подборок с использованием стандартного механизма Lampa
-            function loadPart(partLoaded, partEmpty) {
-                Lampa.Api.partNext(partsData, partsLimit, partLoaded, partEmpty);
+            // Функция загрузки
+            function loadNext() {
+                if (loadedParts >= parts.length || results.length >= partsLimit) {
+                    if (results.length > 0) {
+                        onComplete(results.slice(0, partsLimit));
+                    } else {
+                        onError();
+                    }
+                    return;
+                }
+
+                parts[loadedParts](function(result) {
+                    if (result.results && result.results.length > 0) {
+                        results.push(result);
+                    }
+                    loadedParts++;
+                    loadNext();
+                });
             }
 
-            loadPart(onComplete, onError);
-            return loadPart;
+            // Начинаем загрузку
+            loadNext();
+            
+            return function() {};
         };
     };
 
