@@ -147,10 +147,10 @@
   }
 
   function addStyles() {
-    if (!document.querySelector('link[href="/kuv/styles/kuv-style.css"]')) {
+    if (!document.querySelector('link[href="https://rpd-odr.github.io/kuv/styles/kuv-style.css"]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = "/kuv/styles/kuv-style.css";
+      link.href = "https://rpd-odr.github.io/kuv/styles/kuv-style.css";
       document.head.appendChild(link);
     }
   }
