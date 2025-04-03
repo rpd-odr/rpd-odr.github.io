@@ -1,1 +1,219 @@
+.welcome {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 100;
+	background: url(../img/welcome.jpg) no-repeat 50% 50% !important;
+   background-size: cover !important;
+	transition: all .3s ease-out; 
+} 
+
+@font-face {
+  font-family: "WixMadefor";
+  font-display: swap;
+  src: 
+	url("../fonts/wix/WixMadeforDisplay-Regular.woff2") format("woff2"),
+	url("../fonts/wix/WixMadeforDisplay[wght].ttf") format("truetype");
+  font-weight: 300;
+	font-optical-sizing: auto;
+  font-style: normal;
+}
+@font-face {
+  font-family: "WixMadefor";
+  font-display: swap;
+  src: 
+	url("../fonts/wix/WixMadeforDisplay-Medium.woff2") format("woff2"),
+	url("../fonts/wix/WixMadeforDisplay[wght].ttf") format("truetype");
+  font-weight: 400;
+	font-optical-sizing: auto;
+  font-style: normal;
+}
+@font-face {
+  font-family: "WixMadefor";
+  font-display: swap;
+  src: 
+	url("../fonts/wix/WixMadeforDisplay-SemiBold.woff2") format("woff2"),
+	url("../fonts/wix/WixMadeforDisplay[wght].ttf") format("truetype");
+  font-weight: 600;
+	font-optical-sizing: auto;
+  font-style: normal;
+}
+@font-face {
+  font-family: "WixMadefor";
+  font-display: swap;
+  src: 
+	url("../fonts/wix/WixMadeforDisplay-Bold.woff2") format("woff2"),
+	url("../fonts/wix/WixMadeforDisplay[wght].ttf") format("truetype");
+  font-weight: 700;
+	font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.simple-keyboard-input {
+font-family: "WixMadefor" !important;
+}
+body {
+font-family: "WixMadefor" !important;
+}
+
+.head__logo-icon svg {
+height: auto!important;
+}
+
+.info__icon.active::after {
+	background: #fff url(../img/icons/check-fat-duotone.svg) no-repeat 50% 50%;
+}
+
+.card__icon.icon--book,
+.info__icon.icon--book,
+.feed-item__tags::before {
+	background-image: url(../icons/heart-duotone.svg) !important;
+}
+.card__icon.icon--wath,
+.info__icon.icon--wath,
+.search-history-key:before {
+	background-image: url(../icons/clock-countdown-duotone.svg) !important;
+}
+.card__icon.icon--like,
+.info__icon.icon--like {
+	background-image: url(../icons/thumbs-up-duotone.svg) !important;
+}
+.card__icon.icon--history {
+	background-image: url(../icons/play-circle-duotone.svg) !important;
+}
+
+.content-loading::after, 
+.processing__loader, 
+.activity__loader,
+.player-video__loader,
+.birthday__poster,
+.loading-layer__ico,
+.search-source--loading .search-source__count,
+.modal-loading,
+.modal-pending__loading,
+.season-episode__loader,
+.screensaver__preload,
+.extensions__item-check,
+.iframe__body {
+	background: url(../icons/spinner-ball-duotone.svg) no-repeat 50% 50% !important;
+}
+
+.content-loading::after,
+.processing__loader, 
+.loading-layer__ico,
+.modal-loading,
+.modal-pending__loading,
+.season-episode__loader {
+	background-size: contain;
+}
+
+  
+ .head__split {
+	background: url(../icons/dots-three-vertical-duotone.svg) no-repeat 50% 50% !important;
+	background-size: contain !important;
+}
+
+.full-review-add::before {
+  background: url(../icons/plus-circle-duotone.svg) no-repeat 50% 50%;
+}
+
+.empty__img {
+  background: url(../icons/robot-duotone.svg) no-repeat 50% 50%;
+  background-size: contain;
+  height: 5em;
+}
+
+.error__ico {
+  background: url(../icons/smiley-sad-duotone.svg) no-repeat 50% 50%;
+}
+
+.torrent-item__ffprobe > div.m-video::before {
+  background-image: url(../icons/film-strip-duotone.svg);
+  
+}
+
+.torrent-item__ffprobe > div.m-channels::before {
+  content: '';
+  background-image: url(../icons/waveform-duotone.svg);
+}
+.torrent-item__ffprobe > div.m-audio::before {
+  content: '';
+  background-image: url(../icons/microphone-duotone.svg);
+}
+.torrent-item__ffprobe > div.m-subtitle::before {
+  content: '';
+  background-image: url(../icons/subtitles-duotone.svg);
+}
+
+.search-history-key:before {
+  content: "";
+	background-image: url(../icons/clock-countdown-duotone.svg);
+}
+
+.torrnet-folder-name::before {
+  content: "";
+	background: url(../icons/cards-three-duotone.svg) no-repeat 50% 50%;
+  background-size: contain;
+}
+
+.feed-item__tags::before {
+  content: url(../icons/heart-duotone.svg);
+}
+
+/* Стили для всех иконок с классом 'kuvicon' */
+svg.kuvicon {
+	fill: currentColor !important;
+	/* stroke: currentColor; */
+	/* transition: all .2s ease-out; */
+}
+
+.db-mov-logo {
+    margin: 0.2em 0 0.1em 0.05em;
+    max-height: 2em;
+    max-width: 9em;
+    transition: all .3s ease;
+}
+
+.db-net-logo {
+    max-height: 1.25em;
+    /*filter: brightness(1000%);
+    /* opacity: 0.8; 
+    /* Добавление черно-белого фильтра */
+    filter: contrast(.2) invert(1) brightness(2) grayscale(100%);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    max-height: 1.05em;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    max-height: 2em;
+    transform: scale(1);
+  }
+}
+
+.db-mov-logo.logo-loaded {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  
+  to {
+    opacity: 0;
+    display: none;
+  }
+}
+
+.title-wrapper.fade-out {
+  animation: fadeOut 0.3s ease forwards;
+}
 
