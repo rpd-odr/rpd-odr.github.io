@@ -40,6 +40,7 @@
     "open--premium": { main: gitpath + "icons/star-duotone.svg" },
     "open--feed": { main: gitpath + "icons/star-four-duotone.svg" },
     "open--notice": { main: gitpath + "icons/bell-duotone.svg" },
+    "n-about": { main: gitpath + "icons/info-duotone.svg" },
   };
 
   const iconCache = {};
