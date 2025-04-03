@@ -46,7 +46,7 @@
     "nt-account": { main: gitpath + "icons/user-gear-duotone.svg" },
     "nt-parser": { main: gitpath + "icons/list-magnifying-glass-duotone.svg" },
     "nt-tmdb": { main: gitpath + "icons/database-duotone.svg" },
-    "nt-plugins": { main: gitpath + "icons/puzzle-peace-duotone.svg" },
+    "nt-plugins": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
     "nt-parental_control": { main: gitpath + "icons/lock-duotone.svg" },
     
   };
