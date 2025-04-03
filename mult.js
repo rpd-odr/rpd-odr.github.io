@@ -53,57 +53,30 @@ function filterOutAnime(results) {
                 { key: 'release_date.desc', title: 'Новинки' }
             ];
 
-            // Расширенный список анимационных студий
+            // Список анимационных студий
             var animationStudios = [
                 { id: 2, title: 'Disney' },
                 { id: 3, title: 'Pixar' },
                 { id: 521, title: 'DreamWorks' },
                 { id: 6704, title: 'Illumination' },
                 { id: 9383, title: 'Blue Sky' },
-                { id: 11106, title: 'Sony Animation' },
-                { id: 14160, title: 'Studio Ghibli' },
-                { id: 16, title: 'Warner Animation' },
-                { id: 5219, title: 'Laika' },
-                { id: 10210, title: 'Aardman' },
-                { id: 7, title: 'MGM Animation' },
-                { id: 15357, title: 'Paramount Animation' },
-                { id: 20478, title: 'Netflix Animation' },
-                { id: 13252, title: 'Cartoon Network' },
-                { id: 3172, title: 'Nickelodeon' }
+                { id: 11106, title: 'Sony Animation' }
             ];
 
-            // Базовый фильтр (ТОЛЬКО анимация)
+            // Базовый фильтр
             var baseFilter = [
                 'certification_country=US',
                 'certification.lte=' + ratingLimit,
-                'with_genres=16', // ТОЛЬКО мультфильмы
+                'with_genres=16', // Только мультфильмы
                 'without_genres=10751' // Исключаем семейное кино
             ].join('&');
 
             // Создаем подборки
             var partsData = [];
             
-            // 1. Подборки по студиям
+            // Подборки по студиям
             animationStudios.forEach(function(studio) {
-                partsData.push(createStudioRequest(studio));
-            });
-
-            // 2. Тематические подборки
-            partsData.push(
-                createRequest('discover/movie?with_keywords=210024', 'классические мультфильмы'),
-                createRequest('discover/movie?with_keywords=180449', 'приключения'),
-                createRequest('discover/movie?with_keywords=181317', 'сказки'),
-                createRequest('trending/movie/week', 'популярные сейчас'),
-                createRequest('movie/top_rated', 'лучшие за все время'),
-                createRequest('movie/now_playing', 'в кинотеатрах')
-            );
-
-            // Оставляем только первые 12 подборок (чтобы после фильтрации осталось 8)
-            partsData = partsData.slice(0, 12);
-
-            // Функции для создания запросов
-            function createStudioRequest(studio) {
-                return function(callback) {
+                partsData.push(function(callback) {
                     owner.get(
                         'discover/movie?with_companies=' + studio.id + '&' + baseFilter,
                         params,
@@ -111,58 +84,67 @@ function filterOutAnime(results) {
                             if (json.results) {
                                 json.results = filterOutAnime(json.results);
                             }
-                            json.title = studio.title + ' мультфильмы';
+                            json.title = studio.title;
                             callback(json);
                         },
                         callback
                     );
-                };
-            }
+                });
+            });
 
-            function createRequest(endpoint, title) {
-                return function(callback) {
+            // Общие подборки
+            partsData.push(
+                function(callback) {
                     owner.get(
-                        endpoint + '&' + baseFilter,
+                        'discover/movie?' + baseFilter + '&sort_by=popularity.desc',
                         params,
                         function(json) {
                             if (json.results) {
                                 json.results = filterOutAnime(json.results);
                             }
-                            json.title = title;
+                            json.title = 'Популярные мультфильмы';
                             callback(json);
                         },
                         callback
                     );
-                };
+                },
+                function(callback) {
+                    owner.get(
+                        'discover/movie?' + baseFilter + '&sort_by=vote_average.desc&vote_count.gte=100',
+                        params,
+                        function(json) {
+                            if (json.results) {
+                                json.results = filterOutAnime(json.results);
+                            }
+                            json.title = 'Лучшие мультфильмы';
+                            callback(json);
+                        },
+                        callback
+                    );
+                },
+                function(callback) {
+                    owner.get(
+                        'discover/movie?' + baseFilter + '&sort_by=release_date.desc',
+                        params,
+                        function(json) {
+                            if (json.results) {
+                                json.results = filterOutAnime(json.results);
+                            }
+                            json.title = 'Новые мультфильмы';
+                            callback(json);
+                        },
+                        callback
+                    );
+                }
+            );
+
+            // Загрузка подборок с использованием стандартного механизма Lampa
+            function loadPart(partLoaded, partEmpty) {
+                Lampa.Api.partNext(partsData, partsLimit, partLoaded, partEmpty);
             }
 
-            // Гарантированная загрузка 8 подборок
-            function loadParts() {
-                var loaded = 0;
-                var results = [];
-                
-                function checkComplete() {
-                    if (loaded >= partsLimit && onComplete) {
-                        onComplete(results.slice(0, partsLimit)); // Возвращаем ровно 8 подборок
-                    }
-                }
-                
-                partsData.forEach(part => {
-                    part(function(json) {
-                        if (json.results && json.results.length > 0) {
-                            results.push(json);
-                            loaded++;
-                            checkComplete();
-                        }
-                    }, function() {
-                        loaded++;
-                        checkComplete();
-                    });
-                });
-            }
-            
-            loadParts();
-            return function() {}; // Пустая функция для совместимости
+            loadPart(onComplete, onError);
+            return loadPart;
         };
     };
 
