@@ -42,7 +42,13 @@
     "open--notice": { main: gitpath + "icons/bell-duotone.svg" },
     "n-about": { main: gitpath + "icons/info-duotone.svg" },
     "open--broadcast": { main: gitpath + "icons/broadcast-duotone.svg" },
-    "button--reactions": { main: gitpath + "icons/smiley-sticker-duotone.svg" },
+    "button--reaction": { main: gitpath + "icons/smiley-sticker-duotone.svg" },
+    "nt-account": { main: gitpath + "icons/user-gear-duotone.svg" },
+    "nt-parser": { main: gitpath + "icons/list-magnifying-glass-duotone.svg" },
+    "nt-tmdb": { main: gitpath + "icons/database-duotone.svg" },
+    "nt-plugins": { main: gitpath + "icons/puzzle-peace-duotone.svg" },
+    "nt-parental_control": { main: gitpath + "icons/lock-duotone.svg" },
+    
   };
 
   const iconCache = {};
