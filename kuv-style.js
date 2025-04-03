@@ -37,6 +37,9 @@
     "prestige__viewed": { main: gitpath + "icons/eye-duotone.svg" },
     "item__viewed": { main: gitpath + "icons/play-duotone.svg" },
     "head-rate": { main: gitpath + "icons/star-duotone.svg" },
+    "open--premium": { main: gitpath + "icons/star-duotone.svg" },
+    "open--feed": { main: gitpath + "icons/star-four-duotone.svg" },
+    "open--notice": { main: gitpath + "icons/bell-duotone.svg" },
   };
 
   const iconCache = {};
