@@ -33,116 +33,6 @@ function filterOutAnime(results) {
         }
     }
 
-    // Класс для отображения эпизодов
-    var Episode = function(data) {
-        var card = data.card || data;
-        var episode = data.next_episode_to_air || data.episode || {};
-        if (card.source == undefined) card.source = 'tmdb';
-        
-        Lampa.Arrays.extend(card, {
-            title: card.name,
-            original_title: card.original_name,
-            release_date: card.first_air_date
-        });
-        
-        card.release_year = ((card.release_date || '0000') + '').slice(0, 4);
-
-        function remove(elem) {
-            if (elem) elem.remove();
-        }
-
-        this.build = function() {
-            this.card = Lampa.Template.js('card_episode');
-            this.img_poster = this.card.querySelector('.card__img') || {};
-            this.img_episode = this.card.querySelector('.full-episode__img img') || {};
-            
-            this.card.querySelector('.card__title').innerText = card.title;
-            this.card.querySelector('.full-episode__num').innerText = card.unwatched || '';
-            
-            if (episode && episode.air_date) {
-                this.card.querySelector('.full-episode__name').innerText = 
-                    ('s' + (episode.season_number || '?') + 'e' + (episode.episode_number || '?') + '. ') + 
-                    (episode.name || Lampa.Lang.translate('noname'));
-                this.card.querySelector('.full-episode__date').innerText = 
-                    episode.air_date ? Lampa.Utils.parseTime(episode.air_date).full : '----';
-            }
-
-            if (card.release_year == '0000') {
-                remove(this.card.querySelector('.card__age'));
-            } else {
-                this.card.querySelector('.card__age').innerText = card.release_year;
-            }
-
-            this.card.addEventListener('visible', this.visible.bind(this));
-        };
-
-        this.image = function() {
-            var _this = this;
-            this.img_poster.onload = function() {};
-            this.img_poster.onerror = function() {
-                _this.img_poster.src = './img/img_broken.svg';
-            };
-            this.img_episode.onload = function() {
-                _this.card.querySelector('.full-episode__img').classList.add('full-episode__img--loaded');
-            };
-            this.img_episode.onerror = function() {
-                _this.img_episode.src = './img/img_broken.svg';
-            };
-        };
-
-        this.create = function() {
-            var _this2 = this;
-            this.build();
-            
-            this.card.addEventListener('hover:focus', function() {
-                if (_this2.onFocus) _this2.onFocus(_this2.card, card);
-            });
-            
-            this.card.addEventListener('hover:hover', function() {
-                if (_this2.onHover) _this2.onHover(_this2.card, card);
-            });
-            
-            this.card.addEventListener('hover:enter', function() {
-                if (_this2.onEnter) _this2.onEnter(_this2.card, card);
-            });
-            
-            this.image();
-        };
-
-        this.visible = function() {
-            if (card.poster_path) this.img_poster.src = Lampa.Api.img(card.poster_path);
-            else if (card.profile_path) this.img_poster.src = Lampa.Api.img(card.profile_path);
-            else if (card.poster) this.img_poster.src = card.poster;
-            else if (card.img) this.img_poster.src = card.img;
-            else this.img_poster.src = './img/img_broken.svg';
-            
-            if (card.still_path) this.img_episode.src = Lampa.Api.img(episode.still_path, 'w300');
-            else if (card.backdrop_path) this.img_episode.src = Lampa.Api.img(card.backdrop_path, 'w300');
-            else if (episode.img) this.img_episode.src = episode.img;
-            else if (card.img) this.img_episode.src = card.img;
-            else this.img_episode.src = './img/img_broken.svg';
-            
-            if (this.onVisible) this.onVisible(this.card, card);
-        };
-
-        this.destroy = function() {
-            this.img_poster.onerror = function() {};
-            this.img_poster.onload = function() {};
-            this.img_episode.onerror = function() {};
-            this.img_episode.onload = function() {};
-            this.img_poster.src = '';
-            this.img_episode.src = '';
-            remove(this.card);
-            this.card = null;
-            this.img_poster = null;
-            this.img_episode = null;
-        };
-
-        this.render = function(js) {
-            return js ? this.card : $(this.card);
-        };
-    };
-
     // Источник данных для детской анимации
     var SourceAnimationKids = function(parent) {
         this.network = new Lampa.Reguest();
@@ -155,140 +45,124 @@ function filterOutAnime(results) {
             var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
             var onComplete = arguments.length > 1 ? arguments[1] : undefined;
             var onError = arguments.length > 2 ? arguments[2] : undefined;
-            var partsLimit = 8; // Количество подборок на странице
+            var partsLimit = 8; // Фиксированное количество подборок
 
             var sortOptions = [
                 { key: 'popularity.desc', title: 'Популярные' },
-                { key: 'first_air_date.desc', title: 'Новинки' },
-                { key: 'revenue.desc', title: 'Интересное' }
+                { key: 'vote_average.desc', title: 'С лучшим рейтингом' },
+                { key: 'release_date.desc', title: 'Новинки' }
             ];
 
-            var kidsGenres = [
-                { id: 16, title: 'мультфильмы' },
-                { id: 10751, title: 'семейные' },
-                { id: 14, title: 'фэнтези' },
-                { id: 12, title: 'приключения' }
-            ];
-
-            var kidsStudios = [
+            // Расширенный список анимационных студий
+            var animationStudios = [
                 { id: 2, title: 'Disney' },
                 { id: 3, title: 'Pixar' },
                 { id: 521, title: 'DreamWorks' },
                 { id: 6704, title: 'Illumination' },
                 { id: 9383, title: 'Blue Sky' },
-                { id: 11106, title: 'Sony Animation' }
+                { id: 11106, title: 'Sony Animation' },
+                { id: 14160, title: 'Studio Ghibli' },
+                { id: 16, title: 'Warner Animation' },
+                { id: 5219, title: 'Laika' },
+                { id: 10210, title: 'Aardman' },
+                { id: 7, title: 'MGM Animation' },
+                { id: 15357, title: 'Paramount Animation' },
+                { id: 20478, title: 'Netflix Animation' },
+                { id: 13252, title: 'Cartoon Network' },
+                { id: 3172, title: 'Nickelodeon' }
             ];
 
-            var ratingFilter = 'certification_country=US&certification.lte=' + ratingLimit;
+            // Базовый фильтр (ТОЛЬКО анимация)
+            var baseFilter = [
+                'certification_country=US',
+                'certification.lte=' + ratingLimit,
+                'with_genres=16', // ТОЛЬКО мультфильмы
+                'without_genres=10751' // Исключаем семейное кино
+            ].join('&');
 
-            function shuffleArray(array) {
-                for (var i = array.length - 1; i > 0; i--) {
-                    var j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
-            }
+            // Создаем подборки
+            var partsData = [];
+            
+            // 1. Подборки по студиям
+            animationStudios.forEach(function(studio) {
+                partsData.push(createStudioRequest(studio));
+            });
 
-            function createRequest(endpoint, titleSuffix, callback) {
-                var sort = sortOptions[Math.floor(Math.random() * sortOptions.length)];
-                owner.get(endpoint + '&sort_by=' + sort.key + '&' + ratingFilter, params, function(json) {
-                    if (json.results) {
-                        json.results = filterOutAnime(json.results);
-                    }
-                    json.title = Lampa.Lang.translate(sort.title + ' ' + titleSuffix);
-                    callback(json);
-                }, callback);
-            }
+            // 2. Тематические подборки
+            partsData.push(
+                createRequest('discover/movie?with_keywords=210024', 'классические мультфильмы'),
+                createRequest('discover/movie?with_keywords=180449', 'приключения'),
+                createRequest('discover/movie?with_keywords=181317', 'сказки'),
+                createRequest('trending/movie/week', 'популярные сейчас'),
+                createRequest('movie/top_rated', 'лучшие за все время'),
+                createRequest('movie/now_playing', 'в кинотеатрах')
+            );
 
-            function getStudioMovies(studioName, studioId) {
+            // Оставляем только первые 12 подборок (чтобы после фильтрации осталось 8)
+            partsData = partsData.slice(0, 12);
+
+            // Функции для создания запросов
+            function createStudioRequest(studio) {
                 return function(callback) {
-                    createRequest(
-                        'discover/movie?with_companies=' + studioId + '&with_genres=16,10751',
-                        'от ' + studioName,
+                    owner.get(
+                        'discover/movie?with_companies=' + studio.id + '&' + baseFilter,
+                        params,
+                        function(json) {
+                            if (json.results) {
+                                json.results = filterOutAnime(json.results);
+                            }
+                            json.title = studio.title + ' мультфильмы';
+                            callback(json);
+                        },
                         callback
                     );
                 };
             }
 
-            // Создаем массив подборок
-            var partsData = [
-                function(callback) {
-                    createRequest('discover/movie?with_genres=16,10751', 'мультфильмы для детей', callback);
-                },
-                function(callback) {
-                    createRequest('discover/tv?with_genres=16,10751', 'мультсериалы для детей', callback);
-                },
-                function(callback) {
-                    createRequest('trending/movie/week?with_genres=16,10751', 'популярные на неделе', callback);
-                },
-                function(callback) {
-                    createRequest('movie/top_rated?with_genres=16,10751', 'лучшие мультфильмы', callback);
-                }
-            ];
-
-            // Добавляем подборки по студиям
-            kidsStudios.forEach(function(studio) {
-                partsData.push(getStudioMovies(studio.title, studio.id));
-            });
-
-            // Добавляем подборки по жанрам
-            kidsGenres.forEach(function(genre) {
-                partsData.push(function(callback) {
-                    createRequest('discover/movie?with_genres=' + genre.id, genre.title, callback);
-                });
-                partsData.push(function(callback) {
-                    createRequest('discover/tv?with_genres=' + genre.id, genre.title + ' сериалы', callback);
-                });
-            });
-
-            // Добавляем подборки по годам
-            var currentYear = new Date().getFullYear();
-            for (var i = 0; i < 3; i++) {
-                (function(year) {
-                    partsData.push(function(callback) {
-                        createRequest(
-                            'discover/movie?with_genres=16,10751&primary_release_year=' + year,
-                            'за ' + year + ' год',
-                            callback
-                        );
-                    });
-                })(currentYear - i);
-            }
-
-            // Перемешиваем подборки
-            partsData = shuffleArray(partsData);
-
-            // Ограничиваем общее количество подборок
-            partsData = partsData.slice(0, 15);
-
-            // Добавляем широкие карточки
-            function wrapWithWideFlag(requestFunc) {
+            function createRequest(endpoint, title) {
                 return function(callback) {
-                    requestFunc(function(json) {
-                        if (Math.random() < 0.3) { // 30% chance for wide card
-                            json.small = true;
-                            json.wide = true;
-                            if (Array.isArray(json.results)) {
-                                json.results.forEach(function(card) {
-                                    card.promo = card.overview;
-                                    card.promo_title = card.title || card.name;
-                                });
+                    owner.get(
+                        endpoint + '&' + baseFilter,
+                        params,
+                        function(json) {
+                            if (json.results) {
+                                json.results = filterOutAnime(json.results);
                             }
-                        }
-                        callback(json);
-                    });
+                            json.title = title;
+                            callback(json);
+                        },
+                        callback
+                    );
                 };
             }
 
-            partsData = partsData.map(wrapWithWideFlag);
-
-            // Загружаем несколько подборок
-            function loadPart(partLoaded, partEmpty) {
-                Lampa.Api.partNext(partsData, partsLimit, partLoaded, partEmpty);
+            // Гарантированная загрузка 8 подборок
+            function loadParts() {
+                var loaded = 0;
+                var results = [];
+                
+                function checkComplete() {
+                    if (loaded >= partsLimit && onComplete) {
+                        onComplete(results.slice(0, partsLimit)); // Возвращаем ровно 8 подборок
+                    }
+                }
+                
+                partsData.forEach(part => {
+                    part(function(json) {
+                        if (json.results && json.results.length > 0) {
+                            results.push(json);
+                            loaded++;
+                            checkComplete();
+                        }
+                    }, function() {
+                        loaded++;
+                        checkComplete();
+                    });
+                });
             }
-
-            loadPart(onComplete, onError);
-            return loadPart;
+            
+            loadParts();
+            return function() {}; // Пустая функция для совместимости
         };
     };
 
