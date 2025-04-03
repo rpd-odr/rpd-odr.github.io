@@ -147,10 +147,10 @@
   }
 
   function addStyles() {
-    if (!document.querySelector('link[href="/plugins/kuv/styles/kuv-style.css"]')) {
+    if (!document.querySelector('link[href="/kuv/styles/kuv-style.css"]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = "/plugins/kuv/styles/kuv-style.css";
+      link.href = "/kuv/styles/kuv-style.css";
       document.head.appendChild(link);
     }
   }
@@ -160,7 +160,6 @@
     Lampa.Storage.set("menu_sort", JSON.stringify(["Главная", "Фильмы", "Сериалы", "Мультики", "Избранное", "Релизы", "Торренты"]));
   }
   async function initPlugin() {
-    addMult();
     addReloadButton();
     addStyles();
     customizeMenu();
