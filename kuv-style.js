@@ -41,7 +41,7 @@
     "open--feed": { main: gitpath + "icons/star-four-duotone.svg" },
     "open--notice": { main: gitpath + "icons/bell-duotone.svg" },
     "n-about": { main: gitpath + "icons/info-duotone.svg" },
-    "open--broadcast: { main: gitpath + "icons/broadcast-duotone.svg" },
+    "open--broadcast": { main: gitpath + "icons/broadcast-duotone.svg" },
     "button--reactions": { main: gitpath + "icons/smiley-sticker-duotone.svg" },
   };
 
