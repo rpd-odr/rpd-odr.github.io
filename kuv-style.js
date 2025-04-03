@@ -1,10 +1,12 @@
 (function () {
   "use strict";
+  
+  const gitpath = "https://rpd-odr.github.io/kuv/";
 
   const ICONS = {
-    "head__logo-icon": { main: "/plugins/kuv/img/logo-icon.svg" },
-    "open--search": { main: "/plugins/kuv/icons/magnifying-glass-duotone.svg" },
-    "n-search": { main: "/plugins/kuv/icons/magnifying-glass-duotone.svg" },
+    "head__logo-icon": { main: gitpath + "img/logo-icon.svg" },
+    "open--search": { main: "https://rpd-odr.github.io/kuv/icons/magnifying-glass-duotone.svg" },
+    "n-search": { main: "https://rpd-odr.github.io/kuv/icons/magnifying-glass-duotone.svg" },
     "-settings": { main: "/plugins/kuv/icons/gear-duotone.svg" },
     "reload-icon": { main: "/plugins/kuv/icons/arrows-clockwise-duotone.svg" },
     "full-screen": { main: "/plugins/kuv/icons/arrows-out-simple-duotone.svg" },
