@@ -49,7 +49,7 @@
     "nt-plugins": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
     "nt-parental_control": { main: gitpath + "icons/lock-duotone.svg" },
     "nt-add_plugin": { main: gitpath + "icons/skull-duotone.svg" },
-    "nt-pirate-store": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
+    "nt-pirate_store": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
   };
 
   const iconCache = {};
