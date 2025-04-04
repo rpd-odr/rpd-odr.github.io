@@ -1,14 +1,6 @@
 (function () {
   "use strict";
   
-  var pluginManifest = {
-        name: 'Стиль KUV для Lampa',
-        version: '1.0',
-        description: 'Заменяет иконки и стиль некоторых элементов интерфейса.',
-        author: 'rpd@odr.su',
-        contact: 'https://odr.su'
-    };
-  
   //const localpath = "/plugins/kuv/"; //заменить gitpath на это, если расположен на локальном лампаке в папке wwwroot/plugins
   const gitpath = "https://rpd-odr.github.io/kuv/";
 
