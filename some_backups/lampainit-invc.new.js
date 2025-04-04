@@ -12,7 +12,7 @@ window.lampainit_invc.appload = function appload() {
   // Lampa.Utils.putScriptAsync(["{localhost}/plugins/ts-preload.js", "https://nb557.github.io/plugins/online_mod.js"]);
   // Lampa.Storage.set('proxy_tmdb', 'true');
   // etc
-    Lampa.Utils.putScriptAsync(["{localhost}/online.js", "{localhost}/sync.js", "{localhost}/backup.js", "{localhost}/tracks.js"]);
+    //Lampa.Utils.putScriptAsync(["{localhost}/online.js", "{localhost}/sync.js", "{localhost}/backup.js", "{localhost}/tracks.js"]);
 }
 
 
@@ -25,7 +25,7 @@ window.lampainit_invc.appready = function appready() {
 // Выполняется один раз, когда пользователь впервые открывает лампу
 window.lampainit_invc.first_initiale = function firstinitiale() {
   // Здесь можно указать/изменить первоначальные настройки 
-  Lampa.Storage.set('source', 'tmdb');                    // Источник по умолчанию cub, tmdb
+  Lampa.Storage.set('source', 'cub');                    // Источник по умолчанию cub, tmdb
   Lampa.Storage.set('animation', 'true');               // Анимация включена
   Lampa.Storage.set('internal_torrclient', 'true');
   Lampa.Storage.set('torrserver_savedb', 'true');
@@ -35,11 +35,11 @@ window.lampainit_invc.first_initiale = function firstinitiale() {
       Lampa.Storage.set('poster_size', 'w500');                             // Разрешение постеров TMDB - среднее
       Lampa.Storage.set('proxy_tmdb_auto', 'true');            // Для RU включить tmdb proxy
       Lampa.Storage.set('proxy_tmdb', 'true');                 // Для RU включить tmdb proxy
-    }
+    
 }
 
 
 // Ниже код выполняется до загрузки лампы, например можно изменить настройки 
-// window.lampa_settings.push_state = false;
+window.lampa_settings.push_state = false;
 localStorage.setItem('cub_domain', 'cub.rip');
 localStorage.setItem('cub_mirrors', '["cub.rip", "mirror-kurwa.men", "lampadev.ru"]');
