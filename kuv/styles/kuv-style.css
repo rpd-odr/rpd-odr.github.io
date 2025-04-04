@@ -98,6 +98,7 @@ height: auto!important;
 .extensions__item-check,
 .iframe__body {
 	background: url(../icons/spinner-ball-duotone.svg) no-repeat 50% 50% !important;
+		background-size: contain;
 }
 
 .content-loading::after,
