@@ -178,7 +178,7 @@ svg.kuvicon {
 .simple-button,
 .simple-button--filter > div
 {
-	border-radius: 2em!important;
+	border-radius: 2em !important;
 }
 
 .tag-count__count {
@@ -186,7 +186,7 @@ svg.kuvicon {
 	text-align: center;
 }
 
-simple-button--filter > div {
-	padding: .3em 1em!important;
+.simple-button--filter > div {
+	padding: .3em 1em !important;
 }
 
