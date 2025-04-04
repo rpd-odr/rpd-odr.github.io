@@ -2,9 +2,10 @@
   "use strict";
   
   var pluginManifest = {
+        name: 'Стиль KUV для Lampa',
         version: '1.0',
+        description: 'Заменяет иконки и стиль некоторых элементов интерфейса.',
         author: 'rpd@odr.su',
-        docs: 'https://rpd-odr.github.io/docs/kuv-style',
         contact: 'https://odr.su'
     };
   
@@ -57,6 +58,7 @@
     "nt-parental_control": { main: gitpath + "icons/lock-duotone.svg" },
     "nt-add_plugin": { main: gitpath + "icons/skull-duotone.svg" },
     "nt-pirate_store": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
+    "simple-keyboard-mic": { main: gitpath + "icons/microphone-duotone.svg" },
   };
 
   const iconCache = {};
