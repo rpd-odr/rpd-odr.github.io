@@ -97,7 +97,7 @@ height: auto!important;
 .screensaver__preload,
 .extensions__item-check,
 .iframe__body,
-.lampac-balancer-loader{
+.lampac-balanser-loader{
 	background: url(../icons/spinner-ball-duotone.svg) no-repeat 50% 50% !important;
 		background-size: clamp(8px, 100%, 32px)!important;
 }
