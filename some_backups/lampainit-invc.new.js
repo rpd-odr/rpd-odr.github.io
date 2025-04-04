@@ -12,7 +12,7 @@ window.lampainit_invc.appload = function appload() {
   // Lampa.Utils.putScriptAsync(["{localhost}/plugins/ts-preload.js", "https://nb557.github.io/plugins/online_mod.js"]);
   // Lampa.Storage.set('proxy_tmdb', 'true');
   // etc
-    Lampa.Utils.putScriptAsync(["{localhost}/online.js", "{localhost}/sync.js", "{localhost}/backup.js", "{localhost}/tracks.js"], function() {});
+    Lampa.Utils.putScriptAsync(["{localhost}/online.js", "{localhost}/sync.js", "{localhost}/backup.js", "{localhost}/tracks.js"]);
 }
 
 
