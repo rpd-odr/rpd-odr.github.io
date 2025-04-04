@@ -51,6 +51,7 @@
     "nt-add_plugin": { main: gitpath + "icons/skull-duotone.svg" },
     "nt-pirate_store": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
     "simple-keyboard-mic": { main: gitpath + "icons/microphone-duotone.svg" },
+    "close-button": { main: gitpath + "icons/x-circle-duotone.svg" },
   };
 
   const iconCache = {};
