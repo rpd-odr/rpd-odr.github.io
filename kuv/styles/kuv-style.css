@@ -190,3 +190,13 @@ svg.kuvicon {
 	padding: .3em 1em !important;
 }
 
+.full-person,
+.full-person__photo{
+		border-radius: 7em;
+}
+
+.full-person{
+	padding: .5em;
+	padding-right: 2em;
+}
+
