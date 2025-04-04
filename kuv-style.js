@@ -1,6 +1,13 @@
 (function () {
   "use strict";
   
+  var pluginManifest = {
+        version: '1.0',
+        author: 'rpd@odr.su',
+        docs: 'https://rpd-odr.github.io/docs/kuv-style',
+        contact: 'https://odr.su'
+    };
+  
   //const localpath = "/plugins/kuv/"; //заменить gitpath на это, если расположен на локальном лампаке в папке wwwroot/plugins
   const gitpath = "https://rpd-odr.github.io/kuv/";
 
