@@ -171,51 +171,7 @@ svg.kuvicon {
 	/* transition: all .2s ease-out; */
 }
 
-.db-mov-logo {
-    margin: 0.2em 0 0.1em 0.05em;
-    max-height: 2em;
-    max-width: 9em;
-    transition: all .3s ease;
-}
-
-.db-net-logo {
-    max-height: 1.25em;
-    /*filter: brightness(1000%);
-    /* opacity: 0.8; 
-    /* Добавление черно-белого фильтра */
-    filter: contrast(.2) invert(1) brightness(2) grayscale(100%);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    max-height: 1.05em;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    max-height: 2em;
-    transform: scale(1);
-  }
-}
-
-.db-mov-logo.logo-loaded {
-  animation: fadeIn 0.5s ease forwards;
-}
-
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  
-  to {
-    opacity: 0;
-    display: none;
-  }
-}
-
-.title-wrapper.fade-out {
-  animation: fadeOut 0.3s ease forwards;
+.full-start__button {
+	border-radius: 1.4em!important;
 }
 
