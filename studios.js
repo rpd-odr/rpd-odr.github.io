@@ -117,7 +117,7 @@
                 .button--network img,
                 .button--studio img {
                     height: 100%;
-                    max-height: 1.8em;
+                    max-height: 1.5em;
                     max-width: 4.5em;
                     object-fit: contain;
                 }
