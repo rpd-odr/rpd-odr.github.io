@@ -20,7 +20,8 @@
                 return;
             }
 
-            Lampa.Api.movie(tmdb_id, function(result){
+            // Используем метод get для запроса информации о фильме
+            Lampa.Api.get(`movie/${tmdb_id}`, function(result){
                 let studios = result.production_companies || [];
                 let networks = result.networks || [];
 
@@ -102,7 +103,8 @@
                 return;
             }
 
-            Lampa.Api.movie(tmdb_id, function(result){
+            // Используем Lampa.Api.get для получения информации о фильме
+            Lampa.Api.get(`movie/${tmdb_id}`, function(result){
                 let studios = result.production_companies || [];
                 let networks = result.networks || [];
                 let total = studios.length + networks.length;
