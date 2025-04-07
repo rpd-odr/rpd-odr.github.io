@@ -1,44 +1,50 @@
 (function () {
     'use strict';
 
-    // Ожидаем полной загрузки приложения
-    function waitAppReady() {
-        if (window.appready) {
-            initPlugin();
-        } else {
-            var listener = Lampa.Listener.follow('app', function(e) {
-                if (e.type === 'ready') {
-                    Lampa.Listener.remove('app', listener);
-                    initPlugin();
-                }
-            });
-        }
-    }
+    // Регистрация плагина
+    Lampa.Plugin.register('tmdb_networks_simple', {
+        name: 'TMDB Networks Simple',
+        version: '0.1',
+        description: 'Показывает логотипы студий/сетей производства',
+        author: 'Your Name'
+    });
 
-    function initPlugin() {
-        // Добавляем локализацию
-        Lampa.Lang.add({
-            tmdb_networks_production: {
-                en: 'Production',
-                uk: 'Виробництво',
-                ru: 'Производство'
-            }
-        });
-
-        // Добавляем стили
-        var style = document.createElement('style');
-        style.textContent = `
-            .network-btn {
+    // Стили для плагина
+    $('<style>')
+        .html(`
+            .network-btn { 
+                height: 2.94em;
                 margin-right: 10px;
-                cursor: pointer;
+                background-color: #fff;
+                position: relative;
+                border-radius: 0.6em;
             }
-            .network-btn:hover {
-                opacity: 0.8;
+            .network-btn img {
+                height: 100%;
+                border-radius: 0.6em;
             }
-        `;
-        document.head.appendChild(style);
+            .network-btn .overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0);
+            }
+            .network-btn.focus .overlay {
+                background: rgba(0, 0, 0, 0.3);
+            }
+            .network-btn.focus {
+                box-shadow: 0 0 0 0.2em rgb(255, 255, 255);
+            }
+            .tmdb-networks {
+                margin-top: -3em;
+            }
+        `)
+        .appendTo('head');
 
-        // Обработчик для карточек контента
+    // Основная функция
+    function initPlugin() {
         Lampa.Listener.follow('full', function (e) {
             if (e.type === 'complite') {
                 setTimeout(function() {
@@ -62,48 +68,29 @@
         var tagsContainer = $('.full-descr__tags', cardObject.nodes.body);
         if (!tagsContainer.length) return;
 
-        // Удаляем старую кнопку, если есть
+        // Удаляем старые элементы, если есть
         $('.network-btn', tagsContainer).remove();
 
-        // Создаем новую кнопку
-        var btn = $(`
-            <div class="tag-count selector network-btn">
-                <div class="tag-count__name">${Lampa.Lang.translate('tmdb_networks_production')}</div>
-                <div class="tag-count__count">${networks.length}</div>
-            </div>
-        `);
+        // Создаем кнопки с логотипами
+        networks.forEach(function(network) {
+            if (!network.logo_path) return;
 
-        btn.on('hover:enter', function() {
-            showNetworksList(networks, cardObject);
-        });
+            var btn = $(`
+                <div class="tag-count selector network-btn">
+                    <div class="overlay"></div>
+                    <img src="${Lampa.TMDB.image('t/p/h30' + network.logo_path)}" alt="${network.name}" loading="lazy">
+                </div>
+            `);
 
-        tagsContainer.append(btn);
-    }
+            btn.on('hover:enter', function() {
+                openNetworkContent(network, cardObject);
+            });
 
-    function showNetworksList(networks, cardObject) {
-        var currentController = Lampa.Controller.enabled().name;
-        
-        var items = networks.map(function(network) {
-            return {
-                title: network.name,
-                network: network,
-                image: network.logo_path ? Lampa.TMDB.image('w45' + network.logo_path) : null
-            };
-        });
-
-        Lampa.Select.show({
-            title: Lampa.Lang.translate('tmdb_networks_production'),
-            items: items,
-            onBack: function() {
-                Lampa.Controller.toggle(currentController);
-            },
-            onSelect: function(action) {
-                openNetworkContent(action.network, cardObject, currentController);
-            }
+            tagsContainer.append(btn);
         });
     }
 
-    function openNetworkContent(network, cardObject, prevController) {
+    function openNetworkContent(network, cardObject) {
         var isTv = cardObject.method === 'tv';
         var type = isTv ? 'tv' : 'movie';
         var filterField = isTv ? 'with_networks' : 'with_companies';
@@ -124,5 +111,11 @@
     }
 
     // Запускаем плагин
-    waitAppReady();
+    if (window.appready) {
+        initPlugin();
+    } else {
+        Lampa.Listener.follow('app', function(e) {
+            if (e.type === 'ready') initPlugin();
+        });
+    }
 })();
