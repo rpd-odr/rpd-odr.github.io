@@ -56,13 +56,6 @@
             }
         ];
 
-        if (item.origin_country || item.country || item.country_code) {
-            const region = item.origin_country || item.country || item.country_code;
-            menu.forEach(function(selectItem) {
-                selectItem.filter.watch_region = region;
-            });
-        }
-
         if (isTV) {
             menu.forEach(item => item.filter.with_networks = item.id);
         } else {
@@ -91,8 +84,9 @@
         });
     }
 
-    function renderCompanyButton(render, items, isTV) {
-        $('.button--company', render).remove();
+    function renderButton(render, items, isTV) {
+        var className = isTV ? 'button--network' : 'button--studio';
+        $('.' + className, render).remove();
 
         if (!items || items.length === 0) return;
 
@@ -101,7 +95,7 @@
 
         if (!item) return;
 
-        var btn = $('<div class="full-start__button selector button--company"></div>');
+        var btn = $('<div class="full-start__button selector ' + className + '"></div>');
         btn.html('<img src="' + Lampa.TMDB.image("t/p/w154" + item.logo_path) + '" alt="' + item.name + '">');
 
         btn.on('hover:enter', function () {
@@ -117,28 +111,13 @@
 
         getRelevantData(object, function(items, isTV) {
             if (items.length === 0) return;
-            renderCompanyButton(render, items, isTV);
+            renderButton(render, items, isTV);
         });
     }
 
     function startPlugin() {
         if (window.tmdb_company_selector) return;
         window.tmdb_company_selector = true;
-
-        $('<style>')
-            .html(`
-                .button--company {
-                    margin-left: 10px;
-                    height: 100%;
-                }
-                .button--company img {
-                    height: 100%;
-                    max-height: 30px;
-                    object-fit: contain;
-                    border-radius: 4px;
-                }
-            `)
-            .appendTo('head');
 
         Lampa.Listener.follow('activity,full', function (e) {
             if (e.type === 'complite' || e.type === 'archive') {
