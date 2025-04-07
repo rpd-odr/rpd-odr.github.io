@@ -70,6 +70,7 @@
                 if(element) Lampa.Controller.collectionFocus(element, Lampa.Activity.active().activity.render());
             },
             onSelect: function (action) {
+                // Открытие страницы категории
                 Lampa.Activity.push({
                     url: 'discover/' + (isTV ? 'tv' : 'movie'),
                     title: item.name + ' ' + action.type + (isTV ? ' Сериалы' : ' Фильмы'),
@@ -118,29 +119,17 @@
     function startPlugin() {
         if (window.tmdb_company_selector) return;
         window.tmdb_company_selector = true;
-        
-          $('<style>')
+
+        // Возвращаем стили
+        $('<style>')
             .html(`
                 .button--network, 
-                .button--studio
-                {
-
-
+                .button--studio {
+                    background-color: #fff;
                 }
                 
-                .button--network::after, 
-                .button--studio::after
-                {
-                    content: "";
-                    position: absolute;
-                    background-color: #fff;
-                    margin: .1em;
-                    height: 100%;
-                    width: 100%;
-                }
                 .button--network img,
-                .button--studio img
-                 {
+                .button--studio img {
                     height: 100%;
                     max-height: 1.6em;
                     max-width: 4.8em;
