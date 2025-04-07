@@ -56,6 +56,8 @@
             }
         ];
 
+        // Для сериалов: фильтрация по сети
+        // Для фильмов: фильтрация по студии
         if (isTV) {
             menu.forEach(item => item.filter.with_networks = item.id);
         } else {
