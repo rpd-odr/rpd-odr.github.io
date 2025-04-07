@@ -4,6 +4,8 @@
     const plugin_id = 'studios_and_networks';
 
     function createTag(count){
+        console.log('Creating tag with count:', count); // Отладка
+
         let tag = $(`
             <div class="tag-count selector" data-studios>
                 <div class="tag-count__name">Каналы / телесети</div>
@@ -13,7 +15,6 @@
 
         tag.on('hover:enter', function(){
             let card = Lampa.Activity.active().data;
-
             let tmdb_id = getTmdbId(card);
 
             if (!tmdb_id) {
@@ -73,27 +74,39 @@
     }
 
     function getTmdbId(card){
+        // Приоритет: сначала tmdbID, потом id от cub или tmdb
         if(card?.tmdbID) return card.tmdbID;
         if(card?.id && (card.source === 'tmdb' || card.source === 'cub')) return card.id;
         return null;
     }
 
     function insertTag(card){
+        console.log('Inserting tag...'); // Отладка
+
         let container = $('.full-descr__tags');
         if(container.length && !container.find('[data-studios]').length){
+            console.log('Found container, checking for TMDb ID...'); // Отладка
 
             let tmdb_id = getTmdbId(card);
-            if (!tmdb_id) return;
+            if (!tmdb_id) {
+                console.log('TMDb ID not found'); // Отладка
+                return;
+            }
 
             Lampa.Api.movie(tmdb_id, function(result){
                 let studios = result.production_companies || [];
                 let networks = result.networks || [];
                 let total = studios.length + networks.length;
 
+                console.log('Total studios and networks:', total); // Отладка
+
                 if(total === 0) return;
 
                 container.append(createTag(total));
+                console.log('Tag inserted successfully'); // Отладка
             });
+        } else {
+            console.log('Container not found or tag already exists'); // Отладка
         }
     }
 
