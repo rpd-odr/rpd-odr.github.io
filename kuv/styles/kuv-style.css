@@ -201,5 +201,5 @@ svg.kuvicon {
 }
 
 .network-innie {
-	border-radius: 2em;
+	border-radius: 2em !important;
 }
