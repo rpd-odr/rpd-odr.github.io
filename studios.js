@@ -124,7 +124,8 @@
                 .button--network, 
                 .button--studio
                 {
-                    
+                    overflow: hidden;
+                    background-color: rgba(255,255,255,.7);
                 }
                 .button--network img,
                 .button--studio img
