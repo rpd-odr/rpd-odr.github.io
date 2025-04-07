@@ -131,7 +131,8 @@
                 .button--network::after, 
                 .button--studio::after
                 {
-                    content: '';
+                    content: "";
+                    position: absolute;
                     background-color: #fff;
                     margin: .1em;
                     height: auto;
