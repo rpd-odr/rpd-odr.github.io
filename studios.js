@@ -77,8 +77,8 @@
         var controllerName = Lampa.Controller.enabled().name;
         
         var releaseDateField = isTv ? 'first_air_date' : 'primary_release_date';
-        var topFilter = { 'vote_count.gte': 10 };
-        var newFilter = { 'vote_count.gte': 10 };
+        var topFilter = { 'vote_count.gte': 3 };
+        var newFilter = { 'vote_count.gte': 3 };
         newFilter[releaseDateField + '.lte'] = new Date().toISOString().split('T')[0];
 
         var menu = [
