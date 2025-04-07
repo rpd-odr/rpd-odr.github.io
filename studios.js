@@ -3,80 +3,40 @@
 
     var network = new Lampa.Reguest();
 
-    function getMovieProviders(movie, callback) {
-        var allowedCountryCodes = ['US', 'RU'];
-        var excludeKeywords = ['Free', 'Ad', 'With Ads', 'Free with Ads', 'Plex', 'Tubi', 'Pluto TV', 'Google Play', 'Youtube', 'Max Amazon Channel'];
-        var maxDisplayPriority = 20;
+    function getCompanyOrNetwork(movie, callback) {
+        var isTV = !!movie.name;
+        var url = Lampa.TMDB.api((isTV ? 'tv/' : 'movie/') + movie.id + '?api_key=' + Lampa.TMDB.key());
 
-        var url = Lampa.TMDB.api('movie/' + movie.id + '/watch/providers?api_key=' + Lampa.TMDB.key());
         network.silent(url, function (data) {
-            if (!data.results) {
-                return [];
+            let result = [];
+
+            if (isTV && data.networks && data.networks.length) {
+                result = data.networks;
+            } else if (!isTV && data.production_companies && data.production_companies.length) {
+                result = data.production_companies;
             }
 
-            var countryCodes = Object.keys(data.results).filter(function(countryCode) {
-                return allowedCountryCodes.includes(countryCode);
-            });
-
-            var providers = [];
-            var uniqueProviders = [];
-
-            countryCodes.forEach(function(countryCode) {
-                var countryProviders = (data.results[countryCode].flatrate || [])
-                    .concat(data.results[countryCode].rent || [])
-                    .concat(data.results[countryCode].buy || []);
-            
-                countryProviders.forEach(function(provider) { provider.country_code = countryCode });
-                providers = providers.concat(countryProviders);
-            });
-
-            providers.forEach(function (provider) {
-                if (provider.display_priority > maxDisplayPriority) return;
-
-                if (uniqueProviders.some(function(p) { return p.id == provider.provider_id } )) return;
-
-                var name = provider.provider_name;
-                var excluded = excludeKeywords.some(function (keyword) {
-                    return name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-                });
-
-                if (excluded) return;
-
-                uniqueProviders.push({
-                    id: provider.provider_id,
-                    name: name,
-                    logo_path: provider.logo_path,
-                    display_priority: provider.display_priority,
-                    country_code: provider.country_code
-                });
-            });
-
-            uniqueProviders = uniqueProviders.sort(function (a, b) { return a.display_priority - b.display_priority });
-            callback(uniqueProviders);
+            callback(result, isTV);
         });
     }
 
-    function getNetworks(object, callback) {
+    function getRelevantData(object, callback) {
         var movie = object.card;
-        if (!movie || movie.source !== 'tmdb') return callback([]);
+        if (!movie || movie.source !== 'tmdb') return callback([], false);
 
-        var getFn = movie.networksList 
-            ? function() { callback(movie.networksList); }
-            : movie.networks 
-                ? function() { callback(movie.networks); }
-                : getMovieProviders;
-        
-        getFn(movie, function(networks) {
-            movie.networksList = networks;
-            callback(networks);
-        });
+        if (movie._companyData) {
+            callback(movie._companyData.list, movie._companyData.isTV);
+        } else {
+            getCompanyOrNetwork(movie, function(list, isTV) {
+                movie._companyData = { list, isTV };
+                callback(list, isTV);
+            });
+        }
     }
 
-    function onNetworkButtonClick(network, element, type) {
-        var isTv = type == 'tv';
+    function onCompanyClick(item, element, isTV) {
         var controllerName = Lampa.Controller.enabled().name;
-        
-        var releaseDateField = isTv ? 'first_air_date' : 'primary_release_date';
+        var releaseDateField = isTV ? 'first_air_date' : 'primary_release_date';
         var topFilter = { 'vote_count.gte': 3 };
         var newFilter = { 'vote_count.gte': 3 };
         newFilter[releaseDateField + '.lte'] = new Date().toISOString().split('T')[0];
@@ -96,15 +56,21 @@
             }
         ];
 
-        if (network.country_code) {
+        if (item.origin_country || item.country || item.country_code) {
+            const region = item.origin_country || item.country || item.country_code;
             menu.forEach(function(selectItem) {
-                selectItem.filter.watch_region = network.country_code;
-                selectItem.filter.with_watch_providers = network.id;
+                selectItem.filter.watch_region = region;
             });
         }
 
+        if (isTV) {
+            menu.forEach(item => item.filter.with_networks = item.id);
+        } else {
+            menu.forEach(item => item.filter.with_companies = item.id);
+        }
+
         Lampa.Select.show({
-            title: network.name + (isTv ? ' Сериалы' : ' Фильмы'),
+            title: item.name + (isTV ? ' Сериалы' : ' Фильмы'),
             items: menu,
             onBack: function () {
                 Lampa.Controller.toggle(controllerName);
@@ -112,75 +78,71 @@
             },
             onSelect: function (action) {
                 Lampa.Activity.push({
-                    url: 'discover/' + type,
-                    title: network.name + ' ' + action.type + (isTv ? ' Сериалы' : ' Фильмы'),
+                    url: 'discover/' + (isTV ? 'tv' : 'movie'),
+                    title: item.name + ' ' + action.type + (isTV ? ' Сериалы' : ' Фильмы'),
                     component: 'category_full',
-                    networks: network.id,
                     sort_by: action.sort_by,
                     source: 'tmdb',
                     card_type: true,
                     page: 1,
-                    filter: action.filter,
+                    filter: action.filter
                 });
             }
         });
     }
 
-    function renderExtraBtn(render, networks, type) {
-        $('.button--plaftorms', render).remove();
+    function renderCompanyButton(render, items, isTV) {
+        $('.button--company', render).remove();
 
-        if (!networks || networks.length === 0) return;
+        if (!items || items.length === 0) return;
 
         var container = $('.full-start-new__buttons', render);
-        var network = networks[0];
+        var item = items.find(c => c.logo_path);
 
-        if (!network.logo_path) return;
+        if (!item) return;
 
-        var btn = $('<div class="full-start__button selector button--plaftorms"></div>');
-        
-        btn.html('<img src="' + Lampa.TMDB.image("t/p/w154" + network.logo_path) + '" alt="' + network.name + '">');
-        
+        var btn = $('<div class="full-start__button selector button--company"></div>');
+        btn.html('<img src="' + Lampa.TMDB.image("t/p/w154" + item.logo_path) + '" alt="' + item.name + '">');
+
         btn.on('hover:enter', function () {
-            onNetworkButtonClick(network, this, type);
+            onCompanyClick(item, this, isTV);
         });
 
         container.append(btn);
     }
 
-    function renderNetworks() {
+    function renderCompanyOrNetwork() {
         var object = Lampa.Activity.active();
         var render = object.activity.render();
 
-        getNetworks(object, function(networks) {
-            if (networks.length == 0) return;
-
-            var type = object.method;
-            renderExtraBtn(render, networks, type);
+        getRelevantData(object, function(items, isTV) {
+            if (items.length === 0) return;
+            renderCompanyButton(render, items, isTV);
         });
     }
 
     function startPlugin() {
-        if (window.tmdb_networks) return;
-        window.tmdb_networks = true;
+        if (window.tmdb_company_selector) return;
+        window.tmdb_company_selector = true;
 
         $('<style>')
-            .html('\
-                .button--plaftorms {\
-                    margin-left: 10px;\
-                    height: 100%;\
-                }\
-                .button--plaftorms img {\
-                    height: 100%;\
-                    max-height: 30px;\
-                    object-fit: contain;\
-                    border-radius: 4px;\
-                }\
-            ')
+            .html(`
+                .button--company {
+                    margin-left: 10px;
+                    height: 100%;
+                }
+                .button--company img {
+                    height: 100%;
+                    max-height: 30px;
+                    object-fit: contain;
+                    border-radius: 4px;
+                }
+            `)
             .appendTo('head');
 
         Lampa.Listener.follow('activity,full', function (e) {
             if (e.type === 'complite' || e.type === 'archive') {
-                renderNetworks();
+                renderCompanyOrNetwork();
             }
         });
     }
