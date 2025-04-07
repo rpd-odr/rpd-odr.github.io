@@ -124,8 +124,16 @@
                 .button--network, 
                 .button--studio
                 {
-                    overflow: hidden;
+
+
+                }
+                
+                .button--network ::after, 
+                .button--studio ::after
+                {
+                    content: '';
                     background-color: rgba(255,255,255,.7);
+                    margin: .1em;
                 }
                 .button--network img,
                 .button--studio img
