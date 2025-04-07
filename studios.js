@@ -7,12 +7,19 @@
         var url = Lampa.TMDB.api('movie/' + movie.id + '/watch/providers');
         network.silent(url, function (data) {
             var providers = [];
-            if (data.results && data.results.US) {
-                providers = (data.results.US.flatrate || [])
-                    .concat(data.results.US.rent || [])
-                    .concat(data.results.US.buy || []);
-            }
-            callback(providers.filter(p => p.logo_path));
+            var allowedCountryCodes = ['US', 'RU'];  // Добавили страну RU
+
+            allowedCountryCodes.forEach(function (countryCode) {
+                if (data.results && data.results[countryCode]) {
+                    providers = providers.concat(
+                        (data.results[countryCode].flatrate || [])
+                            .concat(data.results[countryCode].rent || [])
+                            .concat(data.results[countryCode].buy || [])
+                    );
+                }
+            });
+
+            callback(providers.filter(p => p.logo_path));  // Возвращаем провайдеров с логотипами
         });
     }
 
@@ -26,7 +33,6 @@
         getMovieProviders(item, callback);
     }
 
-    // Функция для отображения меню с фильмами/сериалами
     function showNetworkMenu(network, type, element) {
         var isTv = type === 'tv';
         var controller = Lampa.Controller.enabled().name;
@@ -71,7 +77,6 @@
         });
     }
 
-    // Функция для добавления кнопки с логотипом студии или телесети
     function addNetworkButton(render, networks, type) {
         $('.button--network, .button--studio', render).remove(); // Удаляем старые кнопки
 
@@ -86,9 +91,7 @@
         $('.full-start-new__buttons', render).append(btn);
     }
 
-    // Инициализация плагина
     function initPlugin() {
-        // Восстановление твоих стилей для кнопок с правильными названиями классов
         $('<style>')
             .html(`
                 .button--network, 
