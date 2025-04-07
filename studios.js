@@ -159,7 +159,11 @@
 
                     .full-start-new__title {
                         position: relative;
-                        margin-bottom: 0.5em !important;
+                        margin-bottom: 0.6em !important;
+                    }
+                    
+                    .full--tagline {
+                        margin-bottom: 0.6em !important;
                     }
 
                     .original-title {
