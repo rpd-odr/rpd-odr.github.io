@@ -127,11 +127,11 @@
                     
                 }
                 .button--network img,
-                .button--studio img,
+                .button--studio img
                  {
                     height: 100%;
                     max-height: 1.3em;
-                     max-width: 3em;
+                    max-width: 3em;
                     object-fit: contain;
                 }
             `)
