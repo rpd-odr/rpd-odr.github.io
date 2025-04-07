@@ -130,8 +130,8 @@
                 .button--studio img
                  {
                     height: 100%;
-                    max-height: 1.3em;
-                    max-width: 3em;
+                    max-height: 1.6em;
+                    max-width: 4.8em;
                     object-fit: contain;
                 }
             `)
