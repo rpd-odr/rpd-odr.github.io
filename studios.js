@@ -73,10 +73,11 @@
 
     // Функция для добавления кнопки с логотипом студии или телесети
     function addNetworkButton(render, networks, type) {
-        $('.button--platform', render).remove();
+        $('.button--network, .button--studio', render).remove(); // Удаляем старые кнопки
+
         if (!networks || !networks[0] || !networks[0].logo_path) return;
 
-        var btn = $('<div class="full-start__button selector button--platform"></div>')
+        var btn = $('<div class="full-start__button selector button--network"></div>')
             .append('<img src="' + Lampa.TMDB.image('w154' + networks[0].logo_path) + '">')
             .on('hover:enter', function() {
                 showNetworkMenu(networks[0], type, this);
@@ -87,7 +88,7 @@
 
     // Инициализация плагина
     function initPlugin() {
-        // Восстановление твоих стилей для кнопок
+        // Восстановление твоих стилей для кнопок с правильными названиями классов
         $('<style>')
             .html(`
                 .button--network, 
