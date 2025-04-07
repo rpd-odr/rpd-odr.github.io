@@ -83,10 +83,10 @@
         if (!networks || !networks[0] || !networks[0].logo_path) return;
 
         var btn = $('<div class="full-start__button selector button--network"></div>')
-            .append('<img src="' + Lampa.TMDB.image('w154' + networks[0].logo_path) + '">')
-            .on('hover:enter', function() {
-                showNetworkMenu(networks[0], type, this);
-            });
+    .append('<img src="' + Lampa.TMDB.image('t/p/w154' + networks[0].logo_path) + '" alt="' + networks[0].name + '">')
+    .on('hover:enter', function () {
+        showNetworkMenu(networks[0], type, this);
+    });
 
         $('.full-start-new__buttons', render).append(btn);
     }
