@@ -1,98 +1,103 @@
 (function () {
     'use strict';
 
-    var network = new Lampa.Reguest();
-
-    function getMovieProviders(movie, callback) {
-        var allowedCountryCodes = ['US', 'RU'];
-        var excludeKeywords = ['Free', 'Ad', 'With Ads'];
-        var maxDisplayPriority = 20;
-
-        var url = Lampa.TMDB.api('movie/' + movie.id + '/watch/providers');
-        network.silent(url, function (data) {
-            if (!data.results) return callback([]);
-
-            var providers = [];
-            Object.keys(data.results).forEach(function(country) {
-                if (!allowedCountryCodes.includes(country)) return;
-                
-                var items = [].concat(
-                    data.results[country].flatrate || [],
-                    data.results[country].buy || [],
-                    data.results[country].rent || []
-                );
-                
-                items.forEach(function(provider) {
-                    if (provider.display_priority > maxDisplayPriority) return;
-                    if (excludeKeywords.some(k => provider.provider_name.includes(k))) return;
-                    providers.push({
-                        id: provider.provider_id,
-                        name: provider.provider_name,
-                        logo_path: provider.logo_path
-                    });
-                });
-            });
-            
-            callback(providers);
-        });
-    }
-
-    function getNetworks(card, callback) {
-        if (card.networks) return callback(card.networks);
-        if (card.production_companies) return callback(card.production_companies);
-        if (card.source === 'tmdb') getMovieProviders(card, callback);
-        else callback([]);
-    }
-
-    function createProviderButton(network) {
-        if (!network.logo_path) return null;
-        
-        var btn = $(`
-            <div class="full-start__button selector button--platform">
-                <img src="${Lampa.TMDB.image('t/p/h30' + network.logo_path)}" 
-                     alt="${network.name}" 
-                     style="height: 70%; border-radius: 0.3em;">
-            </div>
-        `);
-        
-        btn.on('hover:enter', function() {
-            Lampa.Activity.push({
-                url: 'discover/' + (card.method === 'tv' ? 'tv' : 'movie'),
-                title: network.name,
-                component: 'category_full',
-                filter: {
-                    [card.method === 'tv' ? 'with_networks' : 'with_companies']: network.id
+    // Ждём готовности приложения
+    function waitAppReady() {
+        if (window.appready) {
+            initPlugin();
+        } else {
+            var listener = Lampa.Listener.follow('app', function(e) {
+                if (e.type === 'ready') {
+                    Lampa.Listener.remove('app', listener);
+                    initPlugin();
                 }
             });
-        });
-        
-        return btn;
+        }
     }
 
-    function addPlatformButton() {
-        Lampa.Listener.follow('full', function(e) {
-            if (e.type !== 'complite') return;
-            
-            var card = e.object;
-            var buttonsContainer = $('.full-start-new__buttons', card.nodes.body);
-            if (!buttonsContainer.length) return;
-            
-            $('.button--platform', buttonsContainer).remove();
-            
-            getNetworks(card.item, function(networks) {
-                if (networks.length === 0) return;
-                
-                var mainProvider = networks[0];
-                var btn = createProviderButton(mainProvider);
-                if (btn) buttonsContainer.append(btn);
-            });
+    function initPlugin() {
+        // Добавляем стили для кнопки
+        var style = document.createElement('style');
+        style.textContent = `
+            .button--platforms {
+                margin-left: 10px;
+                height: 100%;
+            }
+            .button--platforms img {
+                height: 100%;
+                max-height: 30px;
+                object-fit: contain;
+                border-radius: 4px;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Обработчик для карточек контента
+        Lampa.Listener.follow('full', function (e) {
+            if (e.type === 'complite') {
+                setTimeout(function() {
+                    try {
+                        processCard(e.object);
+                    } catch (err) {
+                        console.error('Platforms plugin error:', err);
+                    }
+                }, 300);
+            }
         });
     }
 
-    // Запуск
-    if (window.appready) addPlatformButton();
-    else Lampa.Listener.follow('app', function(e) {
-        if (e.type === 'ready') addPlatformButton();
-    });
+    function processCard(cardObject) {
+        var item = cardObject.item;
+        if (!item) return;
 
+        // Получаем список сетей/студий
+        var networks = item.networks || item.production_companies || [];
+        if (networks.length === 0) return;
+
+        // Находим первую сеть с логотипом
+        var network = networks.find(n => n.logo_path) || networks[0];
+        if (!network) return;
+
+        var buttonsContainer = $('.full-start-new__buttons', cardObject.nodes.body);
+        if (!buttonsContainer.length) return;
+
+        // Удаляем старую кнопку, если есть
+        $('.button--platforms', buttonsContainer).remove();
+
+        // Создаем кнопку с логотипом
+        var btn = $(`
+            <div class="full-start__button selector button--platforms">
+                <img src="${Lampa.TMDB.image('w154' + network.logo_path)}" alt="${network.name}">
+            </div>
+        `);
+
+        btn.on('hover:enter', function() {
+            openNetworkContent(network, cardObject);
+        });
+
+        buttonsContainer.append(btn);
+    }
+
+    function openNetworkContent(network, cardObject) {
+        var isTv = cardObject.method === 'tv';
+        var type = isTv ? 'tv' : 'movie';
+        var filterField = isTv ? 'with_networks' : 'with_companies';
+
+        Lampa.Activity.push({
+            url: 'discover/' + type,
+            title: network.name,
+            component: 'category_full',
+            source: 'tmdb',
+            card_type: true,
+            page: 1,
+            filter: {
+                [filterField]: network.id,
+                'vote_count.gte': 10
+            },
+            sort_by: isTv ? 'first_air_date.desc' : 'primary_release_date.desc'
+        });
+    }
+
+    // Запускаем плагин
+    waitAppReady();
 })();
