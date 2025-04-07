@@ -83,7 +83,7 @@
         if (!networks || !networks[0] || !networks[0].logo_path) return;
 
         var btn = $('<div class="full-start__button selector button--network"></div>')
-    .append('<img src="' + Lampa.TMDB.image('t/p/w154' + networks[0].logo_path) + '" alt="' + networks[0].name + '">')
+    .append('<div class="network-innie"><img src="' + Lampa.TMDB.image('t/p/w154' + networks[0].logo_path) + '" alt="' + networks[0].name + '"></div>')
     .on('hover:enter', function () {
         showNetworkMenu(networks[0], type, this);
     });
@@ -96,7 +96,13 @@
             .html(`
                 .button--network, 
                 .button--studio {
-                    background-color: rgba(255,255,255,.3);
+
+                }
+                
+                .network-innie {
+                    background-color: rgba(255,255,255,1);
+                    width: 100%;
+                    height: 100%;
                 }
 
                 .button--network img,
