@@ -96,13 +96,15 @@
             .html(`
                 .button--network, 
                 .button--studio {
-
+                    padding: .3em;
                 }
                 
                 .network-innie {
                     background-color: rgba(255,255,255,1);
                     width: 100%;
                     height: 100%;
+                    border-radius: .7em;
+                    display: flex;
                 }
 
                 .button--network img,
