@@ -1,14 +1,22 @@
 (function(){
+    'use strict';
+
     const plugin_id = 'studios_and_networks';
 
-    function createTag(){
-        let tag = $('<div class="tag tag--gray selector" data-studios><span>Каналы / телесети</span></div>');
+    function createTag(count){
+        let tag = $(`
+            <div class="tag-count selector" data-studios>
+                <div class="tag-count__name">Каналы / телесети</div>
+                <div class="tag-count__count">${count}</div>
+            </div>
+        `);
 
         tag.on('hover:enter', function(){
             let card = Lampa.Activity.active().data;
-            let tmdb_id = card?.tmdbID;
 
-            if(!tmdb_id) {
+            let tmdb_id = getTmdbId(card);
+
+            if (!tmdb_id) {
                 Lampa.Noty.show('TMDb ID не найден');
                 return;
             }
@@ -18,7 +26,7 @@
                 let networks = result.networks || [];
 
                 if(!studios.length && !networks.length){
-                    Lampa.Noty.show('Нет данных о каналах или телесетях');
+                    Lampa.Noty.show('Нет данных о каналах или студиях');
                     return;
                 }
 
@@ -64,16 +72,34 @@
         return tag;
     }
 
-    function insertTag(){
+    function getTmdbId(card){
+        if(card?.tmdbID) return card.tmdbID;
+        if(card?.id && (card.source === 'tmdb' || card.source === 'cub')) return card.id;
+        return null;
+    }
+
+    function insertTag(card){
         let container = $('.full-descr__tags');
         if(container.length && !container.find('[data-studios]').length){
-            container.append(createTag());
+
+            let tmdb_id = getTmdbId(card);
+            if (!tmdb_id) return;
+
+            Lampa.Api.movie(tmdb_id, function(result){
+                let studios = result.production_companies || [];
+                let networks = result.networks || [];
+                let total = studios.length + networks.length;
+
+                if(total === 0) return;
+
+                container.append(createTag(total));
+            });
         }
     }
 
     function init(){
         Lampa.Listener.follow('full', function(e){
-            if(e.type === 'complite') insertTag();
+            if(e.type === 'complite') insertTag(e.data);
         });
     }
 
