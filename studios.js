@@ -26,6 +26,7 @@
         getMovieProviders(item, callback);
     }
 
+    // Функция для отображения меню с фильмами/сериалами
     function showNetworkMenu(network, type, element) {
         var isTv = type === 'tv';
         var controller = Lampa.Controller.enabled().name;
@@ -70,6 +71,7 @@
         });
     }
 
+    // Функция для добавления кнопки с логотипом студии или телесети
     function addNetworkButton(render, networks, type) {
         $('.button--platform', render).remove();
         if (!networks || !networks[0] || !networks[0].logo_path) return;
@@ -83,6 +85,7 @@
         $('.full-start-new__buttons', render).append(btn);
     }
 
+    // Инициализация плагина
     function initPlugin() {
         $('<style>').html(`
             .button--platform {
