@@ -87,18 +87,23 @@
 
     // Инициализация плагина
     function initPlugin() {
-        $('<style>').html(`
-            .button--platform {
-                margin-left: 10px;
-                height: 100%;
-            }
-            .button--platform img {
-                height: 100%;
-                max-height: 30px;
-                object-fit: contain;
-                border-radius: 4px;
-            }
-        `).appendTo('head');
+        // Восстановление твоих стилей для кнопок
+        $('<style>')
+            .html(`
+                .button--network, 
+                .button--studio {
+                    background-color: #fff;
+                }
+
+                .button--network img,
+                .button--studio img {
+                    height: 100%;
+                    max-height: 1.6em;
+                    max-width: 4.8em;
+                    object-fit: contain;
+                }
+            `)
+            .appendTo('head');
 
         Lampa.Listener.follow('full', function(e) {
             if (e.type === 'complite') {
