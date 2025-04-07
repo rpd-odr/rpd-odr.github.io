@@ -4,8 +4,6 @@
     const plugin_id = 'studios_and_networks';
 
     function createTag(count){
-        console.log('Creating tag with count:', count); // Отладка
-
         let tag = $(`
             <div class="tag-count selector" data-studios>
                 <div class="tag-count__name">Каналы / телесети</div>
@@ -74,9 +72,19 @@
     }
 
     function getTmdbId(card){
+        console.log('Card data:', card); // Отладка
+
         // Приоритет: сначала tmdbID, потом id от cub или tmdb
-        if(card?.tmdbID) return card.tmdbID;
-        if(card?.id && (card.source === 'tmdb' || card.source === 'cub')) return card.id;
+        if(card?.tmdbID) {
+            console.log('Using tmdbID:', card.tmdbID); // Отладка
+            return card.tmdbID;
+        }
+
+        if(card?.id && (card.source === 'tmdb' || card.source === 'cub')) {
+            console.log('Using id from source:', card.id); // Отладка
+            return card.id;
+        }
+
         return null;
     }
 
