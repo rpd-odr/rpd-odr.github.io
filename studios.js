@@ -74,17 +74,18 @@
     function getTmdbId(card){
         console.log('Card data:', card); // Отладка
 
-        // Приоритет: сначала tmdbID, потом id от cub или tmdb
-        if(card?.tmdbID) {
-            console.log('Using tmdbID:', card.tmdbID); // Отладка
-            return card.tmdbID;
+        // Проверим, какие поля существуют в объекте card
+        for (let key in card) {
+            console.log(`Key: ${key}, Value:`, card[key]);
         }
 
-        if(card?.id && (card.source === 'tmdb' || card.source === 'cub')) {
-            console.log('Using id from source:', card.id); // Отладка
-            return card.id;
+        // Попробуем найти id в другом месте объекта
+        if(card?.movie?.id) {
+            console.log('Using id from movie:', card.movie.id); // Отладка
+            return card.movie.id;
         }
 
+        // Если не находим, вернем null
         return null;
     }
 
