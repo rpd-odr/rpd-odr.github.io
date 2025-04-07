@@ -96,7 +96,7 @@
             .html(`
                 .button--network, 
                 .button--studio {
-                    background-color: #fff;
+                    background-color: rgba(255,255,255,.3);
                 }
 
                 .button--network img,
