@@ -134,6 +134,8 @@
                     content: '';
                     background-color: #fff;
                     margin: .1em;
+                    height: auto;
+                    width:auto;
                 }
                 .button--network img,
                 .button--studio img
