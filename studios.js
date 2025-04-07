@@ -118,6 +118,24 @@
     function startPlugin() {
         if (window.tmdb_company_selector) return;
         window.tmdb_company_selector = true;
+        
+          $('<style>')
+            .html(`
+                .button--network, 
+                .button--studio
+                {
+                    
+                }
+                .button--network img,
+                .button--studio img,
+                 {
+                    height: 100%;
+                    max-height: 1.3em;
+                     max-width: 3em;
+                    object-fit: contain;
+                }
+            `)
+            .appendTo('head');
 
         Lampa.Listener.follow('activity,full', function (e) {
             if (e.type === 'complite' || e.type === 'archive') {
