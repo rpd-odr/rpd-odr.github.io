@@ -72,6 +72,60 @@
         });
     }
 
+    function onNetworkButtonClick(network, element, type) {
+        var isTv = type == 'tv';
+        var controllerName = Lampa.Controller.enabled().name;
+        
+        var releaseDateField = isTv ? 'first_air_date' : 'primary_release_date';
+        var topFilter = { 'vote_count.gte': 10 };
+        var newFilter = { 'vote_count.gte': 10 };
+        newFilter[releaseDateField + '.lte'] = new Date().toISOString().split('T')[0];
+
+        var menu = [
+            {
+                title: 'Открыть популярные',
+                sort_by: '',
+                type: 'Популярные',
+                filter: topFilter
+            },
+            {
+                title: 'Открыть новинки',
+                sort_by: releaseDateField + '.desc',
+                type: 'Новинки',
+                filter: newFilter
+            }
+        ];
+
+        if (network.country_code) {
+            menu.forEach(function(selectItem) {
+                selectItem.filter.watch_region = network.country_code;
+                selectItem.filter.with_watch_providers = network.id;
+            });
+        }
+
+        Lampa.Select.show({
+            title: network.name + (isTv ? ' Сериалы' : ' Фильмы'),
+            items: menu,
+            onBack: function () {
+                Lampa.Controller.toggle(controllerName);
+                if(element) Lampa.Controller.collectionFocus(element, Lampa.Activity.active().activity.render());
+            },
+            onSelect: function (action) {
+                Lampa.Activity.push({
+                    url: 'discover/' + type,
+                    title: network.name + ' ' + action.type + (isTv ? ' Сериалы' : ' Фильмы'),
+                    component: 'category_full',
+                    networks: network.id,
+                    sort_by: action.sort_by,
+                    source: 'tmdb',
+                    card_type: true,
+                    page: 1,
+                    filter: action.filter,
+                });
+            }
+        });
+    }
+
     function renderExtraBtn(render, networks, type) {
         $('.button--plaftorms', render).remove();
 
@@ -87,26 +141,7 @@
         btn.html('<img src="' + Lampa.TMDB.image("t/p/w154" + network.logo_path) + '" alt="' + network.name + '">');
         
         btn.on('hover:enter', function () {
-            var isTv = type == 'tv';
-            var controllerName = Lampa.Controller.enabled().name;
-            
-            var releaseDateField = isTv ? 'first_air_date' : 'primary_release_date';
-            var filterField = isTv ? 'with_networks' : 'with_companies';
-
-            Lampa.Activity.push({
-                url: 'discover/' + type,
-                title: network.name,
-                component: 'category_full',
-                networks: network.id,
-                source: 'tmdb',
-                card_type: true,
-                page: 1,
-                filter: {
-                    [filterField]: network.id,
-                    'vote_count.gte': 10
-                },
-                sort_by: releaseDateField + '.desc'
-            });
+            onNetworkButtonClick(network, this, type);
         });
 
         container.append(btn);
