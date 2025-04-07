@@ -105,6 +105,7 @@
                     height: 100%;
                     border-radius: .7em;
                     display: flex;
+                    flex-shrink: 0;
                 }
 
                 .button--network img,
