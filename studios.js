@@ -128,11 +128,11 @@
 
                 }
                 
-                .button--network ::after, 
-                .button--studio ::after
+                .button--network::after, 
+                .button--studio::after
                 {
                     content: '';
-                    background-color: rgba(255,255,255,.7);
+                    background-color: #fff;
                     margin: .1em;
                 }
                 .button--network img,
