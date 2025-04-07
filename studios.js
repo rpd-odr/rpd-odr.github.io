@@ -135,8 +135,8 @@
                     position: absolute;
                     background-color: #fff;
                     margin: .1em;
-                    height: auto;
-                    width:auto;
+                    height: 100%;
+                    width: 100%;
                 }
                 .button--network img,
                 .button--studio img
