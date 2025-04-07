@@ -159,12 +159,12 @@
 
                     .full-start-new__title {
                         position: relative;
+                        margin-bottom: 0.5em !important;
                     }
 
                     .original-title {
                         font-size: 0.8em;
                         color: rgba(255, 255, 255, 0.7);
-                        margin-top: 0.2em;
                         font-weight: normal;
                     }
                 `)
