@@ -14,19 +14,26 @@
     function addCollectionsButton() {
         if ($('.menu .menu__item-collections').length) return;
 
-        const button = Lampa.Template.get('menu_button', {
-            title: 'Подборки',
-            class: 'menu__item-collections'
-        });
-
-        button.on('hover:enter', function () {
-            Lampa.Activity.push({
-                url: '',
-                title: 'Подборки мультфильмов',
-                component: 'collections_page',
-                page: 1
+        const button = $('<li>')
+            .addClass('menu__item selector menu__item-collections')
+            .append(
+                $('<div>')
+                    .addClass('menu__ico')
+                    .append('<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><use xlink:href="#filter"></use></svg>')
+            )
+            .append(
+                $('<div>')
+                    .addClass('menu__text')
+                    .text('Подборки')
+            )
+            .on('hover:enter', function () {
+                Lampa.Activity.push({
+                    url: '',
+                    title: 'Подборки мультфильмов',
+                    component: 'collections_page',
+                    page: 1
+                });
             });
-        });
 
         $('.menu .menu__list').append(button);
     }
@@ -72,6 +79,22 @@
 
     // Инициализация плагина
     function initPlugin() {
+        // Добавляем стили
+        if ($('style#collections-plugin').length === 0) {
+            $('<style>')
+                .attr('id', 'collections-plugin')
+                .html(`
+                    .menu__item-collections .menu__ico svg {
+                        width: 38px;
+                        height: 38px;
+                    }
+                    .menu__item-collections .menu__text {
+                        line-height: 38px;
+                    }
+                `)
+                .appendTo('head');
+        }
+
         addCollectionsButton();
 
         // Добавляем кнопку при загрузке меню
