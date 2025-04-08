@@ -1,122 +1,52 @@
-(function () {
-    'use strict';
+!function() {
+    "use strict";
+    
+    // Ждём загрузки приложения
+    Lampa.Listener.follow("app", function(e) {
+        if (e.type === "ready") {
+            // Создаём элемент меню
+            var menuItem = $('<li class="menu__item selector" data-action="cartoons">\
+                <div class="menu__ico">\
+                    <svg viewBox="0 0 514 514" xmlns="http://www.w3.org/2000/svg">\
+                        <path d="m400 2c-79 6-142 75-142 156v14h-99l-98 1-5 2c-38 17-23 63 21 65h15l-3 6c-10 20-10 24-11 76v45l-5-8c-7-12-13-26-18-39-5-15-6-17-11-21-13-12-35-7-41 10-6 16 17 70 46 105 116 145 347 127 439-34 31-54 31-87-1-87-15 0-21 5-28 27-6 18-28 58-31 58-1 0-1-22-1-49v-50l-11-55c-12-60-12-58-6-63 8-7 15-3 24 11 14 24 29 30 47 21 20-9 21-17 10-71-10-52-10-53 2-53s21-14 20-28c-1-6-2-7-10-13-30-20-65-29-103-26m43 74c-10 3-14 17-6 25 13 13 32-4 23-19-3-5-11-8-17-6m-289 114v27l1 26 2 3 3 3h46 46l3-3 2-3v-27-27h-51c-36 0-51 0-52 1m78 116c-54 9-96 54-102 109l-1 6 10 6c70 45 158 47 230 4 9-5 8-4 7-15-7-71-73-122-144-110" fill="currentColor" fill-rule="evenodd"/>\
+                    </svg>\
+                </div>\
+                <div class="menu__text">Мультики</div>\
+            </li>');
 
-    function addCollectionsButton() {
-        if ($('.menu .menu__item-collections').length) return;
-
-        const button = $('<li>')
-            .addClass('menu__item selector menu__item-collections')
-            .append(
-                $('<div>')
-                    .addClass('menu__ico')
-                    .append('<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><use xlink:href="#filter"></use></svg>')
-            )
-            .append(
-                $('<div>')
-                    .addClass('menu__text')
-                    .text('Подборки')
-            )
-            .on('hover:enter', function () {
-                Lampa.Activity.push({
-                    url: '',
-                    title: 'Подборки мультфильмов',
-                    component: 'custom_collections',
-                    page: 1
-                });
+            // Обработка клика
+            menuItem.on("hover:enter", function() {
+                var source = Lampa.Storage.get('source', 'cub'); // Получаем текущий источник
+                
+                if (source === 'tmdb') {
+                    // Для TMDB - объединённая подборка мультфильмов и мультсериалов
+                    Lampa.Activity.push({
+                        url: "discover/movie?with_genres=16&sort_by=popularity.desc",
+                        title: "Мультики (TMDB)",
+                        component: "category_full",
+                        source: "tmdb",
+                        genres: 16,
+                        card_type: true,
+                        page: 1
+                    });
+                }
+                else {
+                    // Для CUB - стандартная категория мультфильмов
+                    Lampa.Activity.push({
+                        url: "",
+                        title: "Мультики",
+                        component: "category",
+                        genres: 16,
+                        id: 16,
+                        source: "cub",
+                        card_type: true,
+                        page: 1
+                    });
+                }
             });
 
-        $('.menu .menu__list').append(button);
-    }
-
-    Lampa.Component.add('custom_collections', function () {
-        this.create = function () {
-            const collections = [
-                { title: 'Disney', url: 'discover/movie', filter: { with_companies: '2', with_genres: '16', sort_by: 'vote_average.desc' } },
-                { title: 'Pixar', url: 'discover/movie', filter: { with_companies: '3', with_genres: '16', sort_by: 'vote_average.desc' } },
-                { title: 'Cartoon Network', url: 'discover/tv', filter: { with_networks: '56', with_genres: '16', sort_by: 'vote_average.desc' } },
-                { title: 'Новинки 2020-х', url: 'discover/movie', filter: { with_genres: '16', 'primary_release_date.gte': '2020-01-01', sort_by: 'primary_release_date.desc' } }
-            ];
-
-            const shuffledCollections = Lampa.Arrays.shuffle(collections);
-
-            this.container = $('<div class="categories"></div>');
-
-            shuffledCollections.forEach(collection => {
-                const categoryBlock = $('<div class="category"><h2>' + collection.title + '</h2><div class="category-list"></div></div>');
-
-                Lampa.TMDB.get({
-                    url: collection.url,
-                    filter: collection.filter,
-                    source: 'tmdb',
-                    page: 1
-                }, (data) => {
-                    if (data && data.results && data.results.length) {
-                        const list = categoryBlock.find('.category-list');
-                        data.results.slice(0, 10).forEach(item => {
-                            const card = $('<div class="card card--small">' +
-                                '<img src="' + (item.poster_path ? 'https://image.tmdb.org/t/p/w200' + item.poster_path : '') + '" />' +
-                                '<div class="card__title">' + (item.title || item.name) + '</div>' +
-                                '</div>');
-                            card.on('hover:enter', () => {
-                                Lampa.Activity.push({
-                                    url: 'movie/' + item.id,
-                                    title: item.title || item.name,
-                                    component: 'full',
-                                    id: item.id,
-                                    source: 'tmdb'
-                                });
-                            });
-                            list.append(card);
-                        });
-                    } else {
-                        console.log('No results for:', collection.title);
-                    }
-                }, () => {
-                    console.log('Error loading:', collection.title);
-                });
-
-                this.container.append(categoryBlock);
-            });
-
-            return this.container;
-        };
-
-        this.destroy = function () {
-            if (this.container) this.container.remove();
-        };
-    });
-
-    function initPlugin() {
-        if ($('style#collections-plugin').length === 0) {
-            $('<style>')
-                .attr('id', 'collections-plugin')
-                .html(`
-                    .menu__item-collections .menu__ico svg {
-                        width: 38px;
-                        height: 38px;
-                    }
-                    .menu__item-collections .menu__text {
-                        line-height: 38px;
-                    }
-                    .categories { padding: 20px; }
-                    .category { margin-bottom: 20px; }
-                    .category h2 { font-size: 24px; color: #fff; margin-bottom: 10px; }
-                    .category-list { display: flex; flex-wrap: wrap; gap: 10px; }
-                    .card--small { width: 120px; cursor: pointer; }
-                    .card--small img { width: 100%; border-radius: 8px; }
-                    .card__title { font-size: 14px; color: #fff; text-align: center; margin-top: 5px; }
-                `)
-                .appendTo('head');
+            // Вставляем кнопку в меню перед пунктом "Сериалы"
+            $(".menu .menu__list").eq(0).find("[data-action=tv]").before(menuItem);
         }
-
-        addCollectionsButton();
-        Lampa.Listener.follow('menu', function (e) {
-            if (e.type === 'load') {
-                addCollectionsButton();
-            }
-        });
-    }
-
-    if (window.appready) initPlugin();
-    else Lampa.Listener.follow('app', e => e.type === 'ready' && initPlugin());
-})();
+    });
+}();
