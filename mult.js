@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // Добавление кнопки в меню
     function addCollectionsButton() {
         if ($('.menu .menu__item-collections').length) return;
 
@@ -29,56 +28,14 @@
         $('.menu .menu__list').append(button);
     }
 
-    // Регистрация компонента
     Lampa.Component.add('collections_main', function () {
         this.create = function () {
             const collections = [
-                {
-                    title: 'Disney',
-                    url: 'discover/movie',
-                    filter: { with_companies: '2', with_genres: '16', sort_by: 'vote_average.desc' }
-                },
-                {
-                    title: 'Pixar',
-                    url: 'discover/movie',
-                    filter: { with_companies: '3', with_genres: '16', sort_by: 'vote_average.desc' }
-                },
-                {
-                    title: 'Cartoon Network',
-                    url: 'discover/tv',
-                    filter: { with_networks: '56', with_genres: '16', sort_by: 'vote_average.desc' }
-                },
-                {
-                    title: 'Новинки 2020-х',
-                    url: 'discover/movie',
-                    filter: { with_genres: '16', 'primary_release_date.gte': '2020-01-01', sort_by: 'primary_release_date.desc' }
-                },
-                {
-                    title: 'Классика 90-х',
-                    url: 'discover/movie',
-                    filter: { with_genres: '16', 'primary_release_date.lte': '1999-12-31', sort_by: 'vote_average.desc' }
-                },
-                {
-                    title: 'Высокий рейтинг',
-                    url: 'discover/movie',
-                    filter: { with_genres: '16', 'vote_average.gte': 7, sort_by: 'vote_average.desc' }
-                },
-                {
-                    title: 'Популярные сериалы',
-                    url: 'discover/tv',
-                    filter: { with_genres: '16', sort_by: 'popularity.desc' }
-                },
-                {
-                    title: 'Семейные мультфильмы',
-                    url: 'discover/movie',
-                    filter: { with_genres: '16,10751', sort_by: 'vote_average.desc' }
-                }
-            ];
+                { title: 'Новинки', url: 'discover/movie', filter: { sort_by: 'primary_release_date.desc', 'primary_release_date.lte': new Date().toISOString().split('T')[0], 'vote_count.gte': '100' } },
+                { title: 'Популярное', url: 'discover/movie', filter: { sort_by: 'popularity.desc', 'vote_count.gte': '100' } }
+            ]; // Тест с рабочими категориями из aviamovie
 
-            // Перемешиваем категории
             const shuffledCollections = Lampa.Arrays.shuffle(collections);
-
-            // Создаём страницу
             this.page = new Lampa.Main({
                 title: 'Подборки мультфильмов',
                 categories: shuffledCollections.map(c => ({
@@ -89,17 +46,14 @@
                     card_type: true
                 }))
             });
-
             this.page.render();
             return this.page;
         };
-
         this.destroy = function () {
             if (this.page) this.page.destroy();
         };
     });
 
-    // Инициализация плагина
     function initPlugin() {
         if ($('style#collections-plugin').length === 0) {
             $('<style>')
@@ -117,7 +71,6 @@
         }
 
         addCollectionsButton();
-
         Lampa.Listener.follow('menu', function (e) {
             if (e.type === 'load') {
                 addCollectionsButton();
