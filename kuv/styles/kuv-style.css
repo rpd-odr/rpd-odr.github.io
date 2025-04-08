@@ -186,8 +186,26 @@ svg.kuvicon {
 	text-align: center;
 }
 
+.simple-button {
+	padding: .3em .8em;
+}
+
+.simple-button > span {
+	margin-left: .8em;
+	margin-right: .8em;
+}
+
 .simple-button--filter > div {
 	padding: .3em 1em !important;
+	margin-left: 0!important;
+}
+
+.online-prestige-watched__body {
+	padding-top: .3em;
+}
+
+.full-start-new__title {
+	line-clamp: 2!important;
 }
 
 .full-person,
