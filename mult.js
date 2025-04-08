@@ -7,7 +7,7 @@
             // Создаём элемент меню
             var menuItem = $('<li class="menu__item selector" data-action="cartoons">\
                 <div class="menu__ico">\
-                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\<circle cx="60" cy="60" r="40" fill="none" stroke="currentColor" stroke-width="4">\<circle cx="140" cy="60" r="40" fill="none" stroke="currentColor" stroke-width="4">\<circle cx="100" cy="130" r="55" fill="none" stroke="currentColor" stroke-width="4">\</svg>\
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\<circle cx="60" cy="60" r="40" fill="none" stroke="currentColor" stroke-width="4"><circle cx="140" cy="60" r="40" fill="none" stroke="currentColor" stroke-width="4"><circle cx="100" cy="130" r="55" fill="none" stroke="currentColor" stroke-width="4">\</svg>\
                  </div>\
                 <div class="menu__text">Мультики</div>\
             </li>');
