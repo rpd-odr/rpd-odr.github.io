@@ -1,16 +1,21 @@
 (function () {
     'use strict';
 
-    function showCollectionsMenu() {
-        const controller = Lampa.Controller.enabled().name;
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
 
-        // Определяем подборки для мультфильмов и мультсериалов
+    function openCollectionsPage() {
         const collections = [
             // Мультфильмы по студиям
             {
                 title: 'Disney',
                 url: 'discover/movie',
-                filter: { with_companies: '2', with_genres: '16' }, // 2 - Disney, 16 - Animation
+                filter: { with_companies: '2', with_genres: '16' }, // 2 - Disney
                 sort: 'vote_average.desc',
                 type: 'movie'
             },
@@ -67,7 +72,6 @@
                 sort: 'popularity.desc',
                 type: 'tv'
             },
-            // Дополнительная подборка
             {
                 title: 'Семейные мультфильмы',
                 url: 'discover/movie',
@@ -77,27 +81,23 @@
             }
         ];
 
-        Lampa.Select.show({
+        // Перемешиваем подборки
+        const shuffledCollections = shuffleArray([...collections]);
+
+        // Создаём активность с перемешанными подборками
+        Lampa.Activity.push({
+            url: '',
             title: 'Подборки мультфильмов',
-            items: collections.map(collection => ({
+            component: 'category_full',
+            source: 'tmdb',
+            card_type: true,
+            page: 1,
+            collections: shuffledCollections.map(collection => ({
                 title: collection.title,
-                collection: collection
-            })),
-            onBack: function() {
-                Lampa.Controller.toggle(controller);
-            },
-            onSelect: function(item) {
-                Lampa.Activity.push({
-                    url: item.collection.url,
-                    title: item.collection.title,
-                    component: 'category_full',
-                    source: 'tmdb',
-                    card_type: true,
-                    page: 1,
-                    sort_by: item.collection.sort,
-                    filter: item.collection.filter
-                });
-            }
+                url: collection.url,
+                filter: collection.filter,
+                sort_by: collection.sort
+            }))
         });
     }
 
@@ -120,7 +120,7 @@
                     .text('Подборки')
             )
             .on('hover:enter', function() {
-                showCollectionsMenu();
+                openCollectionsPage();
             });
 
         menu.append(button);
