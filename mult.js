@@ -17,16 +17,27 @@
                     .text('Подборки')
             )
             .on('hover:enter', function () {
+                const collections = [
+                    { title: 'Disney', url: 'discover/movie', filter: { with_companies: '2', with_genres: '16', sort_by: 'vote_average.desc' } },
+                    { title: 'Pixar', url: 'discover/movie', filter: { with_companies: '3', with_genres: '16', sort_by: 'vote_average.desc' } },
+                    { title: 'Cartoon Network', url: 'discover/tv', filter: { with_networks: '56', with_genres: '16', sort_by: 'vote_average.desc' } },
+                    { title: 'Новинки 2020-х', url: 'discover/movie', filter: { with_genres: '16', 'primary_release_date.gte': '2020-01-01', sort_by: 'primary_release_date.desc' } }
+                ];
+
+                const shuffledCollections = Lampa.Arrays.shuffle(collections);
+
                 Lampa.Activity.push({
-                    url: 'discover/movie',
+                    url: '',
                     title: 'Подборки мультфильмов',
                     component: 'category_full',
-                    source: 'tmdb',
                     page: 1,
-                    filter: {
-                        with_genres: '16', // Только мультфильмы
-                        sort_by: 'popularity.desc'
-                    }
+                    categories: shuffledCollections.map(c => ({
+                        title: c.title,
+                        url: c.url,
+                        filter: c.filter,
+                        source: 'tmdb',
+                        card_type: true
+                    }))
                 });
             });
 
