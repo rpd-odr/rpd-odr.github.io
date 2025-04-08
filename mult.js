@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    function shuffleArray(array) {
+    // Функция для перемешивания массива
+    function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
@@ -9,148 +10,76 @@
         return array;
     }
 
-    function openCollectionsPage() {
-        const collections = [
-            // Мультфильмы по студиям
-            {
-                title: 'Disney',
-                url: 'discover/movie',
-                filter: { with_companies: '2', with_genres: '16' }, // 2 - Disney
-                sort: 'vote_average.desc',
-                type: 'movie'
-            },
-            {
-                title: 'Pixar',
-                url: 'discover/movie',
-                filter: { with_companies: '3', with_genres: '16' }, // 3 - Pixar
-                sort: 'vote_average.desc',
-                type: 'movie'
-            },
-            // Мультсериалы по студиям
-            {
-                title: 'Cartoon Network',
-                url: 'discover/tv',
-                filter: { with_networks: '56', with_genres: '16' }, // 56 - Cartoon Network
-                sort: 'vote_average.desc',
-                type: 'tv'
-            },
-            // По годам
-            {
-                title: 'Новинки 2020-х',
-                url: 'discover/movie',
-                filter: { 
-                    with_genres: '16', 
-                    'primary_release_date.gte': '2020-01-01',
-                    'primary_release_date.lte': '2029-12-31'
-                },
-                sort: 'primary_release_date.desc',
-                type: 'movie'
-            },
-            {
-                title: 'Классика 90-х',
-                url: 'discover/movie',
-                filter: { 
-                    with_genres: '16', 
-                    'primary_release_date.gte': '1990-01-01',
-                    'primary_release_date.lte': '1999-12-31'
-                },
-                sort: 'vote_average.desc',
-                type: 'movie'
-            },
-            // По рейтингу и популярности
-            {
-                title: 'Высокий рейтинг',
-                url: 'discover/movie',
-                filter: { with_genres: '16', 'vote_count.gte': 100, 'vote_average.gte': 8 },
-                sort: 'vote_average.desc',
-                type: 'movie'
-            },
-            {
-                title: 'Популярные сериалы',
-                url: 'discover/tv',
-                filter: { with_genres: '16', 'vote_count.gte': 50 },
-                sort: 'popularity.desc',
-                type: 'tv'
-            },
-            {
-                title: 'Семейные мультфильмы',
-                url: 'discover/movie',
-                filter: { with_genres: '16,10751' }, // 10751 - Family
-                sort: 'vote_average.desc',
-                type: 'movie'
-            }
-        ];
+    // Добавление кнопки в меню
+    function addCollectionsButton() {
+        if ($('.menu .menu__item-collections').length) return;
 
-        // Перемешиваем подборки
-        const shuffledCollections = shuffleArray([...collections]);
-
-        // Создаём активность с перемешанными подборками
-        Lampa.Activity.push({
-            url: '',
-            title: 'Подборки мультфильмов',
-            component: 'category_full',
-            source: 'tmdb',
-            card_type: true,
-            page: 1,
-            collections: shuffledCollections.map(collection => ({
-                title: collection.title,
-                url: collection.url,
-                filter: collection.filter,
-                sort_by: collection.sort
-            }))
+        const button = Lampa.Template.get('menu_button', {
+            title: 'Подборки',
+            class: 'menu__item-collections'
         });
+
+        button.on('hover:enter', function () {
+            Lampa.Activity.push({
+                url: '',
+                title: 'Подборки мультфильмов',
+                component: 'collections_page',
+                page: 1
+            });
+        });
+
+        $('.menu .menu__list').append(button);
     }
 
-    function addCollectionsButton() {
-        if ($('.menu__collections-button').length) return;
+    // Регистрация кастомного компонента для страницы подборок
+    Lampa.Component.add('collections_page', function () {
+        this.create = function () {
+            const collections = [
+                { title: 'Disney', url: 'discover/movie', filter: { with_companies: '2', with_genres: '16' }, sort: 'vote_average.desc' },
+                { title: 'Pixar', url: 'discover/movie', filter: { with_companies: '3', with_genres: '16' }, sort: 'vote_average.desc' },
+                { title: 'Cartoon Network', url: 'discover/tv', filter: { with_networks: '56', with_genres: '16' }, sort: 'vote_average.desc' },
+                { title: 'Новинки 2020-х', url: 'discover/movie', filter: { with_genres: '16', 'primary_release_date.gte': '2020-01-01', 'primary_release_date.lte': '2029-12-31' }, sort: 'primary_release_date.desc' },
+                { title: 'Классика 90-х', url: 'discover/movie', filter: { with_genres: '16', 'primary_release_date.gte': '1990-01-01', 'primary_release_date.lte': '1999-12-31' }, sort: 'vote_average.desc' },
+                { title: 'Высокий рейтинг', url: 'discover/movie', filter: { with_genres: '16', 'vote_count.gte': 100, 'vote_average.gte': 8 }, sort: 'vote_average.desc' },
+                { title: 'Популярные сериалы', url: 'discover/tv', filter: { with_genres: '16', 'vote_count.gte': 50 }, sort: 'popularity.desc' },
+                { title: 'Семейные мультфильмы', url: 'discover/movie', filter: { with_genres: '16,10751' }, sort: 'vote_average.desc' }
+            ];
 
-        const menu = $('.menu .menu__list');
-        if (!menu.length) return;
+            // Перемешиваем подборки
+            const shuffledCollections = shuffle([...collections]);
 
-        const button = $('<li>')
-            .addClass('menu__item selector menu__collections-button')
-            .append(
-                $('<div>')
-                    .addClass('menu__ico')
-                    .append('<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><use xlink:href="#filter"></use></svg>')
-            )
-            .append(
-                $('<div>')
-                    .addClass('menu__text')
-                    .text('Подборки')
-            )
-            .on('hover:enter', function() {
-                openCollectionsPage();
+            // Создаём объект страницы
+            this.page = new Lampa.Main({
+                title: 'Подборки мультфильмов',
+                categories: shuffledCollections.map(collection => ({
+                    title: collection.title,
+                    url: collection.url,
+                    filter: collection.filter,
+                    sort: collection.sort,
+                    source: 'tmdb',
+                    card_type: true
+                }))
             });
 
-        menu.append(button);
-    }
+            this.page.render();
+            return this.page;
+        };
 
+        this.destroy = function () {
+            if (this.page) this.page.destroy();
+        };
+    });
+
+    // Инициализация плагина
     function initPlugin() {
-        if ($('style#collections-plugin').length === 0) {
-            $('<style>')
-                .attr('id', 'collections-plugin')
-                .html(`
-                    .menu__collections-button .menu__ico svg {
-                        width: 38px;
-                        height: 38px;
-                    }
-                    .menu__collections-button .menu__text {
-                        line-height: 38px;
-                    }
-                `)
-                .appendTo('head');
-        }
+        addCollectionsButton();
 
-        Lampa.Listener.follow('menu', function(e) {
+        // Добавляем кнопку при загрузке меню
+        Lampa.Listener.follow('menu', function (e) {
             if (e.type === 'load') {
                 addCollectionsButton();
             }
         });
-
-        if ($('.menu .menu__list').length) {
-            addCollectionsButton();
-        }
     }
 
     if (window.appready) initPlugin();
