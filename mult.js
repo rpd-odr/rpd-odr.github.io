@@ -1,6 +1,7 @@
 (function () {
     'use strict';
 
+    // Функция для перемешивания массива
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -9,6 +10,7 @@
         return array;
     }
 
+    // Добавление кнопки в меню
     function addCollectionsButton() {
         if ($('.menu .menu__item-collections').length) return;
 
@@ -44,17 +46,12 @@
                     component: 'category_full',
                     page: 1,
                     categories: shuffledCollections.map(collection => {
-                        const params = new URLSearchParams({
-                            language: 'ru',
-                            page: '1',
-                            sort_by: collection.sort,
-                            ...collection.filter
-                        }).toString();
-                        const fullUrl = `/3/${collection.url}?${params}`;
-                        console.log('Generated URL:', Lampa.TMDB.api(fullUrl));
+                        console.log('Collection:', collection);
                         return {
                             title: collection.title,
-                            url: fullUrl,
+                            url: collection.url,
+                            filter: collection.filter,
+                            sort_by: collection.sort,
                             source: 'tmdb',
                             card_type: true
                         };
@@ -65,6 +62,7 @@
         $('.menu .menu__list').append(button);
     }
 
+    // Инициализация плагина
     function initPlugin() {
         if ($('style#collections-plugin').length === 0) {
             $('<style>')
