@@ -7,7 +7,7 @@
             // Создаём элемент меню
             var menuItem = $('<li class="menu__item selector" data-action="cartoons">\
                 <div class="menu__ico">\
-                    <svg>\
+                    <svg fill="currentColor">\
                         <image xlink:href="https://rpd-odr.github.io/kuv/icons/rabbit-duotone.svg"/>\
                     </svg>\
                 </div>\
