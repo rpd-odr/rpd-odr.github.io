@@ -23,7 +23,7 @@
     "-main": { main: gitpath + "icons/house-duotone.svg" },
     "n-movie": { main: gitpath + "icons/film-slate-duotone.svg" },
     "n-tv": { main: gitpath + "icons/television-duotone.svg" },
-    "menu-mult": { main: gitpath + "icons/rabbit-duotone.svg" },
+    "n-cartoon": { main: gitpath + "icons/rabbit-duotone.svg" },
     "-favorite": { main: gitpath + "icons/list-heart-duotone.svg" },
     "-relise": { main: gitpath + "icons/high-definition-duotone.svg" },
     "-mytorrents": { main: gitpath + "icons/magnet-duotone.svg" },
