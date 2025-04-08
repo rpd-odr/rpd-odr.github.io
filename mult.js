@@ -27,59 +27,38 @@
                     .text('Подборки')
             )
             .on('hover:enter', function () {
+                const collections = [
+                    { title: 'Disney', url: 'discover/movie', filter: { with_companies: '2', with_genres: '16' }, sort: 'vote_average.desc' },
+                    { title: 'Pixar', url: 'discover/movie', filter: { with_companies: '3', with_genres: '16' }, sort: 'vote_average.desc' },
+                    { title: 'Cartoon Network', url: 'discover/tv', filter: { with_networks: '56', with_genres: '16' }, sort: 'vote_average.desc' },
+                    { title: 'Новинки 2020-х', url: 'discover/movie', filter: { with_genres: '16', 'primary_release_date.gte': '2020-01-01' }, sort: 'primary_release_date.desc' },
+                    { title: 'Классика 90-х', url: 'discover/movie', filter: { with_genres: '16', 'primary_release_date.lte': '1999-12-31' }, sort: 'vote_average.desc' },
+                    { title: 'Высокий рейтинг', url: 'discover/movie', filter: { with_genres: '16', 'vote_average.gte': 7 }, sort: 'vote_average.desc' },
+                    { title: 'Популярные сериалы', url: 'discover/tv', filter: { with_genres: '16' }, sort: 'popularity.desc' },
+                    { title: 'Семейные мультфильмы', url: 'discover/movie', filter: { with_genres: '16,10751' }, sort: 'vote_average.desc' }
+                ];
+
+                // Перемешиваем подборки
+                const shuffledCollections = shuffle([...collections]);
+
                 Lampa.Activity.push({
                     url: '',
                     title: 'Подборки мультфильмов',
-                    component: 'collections_page',
-                    page: 1
+                    component: 'category_full',
+                    page: 1,
+                    categories: shuffledCollections.map(collection => ({
+                        title: collection.title,
+                        url: collection.url,
+                        filter: collection.filter,
+                        sort_by: collection.sort,
+                        source: 'tmdb',
+                        card_type: true
+                    }))
                 });
             });
 
         $('.menu .menu__list').append(button);
     }
-
-    // Регистрация кастомного компонента
-    Lampa.Component.add('collections_page', function () {
-        this.create = function () {
-            const collections = [
-                { title: 'Disney', url: 'discover/movie', filter: { with_companies: '2', with_genres: '16' }, sort: 'vote_average.desc' },
-                { title: 'Pixar', url: 'discover/movie', filter: { with_companies: '3', with_genres: '16' }, sort: 'vote_average.desc' },
-                { title: 'Cartoon Network', url: 'discover/tv', filter: { with_networks: '56', with_genres: '16' }, sort: 'vote_average.desc' },
-                { title: 'Новинки 2020-х', url: 'discover/movie', filter: { with_genres: '16', 'primary_release_date.gte': '2020-01-01', 'primary_release_date.lte': '2029-12-31' }, sort: 'primary_release_date.desc' },
-                { title: 'Классика 90-х', url: 'discover/movie', filter: { with_genres: '16', 'primary_release_date.gte': '1990-01-01', 'primary_release_date.lte': '1999-12-31' }, sort: 'vote_average.desc' },
-                { title: 'Высокий рейтинг', url: 'discover/movie', filter: { with_genres: '16', 'vote_count.gte': 100, 'vote_average.gte': 8 }, sort: 'vote_average.desc' },
-                { title: 'Популярные сериалы', url: 'discover/tv', filter: { with_genres: '16', 'vote_count.gte': 50 }, sort: 'popularity.desc' },
-                { title: 'Семейные мультфильмы', url: 'discover/movie', filter: { with_genres: '16,10751' }, sort: 'vote_average.desc' }
-            ];
-
-            // Перемешиваем подборки
-            const shuffledCollections = shuffle([...collections]);
-
-            // Используем Lampa.Category для отображения категорий
-            this.category = new Lampa.Category({
-                title: 'Подборки мультфильмов'
-            });
-
-            shuffledCollections.forEach(collection => {
-                this.category.add({
-                    title: collection.title,
-                    url: collection.url,
-                    filter: collection.filter,
-                    sort_by: collection.sort,
-                    source: 'tmdb',
-                    card_type: true
-                });
-            });
-
-            // Рендерим страницу
-            this.category.render();
-            return this.category;
-        };
-
-        this.destroy = function () {
-            if (this.category) this.category.destroy();
-        };
-    });
 
     // Инициализация плагина
     function initPlugin() {
