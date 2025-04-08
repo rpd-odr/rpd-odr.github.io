@@ -22,7 +22,7 @@
                     // Для TMDB - объединённая подборка мультфильмов и мультсериалов
                     Lampa.Activity.push({
                         url: "discover/movie?with_genres=16&sort_by=popularity.desc",
-                        title: "Мультики (TMDB)",
+                        title: "Мультики – TMDB",
                         component: "category_full",
                         source: "tmdb",
                         genres: 16,
@@ -34,7 +34,7 @@
                     // Для CUB - стандартная категория мультфильмов
                     Lampa.Activity.push({
                         url: "",
-                        title: "Мультики",
+                        title: "Мультики – CUB",
                         component: "category",
                         genres: 16,
                         id: 16,
