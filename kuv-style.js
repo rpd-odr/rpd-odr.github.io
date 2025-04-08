@@ -1,7 +1,15 @@
+// Плагин KUV style для Lampa.
+
+// Заменяет большинство иконок и шрифты в интерфейсе.
+// Частично переработан интерфейс.
+// Добавлена кнопка перезагрузки в шапку.
+
+// Для корректной работы из локального источника необходима папка kuv со всеми подпапками. А также нужно заменить gitpath на localpath в коде ниже!
+
 (function () {
   "use strict";
   
-  //const localpath = "/plugins/kuv/"; //заменить gitpath на это, если расположен на локальном лампаке в папке wwwroot/plugins
+  //const localpath = "/plugins/kuv/"; // раскомментировать и заменить gitpath на localpath, если расположен локально (на лампаке в папке wwwroot/plugins).
   const gitpath = "https://rpd-odr.github.io/kuv/";
 
   const ICONS = {
