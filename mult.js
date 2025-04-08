@@ -38,7 +38,7 @@
         $('.menu .menu__list').append(button);
     }
 
-    // Регистрация кастомного компонента для страницы подборок
+    // Регистрация кастомного компонента
     Lampa.Component.add('collections_page', function () {
         this.create = function () {
             const collections = [
@@ -55,31 +55,34 @@
             // Перемешиваем подборки
             const shuffledCollections = shuffle([...collections]);
 
-            // Создаём объект страницы
-            this.page = new Lampa.Main({
-                title: 'Подборки мультфильмов',
-                categories: shuffledCollections.map(collection => ({
+            // Используем Lampa.Category для отображения категорий
+            this.category = new Lampa.Category({
+                title: 'Подборки мультфильмов'
+            });
+
+            shuffledCollections.forEach(collection => {
+                this.category.add({
                     title: collection.title,
                     url: collection.url,
                     filter: collection.filter,
-                    sort: collection.sort,
+                    sort_by: collection.sort,
                     source: 'tmdb',
                     card_type: true
-                }))
+                });
             });
 
-            this.page.render();
-            return this.page;
+            // Рендерим страницу
+            this.category.render();
+            return this.category;
         };
 
         this.destroy = function () {
-            if (this.page) this.page.destroy();
+            if (this.category) this.category.destroy();
         };
     });
 
     // Инициализация плагина
     function initPlugin() {
-        // Добавляем стили
         if ($('style#collections-plugin').length === 0) {
             $('<style>')
                 .attr('id', 'collections-plugin')
@@ -97,7 +100,6 @@
 
         addCollectionsButton();
 
-        // Добавляем кнопку при загрузке меню
         Lampa.Listener.follow('menu', function (e) {
             if (e.type === 'load') {
                 addCollectionsButton();
