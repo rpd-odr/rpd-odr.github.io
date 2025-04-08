@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // Функция для перемешивания массива
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -10,7 +9,6 @@
         return array;
     }
 
-    // Добавление кнопки в меню
     function addCollectionsButton() {
         if ($('.menu .menu__item-collections').length) return;
 
@@ -38,7 +36,6 @@
                     { title: 'Семейные мультфильмы', url: 'discover/movie', filter: { with_genres: '16,10751' }, sort: 'vote_average.desc' }
                 ];
 
-                // Перемешиваем подборки
                 const shuffledCollections = shuffle([...collections]);
 
                 Lampa.Activity.push({
@@ -46,21 +43,28 @@
                     title: 'Подборки мультфильмов',
                     component: 'category_full',
                     page: 1,
-                    categories: shuffledCollections.map(collection => ({
-                        title: collection.title,
-                        url: collection.url,
-                        filter: collection.filter,
-                        sort_by: collection.sort,
-                        source: 'tmdb',
-                        card_type: true
-                    }))
+                    categories: shuffledCollections.map(collection => {
+                        const params = new URLSearchParams({
+                            language: 'ru',
+                            page: '1',
+                            sort_by: collection.sort,
+                            ...collection.filter
+                        }).toString();
+                        const fullUrl = `/3/${collection.url}?${params}`;
+                        console.log('Generated URL:', Lampa.TMDB.api(fullUrl));
+                        return {
+                            title: collection.title,
+                            url: fullUrl,
+                            source: 'tmdb',
+                            card_type: true
+                        };
+                    })
                 });
             });
 
         $('.menu .menu__list').append(button);
     }
 
-    // Инициализация плагина
     function initPlugin() {
         if ($('style#collections-plugin').length === 0) {
             $('<style>')
