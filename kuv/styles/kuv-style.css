@@ -208,6 +208,10 @@ svg.kuvicon {
 	line-clamp: 2!important;
 }
 
+.full-start-new__right {
+	outline: none!important;
+}
+
 .full-person,
 .full-person__photo{
 		border-radius: 7em;
