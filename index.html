@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KUV плагины для Lampa</title>
 
   <!-- Подключение шрифта -->
@@ -14,7 +14,6 @@
     body {
       font-family: "Wix Madefor Display", sans-serif;
       font-weight: 400;
-      font-style: normal;
       margin: 0;
       padding: 0;
       background-color: #333;
@@ -61,14 +60,45 @@
       margin-bottom: 1.5rem;
       padding: 1rem;
       border-radius: 0.5rem;
-      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      overflow: hidden;
+      position: relative;
+    }
+
+    details[open] {
+      background-color: #555;
     }
 
     details summary {
       font-weight: 600;
       font-size: 1.1rem;
-      margin-bottom: 0.5em;
-      outline: none;
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details summary::before {
+      content: "▶";
+      display: inline-block;
+      transform: rotate(0deg);
+      transition: transform 0.3s ease;
+      margin-right: 0.7em;
+      font-size: 0.9rem;
+    }
+
+    details[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    details p {
+      margin-top: 1em;
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
 
     footer {
@@ -76,16 +106,18 @@
       padding: 1rem;
       background-color: #333;
       color: white;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
       font-size: 0.9rem;
+    }
+
+    @media (min-width: 768px) {
+      main {
+        padding: 3rem;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Шапка сайта -->
   <header>
     <div class="header-inner">
       <img src="kuv/img/logo-icon.svg" alt="Логотип" class="logo-icon">
@@ -93,7 +125,6 @@
     </div>
   </header>
 
-  <!-- Основной контент -->
   <main>
     <section class="intro">
       <p>Подборка плагинов для кастомизации и расширения функциональности Lampa TV. Все плагины интегрируются в интерфейс, сохраняя оригинальный стиль приложения.</p>
@@ -101,23 +132,22 @@
 
     <section class="plugin-list">
       <details>
-        <summary>1. KUV Style</summary>
+        <summary>KUV Style</summary>
         <p>Плагин кастомизации интерфейса. Меняет иконки, шрифт, фон загрузки и визуальные элементы на стильные SVG из набора KUV. Использует шрифт Wix Madefor, адаптирован под Lampa UI.</p>
       </details>
 
       <details>
-        <summary>2. Studio Button</summary>
+        <summary>Studio Button</summary>
         <p>Добавляет кнопку с логотипом студии или телесети в карточке фильма или сериала. При нажатии открывает подборку контента, выпущенного этой студией. Работает на основе данных TMDB.</p>
       </details>
 
       <details>
-        <summary>3. Мульт-подборки</summary>
+        <summary>Мульт-подборки</summary>
         <p>Создаёт отдельную страницу в меню с подборками мультфильмов, сгруппированными по студиям, годам и другим категориям. Поддерживает быстрый просмотр и выбор контента прямо из списка.</p>
       </details>
     </section>
   </main>
 
-  <!-- Подвал сайта -->
   <footer>
     <p>&copy; 2025 KUV Plugins</p>
   </footer>
