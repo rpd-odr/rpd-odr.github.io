@@ -1,17 +1,18 @@
 // Плагин KUV style для Lampa.
-
 // Заменяет большинство иконок и шрифты в интерфейсе.
 // Частично переработан интерфейс.
 // Добавлена кнопка перезагрузки в шапку.
 
-// Для корректной работы из локального источника необходима папка kuv со всеми подпапками. А также нужно заменить gitpath на localpath в коде ниже!
+// Для корректной работы из локального источника необходима папка kuv со всеми подпапками.
+// А также нужно заменить gitpath на localpath в коде ниже!
 
 (function () {
   "use strict";
-  
-  //const localpath = "/plugins/kuv/"; // раскомментировать и заменить gitpath на localpath, если расположен локально (на лампаке в папке wwwroot/plugins).
+
+  // const localpath = "/plugins/kuv/"; // раскомментировать и заменить gitpath на localpath, если расположен локально
   const gitpath = "https://rpd-odr.github.io/kuv/";
 
+  // Карта иконок: ключ — часть класса, значения — пути к SVG
   const ICONS = {
     "head__logo-icon": { main: gitpath + "img/logo-icon.svg" },
     "open--search": { main: gitpath + "icons/magnifying-glass-duotone.svg" },
@@ -63,17 +64,14 @@
     "close-button": { main: gitpath + "icons/x-circle-duotone.svg" },
   };
 
-  const iconCache = {};
+  const iconCache = {}; // Кэш иконок
 
+  // Загружает иконку с кэшированием
   async function fetchIcon(path) {
-    if (iconCache[path]) {
-      return iconCache[path];
-    }
+    if (iconCache[path]) return iconCache[path];
     try {
       const response = await fetch(path);
-      if (!response.ok) {
-        throw new Error(`Ошибка загрузки SVG (${path}): ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Ошибка загрузки SVG (${path}): ${response.status}`);
       const svgContent = await response.text();
       iconCache[path] = svgContent;
       return svgContent;
@@ -82,6 +80,8 @@
       return null;
     }
   }
+
+  // Присваивает классы по data-action
   function assignActionClasses(targetElement) {
     targetElement.querySelectorAll("[data-action]").forEach((parentElement) => {
       const action = parentElement.dataset.action;
@@ -99,6 +99,7 @@
     });
   }
 
+  // Присваивает классы по data-component
   function assignComponentClasses(targetElement) {
     targetElement.querySelectorAll("[data-component]").forEach((parentElement) => {
       const component = parentElement.dataset.component;
@@ -116,6 +117,7 @@
     });
   }
 
+  // Заменяет иконки на SVG
   async function replaceIcons(targetElement) {
     for (const [key, paths] of Object.entries(ICONS)) {
       const elements = targetElement.querySelectorAll(`[class*="${key}"]`);
@@ -127,17 +129,14 @@
 
         if (!existingSvg && !existingImg) continue;
 
-        if (existingSvg) {
-          existingSvg.remove();
-        }
-        if (existingImg) {
-          existingImg.remove();
-        }
+        if (existingSvg) existingSvg.remove();
+        if (existingImg) existingImg.remove();
 
         const mainPath = paths.main;
         const altPath = paths.alt;
         let pathToUse = mainPath;
 
+        // Проверка на fill="transparent" у старого SVG
         const childFillTransparent = existingSvg && Array.from(existingSvg.querySelectorAll("*")).some(
           (child) => child.getAttribute("fill") === "transparent"
         );
@@ -158,33 +157,37 @@
     }
   }
 
-
+  // Добавляет кнопку "Перезагрузить" в шапку
   function addReloadButton() {
     const reloadButton = $(
       '<div id="RELOAD" class="head__action selector reload-screen">' +
       '<div class="reload-icon"><svg></svg></div>' +
       '</div>'
     );
-    replaceIcons(reloadButton[0]); // Заменяем иконку внутри reloadButton
+    replaceIcons(reloadButton[0]); // применяем иконку
     $('.head__actions').append(reloadButton);
     $('#RELOAD').on('hover:enter hover:click hover:touch', function () {
       location.reload();
     });
   }
 
+  // Добавляет кастомные стили
   function addStyles() {
-    if (!document.querySelector('link[href="https://rpd-odr.github.io/kuv/styles/kuv-style.css"]')) {
+    if (!document.querySelector('link[href="' + gitpath + 'styles/kuv-style.css"]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = gitpath + "styles/kuv-style.css"; // тут тоже можно поменять на localpath
+      link.href = gitpath + "styles/kuv-style.css"; // заменить на localpath при необходимости
       document.head.appendChild(link);
     }
   }
 
+  // Настраивает левое меню
   function customizeMenu() {
     Lampa.Storage.set("menu_hide", JSON.stringify(["Персоны", "Аниме", "Лента", "История", "Расписание", "Подписки", "Фильтр", "Каталог"]));
     Lampa.Storage.set("menu_sort", JSON.stringify(["Главная", "Фильмы", "Сериалы", "Мультики", "Избранное", "Релизы", "Торренты"]));
   }
+
+  // Инициализация плагина
   async function initPlugin() {
     addReloadButton();
     addStyles();
@@ -205,9 +208,10 @@
       await replaceIcons(document.body);
     });
 
-    observeDOMChanges();
+    observeDOMChanges(); // отслеживаем изменения DOM
   }
 
+  // Следим за DOM и заменяем иконки при динамических изменениях
   function observeDOMChanges() {
     if (typeof MutationObserver === "undefined") return;
     const observer = new MutationObserver((mutations) => {
@@ -226,6 +230,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
+  // Запуск при готовности приложения
   if (window.appready) {
     initPlugin();
   } else {
