@@ -1,191 +1,183 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>KUV плагины для Lampa</title>
 
-  <!-- Подключение шрифта -->
+  <!-- Подключение шрифта и стилей -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400..800&display=swap" rel="stylesheet">
 
-<style>
-  :root {
-    --bg: #fff;
-    --text: #111;
-    --card: #f2f2f2;
-    --accent: #333;
-  }
+  <!-- Подключение иконок Phosphor -->
+  <link href="https://unpkg.com/phosphor-icons/web/css/phosphor.css" rel="stylesheet">
 
-  @media (prefers-color-scheme: dark) {
+  <style>
     :root {
-      --bg: #333;
-      --text: #fff;
-      --card: #444;
-      --accent: #555;
+      --bg: #fff;
+      --text: #111;
+      --card: #f2f2f2;
+      --accent: #333;
     }
-  }
 
-  body {
-    font-family: "Wix Madefor Display", sans-serif;
-    font-weight: 400;
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg);
-    color: var(--text);
-  }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #333;
+        --text: #fff;
+        --card: #444;
+        --accent: #555;
+      }
+    }
 
-  header {
-    background-color: var(--bg);
-    padding: 1.5rem;
-    text-align: center;
-  }
+    body {
+      font-family: "Wix Madefor Display", sans-serif;
+      font-weight: 400;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+    }
 
-  .header-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1em;
-  }
+    header {
+      background-color: var(--bg);
+      padding: 1.5rem;
+      text-align: center;
+    }
 
-  .logo-icon {
-    width: 2em;
-    height: 2em;
-  }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1em;
+    }
 
-  .header-title {
-    font-size: 1.5rem;
-    margin: 0;
-  }
+    .logo-icon {
+      width: 2em;
+      height: 2em;
+    }
 
-  main {
-    padding: 1.5rem 2rem 2rem;
-  }
+    .header-title {
+      font-size: 1.5rem;
+      margin: 0;
+    }
 
-  .intro p {
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-  }
-
-  .plugin-list {
-    margin-top: 1rem;
-  }
-
-  details {
-    background-color: var(--card);
-    margin-bottom: 1.2rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    transition: background-color 0.3s ease-in-out;
-    overflow: hidden;
-    max-height: 10rem; /* Начальная высота, чтобы элементы не вылезали */
-  }
-
-  details[open] {
-    background-color: var(--accent);
-    max-height: 30rem; /* Высота при открытии */
-  }
-
-  details summary {
-    font-weight: 600;
-    font-size: 1.1rem;
-    list-style: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    outline: none;
-    border: none;
-    background: none;
-    padding: 0;
-    transition: color 0.2s ease;
-  }
-
-  details summary::-webkit-details-marker {
-    display: none;
-  }
-
-  details summary::before {
-    content: "▸";
-    display: inline-block;
-    margin-right: 0.6em;
-    transition: transform 0.2s ease, color 0.2s ease;
-  }
-
-  details[open] summary::before {
-    content: "▾";
-    transform: rotate(90deg); /* Поворот стрелки */
-  }
-
-  details summary:hover {
-    color: var(--accent);
-  }
-
-  details summary:focus {
-    outline: none;
-  }
-
-  details p {
-    margin-top: 1em;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  details[open] p {
-    opacity: 1; /* Плавное появление текста */
-  }
-
-  footer {
-    text-align: center;
-    padding: 1rem;
-    background-color: var(--bg);
-    color: var(--text);
-    font-size: 0.9rem;
-  }
-
-  @media (min-width: 768px) {
     main {
-      padding: 2rem 3rem;
+      padding: 1.5rem 2rem 2rem;
     }
-  }
-</style>
 
-<header>
-  <div class="header-inner">
-    <img src="kuv/img/logo-icon.svg" alt="Logo" class="logo-icon">
-    <h1 class="header-title">KUV Плагины для Lampa</h1>
-  </div>
-</header>
+    .intro p {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
 
-<main>
-  <section class="intro">
-    <h1>Добро пожаловать в наш проект!</h1>
-    <p>Здесь можно ознакомиться с плагинами, предназначенными для Lampa.</p>
-  </section>
+    .plugin-list {
+      margin-top: 1rem;
+    }
 
-  <section class="plugin-list">
-    <details>
-      <summary>Плагин "Мультфильмы"</summary>
-      <p>Этот плагин добавляет функциональность поиска мультфильмов по различным критериям, таким как студии и год выпуска.</p>
-    </details>
+    details {
+      background-color: var(--card);
+      margin-bottom: 1.2rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s ease-in-out;
+      overflow: hidden;
+      max-height: 10rem; /* Начальная высота, чтобы элементы не вылезали */
+    }
 
-    <details>
-      <summary>Плагин "Студии"</summary>
-      <p>Плагин позволяет фильтровать фильмы и сериалы по студиям-производителям. Очень полезно для тех, кто интересуется работами конкретных студий.</p>
-    </details>
+    details[open] {
+      background-color: var(--accent);
+      max-height: 30rem; /* Высота при открытии */
+    }
 
-    <details>
-      <summary>Плагин "KUV Style"</summary>
-      <p>Этот плагин настраивает визуальный стиль Lampa, добавляя уникальные шрифты, иконки и анимации, улучшая пользовательский интерфейс.</p>
-    </details>
-  </section>
-</main>
+    details summary {
+      font-weight: 600;
+      font-size: 1.1rem;
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      outline: none;
+      border: none;
+      background: none;
+      padding: 0;
+      transition: color 0.2s ease;
+    }
 
-<footer>
-  <p>&copy; 2025 KUV Плагины для Lampa</p>
-</footer>
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details summary::before {
+      content: "▸";
+      display: inline-block;
+      margin-right: 0.6em;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    details[open] summary::before {
+      content: "▾";
+      transform: rotate(90deg); /* Поворот стрелки */
+    }
+
+    details summary:hover {
+      color: var(--accent);
+    }
+
+    details summary:focus {
+      outline: none;
+    }
+
+    details p {
+      margin-top: 1em;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Шапка сайта -->
+  <header>
+    <div class="header-inner">
+      <img src="kuv/img/logo-icon.svg" alt="Logo" class="logo-icon">
+      <h1 class="header-title">KUV плагины для Lampa</h1>
+    </div>
+  </header>
+
+  <!-- Основной контент -->
+  <main>
+    <section class="intro">
+      <h2>Краткое описание плагинов</h2>
+      <p>Этот набор плагинов позволяет улучшить визуальный стиль Lampa, добавляя новые возможности для фильтрации контента, отображения студий и улучшения интерфейса.</p>
+    </section>
+
+    <section class="plugin-list">
+      <h2>Плагины</h2>
+      
+      <details>
+        <summary><i class="ph-duotone ph-film-strip"></i> Плагин мультфильмов</summary>
+        <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
+      </details>
+
+      <details>
+        <summary><i class="ph-duotone ph-film-reel"></i> Плагин студий</summary>
+        <p>Позволяет отображать логотипы студий в карточках фильмов, а также открывать фильтры по студиям и жанрам.</p>
+      </details>
+
+      <details>
+        <summary><i class="ph-duotone ph-tv"></i> KUV стиль</summary>
+        <p>Плагин для кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
+      </details>
+    </section>
+  </main>
+
+  <!-- Подвал сайта -->
+  <footer>
+    <p>&copy; 2025 KUV плагины для Lampa</p>
+  </footer>
+
 </body>
 </html>
