@@ -24,7 +24,7 @@
       --text: #111;
       --card: #f2f2f2;
       --accent: #333;
-      --link-bg: #5bc0de;
+      --link-bg: rgba(91, 192, 222, 0.8);
       --link-hover-bg: #31a8b0;
     }
 
@@ -34,7 +34,7 @@
         --text: #fff;
         --card: #444;
         --accent: #555;
-        --link-bg: #5bc0de;
+        --link-bg: rgba(91, 192, 222, 0.8);
         --link-hover-bg: #31a8b0;
       }
     }
@@ -124,12 +124,17 @@
 
     details img {
       max-width: 100%;
-      border-radius: 0.5em;
+      border-radius: 1em;
       margin-top: 1rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     details a {
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       color: var(--text);
       background-color: var(--link-bg);
       padding: 0.5rem 1rem;
@@ -142,6 +147,11 @@
 
     details a:hover {
       background-color: var(--link-hover-bg);
+    }
+
+    .link-icon,
+    .copy-icon {
+      font-size: 1.2em;
     }
 
     h2 {
@@ -187,21 +197,33 @@
         <summary><i class="ph-duotone ph-rabbit"></i> Плагин мультфильмов</summary>
         <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+1" alt="Скриншот плагина мультфильмов">
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-multifilms')">https://github.com/your-repo/your-plugin-multifilms</a>
+        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-multifilms')">
+          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+          https://github.com/your-repo/your-plugin-multifilms
+          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+        </a>
       </details>
 
       <details>
         <summary><i class="ph-duotone ph-film-reel"></i> Плагин студий</summary>
         <p>Позволяет отображать логотипы студий в карточках фильмов, а также открывать фильтры по студиям и жанрам.</p>
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+2" alt="Скриншот плагина студий">
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-studios')">https://github.com/your-repo/your-plugin-studios</a>
+        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-studios')">
+          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+          https://github.com/your-repo/your-plugin-studios
+          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+        </a>
       </details>
 
       <details>
         <summary><i class="ph-duotone ph-paint-brush"></i> KUV стиль</summary>
         <p>Плагин для кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+3" alt="Скриншот плагина стиля">
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-kuv-style')">https://github.com/your-repo/your-plugin-kuv-style</a>
+        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-kuv-style')">
+          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+          https://github.com/your-repo/your-plugin-kuv-style
+          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+        </a>
       </details>
     </section>
   </main>
