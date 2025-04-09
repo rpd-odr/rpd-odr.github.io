@@ -28,7 +28,7 @@
             } else {
                 Lampa.Activity.push({
                     url: "",
-                    title: "Мультики&hairsp;- CUB",
+                    title: "Мультики&hairsp;&#150;&hairsp;CUB",
                     component: "category",
                     genres: 16,
                     id: 16,
