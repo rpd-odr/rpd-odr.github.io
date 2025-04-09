@@ -24,9 +24,9 @@
       --text: #111;
       --card: #f2f2f2;
       --accent: #333;
-      --link-bg: rgba(91, 192, 222, 0.8);
+      --link-bg: rgba(49, 186, 235, 0.5); /* Прозрачный фон */
       --link-hover-bg: #31a8b0;
-      --link-border: rgba(91, 192, 222, 0.9);
+      --link-border: #31baeb; /* Цвет обводки */
     }
 
     @media (prefers-color-scheme: dark) {
@@ -35,9 +35,9 @@
         --text: #fff;
         --card: #444;
         --accent: #555;
-        --link-bg: rgba(91, 192, 222, 0.9);
+        --link-bg: rgba(49, 186, 235, 0.5);
         --link-hover-bg: #31a8b0;
-        --link-border: rgba(91, 192, 222, 1);
+        --link-border: #31baeb;
       }
     }
 
@@ -146,7 +146,7 @@
       margin-top: 1em;
       transition: background-color 0.3s ease;
       border: 2px solid var(--link-border);
-      font-size: 0.9rem;
+      font-size: 0.8rem; /* Сделаем текст поменьше */
     }
 
     details a:hover {
@@ -156,7 +156,10 @@
     .link-icon,
     .copy-icon {
       font-size: 1.2em;
-      margin-right: 0.5em;
+    }
+
+    .copy-icon {
+      margin-left: 0.5em;
     }
 
     h2 {
@@ -204,7 +207,7 @@
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+1" alt="Скриншот плагина мультфильмов">
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-multifilms')">
           <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          Ссылка
+          https://github.com/your-repo/your-plugin-multifilms
           <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
         </a>
       </details>
@@ -215,7 +218,7 @@
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+2" alt="Скриншот плагина студий">
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-studios')">
           <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          Ссылка
+          https://github.com/your-repo/your-plugin-studios
           <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
         </a>
       </details>
@@ -226,7 +229,7 @@
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+3" alt="Скриншот плагина стиля">
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-kuv-style')">
           <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          Ссылка
+          https://github.com/your-repo/your-plugin-kuv-style
           <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
         </a>
       </details>
