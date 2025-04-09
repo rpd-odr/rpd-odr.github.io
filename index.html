@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>KUV плагины для Lampa</title>
 
-  <!-- Fonts and icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400..800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css" />
+  <!-- Подключение шрифта и стилей -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <!-- Подключение иконок Phosphor -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css" />
 
   <style>
     :root {
@@ -19,6 +22,7 @@
       --accent: #333;
       --link-bg: rgba(49, 186, 235, 0.2);
       --link-hover-bg: #31a8b0;
+      --link-border: #31baeb;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -27,21 +31,26 @@
         --text: #fff;
         --card: #444;
         --accent: #555;
-        --link-bg: rgba(49, 186, 235, 0.2);
-        --link-hover-bg: #31a8b0;
       }
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       font-family: "Wix Madefor Display", sans-serif;
+      font-weight: 400;
       margin: 0;
+      padding: 0;
       background-color: var(--bg);
       color: var(--text);
+      line-height: 1.5;
     }
 
     header {
       background-color: #292929;
-      padding: 2rem 1rem 1rem;
+      padding: 1.5rem;
       text-align: center;
     }
 
@@ -49,30 +58,34 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     .logo-icon {
-      width: 3.5em;
-      height: 3.5em;
+      width: 2.5em;
+      height: 2.5em;
     }
 
     .header-title {
-      font-size: 1.5rem;
-      margin: 0.7rem 0 0.2rem;
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+      margin: 0.5rem 0;
       color: white;
     }
 
     .header-subtitle {
-      font-size: 1rem;
+      font-size: clamp(0.875rem, 2.5vw, 1rem);
       color: #bbb;
     }
 
     main {
-      padding: 1.5rem 2rem 3rem;
+      padding: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     .intro p {
-      font-size: 1rem;
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
       line-height: 1.6;
       margin-bottom: 1.5rem;
     }
@@ -83,71 +96,87 @@
 
     details {
       background-color: var(--card);
-      margin-bottom: 1.2rem;
-      padding: 1rem;
-      border-radius: 1.6em;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border-radius: 1em;
+      transition: background-color 0.3s ease;
     }
 
-    summary {
+    details summary {
       font-weight: 600;
-      font-size: 1rem;
-      list-style: none;
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
       cursor: pointer;
       display: flex;
       align-items: center;
+      padding: 0.5rem 0;
     }
 
-    summary::-webkit-details-marker {
+    details summary::-webkit-details-marker {
       display: none;
     }
 
-    summary i {
-      margin-right: 0.5em;
+    details summary i {
+      margin-right: 0.5rem;
       font-size: 1.2em;
+      flex-shrink: 0;
     }
 
     details p {
-      margin-top: 1em;
-      font-size: 0.95rem;
-      line-height: 1.5;
+      margin: 0.75rem 0 0;
+      font-size: clamp(0.85rem, 2vw, 0.95rem);
     }
 
     details img {
       max-width: 100%;
-      border-radius: 1em;
-      margin: 1rem auto 0;
+      height: auto;
+      border-radius: 0.75em;
+      margin-top: 1rem;
       display: block;
     }
 
     details a {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      background-color: var(--link-bg);
-      padding: 0.5rem 1rem;
-      border-radius: 1em;
-      text-decoration: none;
-      font-size: 0.65rem;
-      margin-top: 1em;
+      justify-content: space-between;
       color: var(--text);
+      background-color: var(--link-bg);
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.75em;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 1rem;
+      border: 2px solid var(--link-border);
+      font-size: clamp(0.7rem, 2vw, 0.85rem);
       transition: background-color 0.3s ease;
-      gap: 0.4em;
+      word-break: break-all;
     }
 
     details a:hover {
       background-color: var(--link-hover-bg);
     }
 
+    .copy-message {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #28a745;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.9rem;
+      z-index: 1000;
+    }
+
     .link-icon, .copy-icon {
-      font-size: 1.1em;
-      width: 1.2em;
-      display: inline-block;
-      text-align: center;
+      font-size: 1.2em;
+      width: 1.4em;
+      flex-shrink: 0;
     }
 
     h2 {
-      font-size: 1.25rem;
-      margin-top: 1.5rem;
+      font-size: clamp(1.1rem, 3vw, 1.25rem);
+      margin: 1.5rem 0 1rem;
     }
 
     footer {
@@ -160,37 +189,48 @@
     footer a {
       color: #31baeb;
       text-decoration: none;
-      font-weight: bold;
-      font-size: 0.9rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
+      font-weight: 600;
+      font-size: clamp(0.85rem, 2vw, 0.9rem);
     }
 
     footer img {
-      width: 2.5em;
-      vertical-align: middle;
+      width: 3em;
+      margin-top: 0.5rem;
     }
 
-    @media screen and (max-width: 600px) {
+    /* Медиа-запросы для адаптивности */
+    @media (min-width: 768px) {
+      header {
+        padding: 2rem;
+      }
+
       main {
+        padding: 2rem;
+      }
+
+      details {
         padding: 1rem;
+      }
+
+      details summary {
+        padding: 0.75rem 0;
+      }
+
+      details a {
+        padding: 0.75rem 1rem;
       }
     }
   </style>
 </head>
 <body>
-
-  <!-- Шапка -->
   <header>
     <div class="header-inner">
-      <img src="kuv/img/logo-icon.svg" alt="Logo" class="logo-icon" />
+      <img src="kuv/img/logo-icon.svg" alt="Logo" class="logo-icon">
       <h1 class="header-title">KUV плагины для Lampa</h1>
       <p class="header-subtitle">Дополнительные возможности для улучшения интерфейса</p>
     </div>
   </header>
 
-  <!-- Контент -->
   <main>
     <section class="intro">
       <h2>Краткое описание плагинов</h2>
@@ -199,68 +239,57 @@
 
     <section class="plugin-list">
       <h2>Плагины</h2>
-
-      <!-- Мультфильмы -->
+      
       <details>
         <summary><i class="ph-duotone ph-rabbit"></i> Плагин мультфильмов</summary>
-        <p>Добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
-        <img src="https://via.placeholder.com/400x200?text=Screenshot+1" alt="Скриншот плагина мультфильмов" />
+        <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
+        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+1" alt="Скриншот плагина мультфильмов">
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-multifilms')">
           https://github.com/your-repo/your-plugin-multifilms
-          <i class="ph-duotone ph-link link-icon"></i>
-          <i class="ph-duotone ph-copy copy-icon"></i>
+          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
         </a>
       </details>
 
-      <!-- Студии -->
       <details>
         <summary><i class="ph-duotone ph-film-reel"></i> Плагин студий</summary>
         <p>Позволяет отображать логотипы студий в карточках фильмов, а также открывать фильтры по студиям и жанрам.</p>
-        <img src="https://via.placeholder.com/400x200?text=Screenshot+2" alt="Скриншот плагина студий" />
+        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+2" alt="Скриншот плагина студий">
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-studios')">
           https://github.com/your-repo/your-plugin-studios
-          <i class="ph-duotone ph-link link-icon"></i>
-          <i class="ph-duotone ph-copy copy-icon"></i>
+          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
         </a>
       </details>
 
-      <!-- Стиль -->
       <details>
         <summary><i class="ph-duotone ph-paint-brush"></i> KUV стиль</summary>
-        <p>Кастомизация интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
-        <img src="https://via.placeholder.com/400x200?text=Screenshot+3" alt="Скриншот плагина стиля" />
+        <p>Плагин для кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
+        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+3" alt="Скриншот плагина стиля">
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-kuv-style')">
           https://github.com/your-repo/your-plugin-kuv-style
-          <i class="ph-duotone ph-link link-icon"></i>
-          <i class="ph-duotone ph-copy copy-icon"></i>
+          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
         </a>
       </details>
 
-      <!-- Общий пакет -->
       <details>
         <summary><i class="ph-duotone ph-unite"></i> Все плагины</summary>
-        <p>Позволяет подключить весь набор KUV-плагинов сразу.</p>
+        <p>Этот пункт позволяет подключить все плагины сразу, чтобы не подключать их по отдельности.</p>
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/kuv-all-plugins')">
           https://github.com/your-repo/kuv-all-plugins
-          <i class="ph-duotone ph-link link-icon"></i>
-          <i class="ph-duotone ph-copy copy-icon"></i>
+          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
         </a>
       </details>
     </section>
   </main>
 
-  <!-- Футер -->
   <footer>
-    <p>
-      Developed by
-      <a href="https://odr.su" target="_blank">
-        odr.su
-        <img src="https://odr.su/images/dist/logo.svg" alt="ODR Logo" />
-      </a>
-    </p>
+    <p>© 2025 KUV плагины для Lampa | <a href="https://odr.su" target="_blank">odr.su</a></p>
+    <img src="https://odr.su/images/dist/logo.svg" alt="Логотип ODR" />
   </footer>
 
-  <!-- Копирование ссылок -->
   <script>
     function copyLink(event, link) {
       event.preventDefault();
@@ -270,7 +299,15 @@
       textarea.select();
       document.execCommand('copy');
       document.body.removeChild(textarea);
-      alert('Ссылка скопирована!');
+
+      const copyMessage = document.createElement('div');
+      copyMessage.className = 'copy-message';
+      copyMessage.textContent = 'Ссылка скопирована!';
+      document.body.appendChild(copyMessage);
+
+      setTimeout(() => {
+        copyMessage.remove();
+      }, 2000);
     }
   </script>
 </body>
