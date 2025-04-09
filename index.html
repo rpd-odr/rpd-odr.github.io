@@ -22,7 +22,6 @@
       --accent: #333;
       --link-bg: rgba(49, 186, 235, 0.2);
       --link-hover-bg: #31a8b0;
-      --link-border: #31baeb;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -145,7 +144,6 @@
       text-decoration: none;
       font-weight: 600;
       margin-top: 1rem;
-      border: 2px solid var(--link-border);
       font-size: clamp(0.7rem, 2vw, 0.85rem);
       transition: background-color 0.3s ease;
       word-break: break-all;
@@ -153,6 +151,18 @@
 
     details a:hover {
       background-color: var(--link-hover-bg);
+    }
+
+    .icons-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-left: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .link-icon, .copy-icon {
+      font-size: 1.2em;
+      width: 1.4em;
     }
 
     .copy-message {
@@ -166,12 +176,6 @@
       border-radius: 0.5rem;
       font-size: 0.9rem;
       z-index: 1000;
-    }
-
-    .link-icon, .copy-icon {
-      font-size: 1.2em;
-      width: 1.4em;
-      flex-shrink: 0;
     }
 
     h2 {
@@ -198,7 +202,6 @@
       margin-top: 0.5rem;
     }
 
-    /* Медиа-запросы для адаптивности */
     @media (min-width: 768px) {
       header {
         padding: 2rem;
@@ -243,11 +246,14 @@
       <details>
         <summary><i class="ph-duotone ph-rabbit"></i> Плагин мультфильмов</summary>
         <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
-        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+1" alt="Скриншот плагина мультфильмов">
+        <img src="screens/IMG_7588.png" alt="Скриншот плагина мультфильмов 1">
+        <img src="screens/IMG_7589.png" alt="Скриншот плагина мультфильмов 2">
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-multifilms')">
           https://github.com/your-repo/your-plugin-multifilms
-          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+          <span class="icons-container">
+            <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+            <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+          </span>
         </a>
       </details>
 
@@ -257,8 +263,10 @@
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+2" alt="Скриншот плагина студий">
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-studios')">
           https://github.com/your-repo/your-plugin-studios
-          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+          <span class="icons-container">
+            <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+            <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+          </span>
         </a>
       </details>
 
@@ -268,8 +276,10 @@
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+3" alt="Скриншот плагина стиля">
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-kuv-style')">
           https://github.com/your-repo/your-plugin-kuv-style
-          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+          <span class="icons-container">
+            <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+            <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+          </span>
         </a>
       </details>
 
@@ -278,8 +288,10 @@
         <p>Этот пункт позволяет подключить все плагины сразу, чтобы не подключать их по отдельности.</p>
         <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/kuv-all-plugins')">
           https://github.com/your-repo/kuv-all-plugins
-          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+          <span class="icons-container">
+            <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+            <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
+          </span>
         </a>
       </details>
     </section>
