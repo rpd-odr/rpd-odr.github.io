@@ -4,14 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Мой проект</title>
-  
+  <title>KUV плагины для Lampa</title>
   
   <!-- Встроенные стили -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400..800&display=swap');
     /* Основные стили */
-    
     body {
        font-family: "Wix Madefor Display", sans-serif;
         font-optical-sizing: auto;
@@ -27,22 +25,17 @@
       background-color: #333;
       color: white;
       padding: 15px;
-      text-align: center;
+      display: flex;
+      align-items: center;
     }
 
-    header nav ul {
-      list-style-type: none;
-      padding: 0;
+    header .logo {
+      margin-right: 15px;
     }
 
-    header nav ul li {
-      display: inline;
-      margin: 0 15px;
-    }
-
-    header nav ul li a {
-      color: white;
-      text-decoration: none;
+    header svg {
+      width: 50px; /* Размер логотипа */
+      height: auto;
     }
 
     main {
@@ -51,7 +44,7 @@
 
     .intro h1 {
       font-size: 2em;
-      color: #333;
+      color: #fff;
     }
 
     .features ul {
@@ -80,43 +73,41 @@
 </head>
 <body>
 
-  <!-- Шапка сайта -->
+  <!-- Шапка сайта с логотипом -->
   <header>
-    <nav>
-      <ul>
-        <li><a href="#">Главная</a></li>
-        <li><a href="#">О проекте</a></li>
-        <li><a href="#">Контакты</a></li>
-      </ul>
-    </nav>
+    <div class="logo">
+      <!-- Логотип SVG -->
+      <img src="kuv/img/logo-icon.svg" alt="KUV Logo">
+    </div>
+    <h1>KUV плагины для Lampa</h1>
   </header>
 
   <!-- Основной контент -->
   <main>
     <section class="intro">
-      <h1>Добро пожаловать в наш проект!</h1>
-      <p>Здесь будет описание вашего проекта или продукта.</p>
+      <h2>Добро пожаловать в мир KUV плагинов!</h2>
+      <p>Здесь представлены плагины для Lampa, которые улучшат ваш опыт работы с этим медиа-плеером.</p>
     </section>
 
     <section class="features">
-      <h2>Особенности</h2>
+      <h2>Особенности плагинов</h2>
       <ul>
-        <li>Особенность 1</li>
-        <li>Особенность 2</li>
-        <li>Особенность 3</li>
+        <li>Поддержка множества форматов</li>
+        <li>Легкость в установке и настройке</li>
+        <li>Оптимизация под последние версии Lampa</li>
       </ul>
     </section>
   </main>
 
   <!-- Подвал сайта -->
   <footer>
-    <p>&copy; 2025 Мой проект</p>
+    <p>&copy; 2025 KUV плагины для Lampa</p>
   </footer>
 
   <!-- Встроенные скрипты -->
   <script>
     // Простой скрипт для демонстрации
-    document.querySelector('h1').addEventListener('click', function() {
+    document.querySelector('h2').addEventListener('click', function() {
       alert('Вы нажали на заголовок!');
     });
   </script>
