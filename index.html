@@ -1,7 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Мой проект</title>
+
+  <!-- Встроенные стили -->
+  <style>
+    /* Основные стили */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background-color: #333;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    header nav ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    header nav ul li {
+      display: inline;
+      margin: 0 15px;
+    }
+
+    header nav ul li a {
+      color: white;
+      text-decoration: none;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    .intro h1 {
+      font-size: 2em;
+      color: #333;
+    }
+
+    .features ul {
+      padding: 0;
+      list-style-type: none;
+    }
+
+    .features ul li {
+      background: #fff;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #333;
+      color: white;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+
+  <!-- Шапка сайта -->
+  <header>
+    <nav>
+      <ul>
+        <li><a href="#">Главная</a></li>
+        <li><a href="#">О проекте</a></li>
+        <li><a href="#">Контакты</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Основной контент -->
+  <main>
+    <section class="intro">
+      <h1>Добро пожаловать в наш проект!</h1>
+      <p>Здесь будет описание вашего проекта или продукта.</p>
+    </section>
+
+    <section class="features">
+      <h2>Особенности</h2>
+      <ul>
+        <li>Особенность 1</li>
+        <li>Особенность 2</li>
+        <li>Особенность 3</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Подвал сайта -->
+  <footer>
+    <p>&copy; 2025 Мой проект</p>
+  </footer>
+
+  <!-- Встроенные скрипты -->
+  <script>
+    // Простой скрипт для демонстрации
+    document.querySelector('h1').addEventListener('click', function() {
+      alert('Вы нажали на заголовок!');
+    });
+  </script>
+
 </body>
 </html>
