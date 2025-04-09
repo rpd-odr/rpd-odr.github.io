@@ -1,304 +1,253 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KUV плагины для Lampa</title>
 
-  <!-- Подключение шрифта и стилей -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400..800&display=swap" rel="stylesheet">
-
-  <!-- Подключение иконок Phosphor -->
-  <link
-    rel="stylesheet"
-    type="text/css"
-    href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css"
-  />
+  <!-- Шрифты и иконки -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400..700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <style>
     :root {
-      --bg: #fff;
-      --text: #111;
-      --card: #f2f2f2;
-      --accent: #333;
-      --link-bg: rgba(49, 186, 235, 0.2); /* Прозрачный фон 20% */
-      --link-hover-bg: #31a8b0;
-      --link-border: #31baeb; /* Цвет обводки */
+      color-scheme: light dark;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #333;
-        --text: #fff;
-        --card: #444;
-        --accent: #555;
-        --link-bg: rgba(49, 186, 235, 0.2);
-        --link-hover-bg: #31a8b0;
-        --link-border: #31baeb;
-      }
+    * {
+      box-sizing: border-box;
     }
 
     body {
-      font-family: "Wix Madefor Display", sans-serif;
-      font-weight: 400;
       margin: 0;
-      padding: 0;
-      background-color: var(--bg);
-      color: var(--text);
+      font-family: "Wix Madefor Display", sans-serif;
+      background-color: #1a1a1a;
+      color: white;
     }
 
     header {
-      background-color: #292929; /* Темнее */
-      padding: 2rem;
+      background-color: #111;
       text-align: center;
+      padding: 1rem 0;
     }
 
-    .header-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    header .logo {
+      width: 6rem;
+      display: block;
+      margin: 0 auto 0.5rem;
     }
 
-    .logo-icon {
-      width: 2em;
-      height: 2em;
-    }
-
-    .header-title {
-      font-size: 1.5rem;
-      margin: 0.5rem 0;
-      color: white;
-    }
-
-    .header-subtitle {
-      font-size: 1rem;
-      color: #bbb;
+    header h1 {
+      font-size: 1.8rem;
+      margin: 0;
     }
 
     main {
-      padding: 1.5rem 2rem 2rem;
+      max-width: 60rem;
+      margin: 0 auto;
+      padding: 2rem 1rem 5rem;
     }
 
-    .intro p {
-      font-size: 1rem;
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
+    summary {
+      cursor: pointer;
+      font-size: 1.2rem;
+      background-color: #2a2a2a;
+      padding: 1rem;
+      border-radius: 1.6em;
+      display: flex;
+      align-items: center;
+      gap: 0.6em;
     }
 
-    .plugin-list {
-      margin-top: 1rem;
+    summary i {
+      font-size: 1.4em;
     }
 
     details {
-      background-color: var(--card);
-      margin-bottom: 1.2rem;
-      padding: 1rem;
-      border-radius: 1.6em;
-      overflow: hidden;
-      transition: background-color 0.3s ease;
+      margin-bottom: 2rem;
     }
 
-    details summary {
-      font-weight: 600;
-      font-size: 1rem;
-      list-style: none;
-      cursor: pointer;
+    details[open] summary {
+      background-color: #2f2f2f;
+    }
+
+    .plugin-content {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      outline: none;
-      border: none;
-      background: none;
-      padding: 0;
-    }
-
-    details summary::-webkit-details-marker {
-      display: none;
-    }
-
-    details summary i {
-      margin-right: 0.5em;
-      font-size: 1.2em;
-    }
-
-    details p {
-      margin-top: 1em;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    details img {
-      max-width: 100%;
-      border-radius: 1em;
+      gap: 2rem;
       margin-top: 1rem;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
     }
 
-    details a {
+    .plugin-content img {
+      max-width: 300px;
+      border-radius: 1em;
+      flex-shrink: 0;
+      margin: 0 auto;
+    }
+
+    .plugin-info {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .copy-box {
+      background-color: rgba(49, 186, 235, 0.2);
+      color: #31baeb;
+      padding: 0.7em 1em;
+      border-radius: 2em;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      color: var(--text);
-      background-color: var(--link-bg);
-      padding: 0.5rem 1rem;
-      border-radius: 1em;
-      text-decoration: none;
-      font-weight: bold;
-      margin-top: 1em;
-      transition: background-color 0.3s ease;
-      border: 2px solid var(--link-border);
-      font-size: 0.7rem; /* Сделаем текст поменьше */
+      font-size: 0.75rem;
+      margin-top: 1rem;
     }
 
-    details a:hover {
-      background-color: var(--link-hover-bg);
+    .copy-box span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-right: auto;
     }
 
-    .copy-message {
-      display: none;
-      position: fixed;
-      bottom: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #28a745;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .link-icon,
-    .copy-icon {
-      font-size: 1.2em;
-      width: 1.4em; /* Размер иконок */
-    }
-
-    h2 {
-      font-size: 1.25rem;
-      margin-top: 1.5rem;
+    .copy-box i {
+      margin-left: 0.6em;
+      font-size: 1em;
     }
 
     footer {
-      background-color: #292929; /* Темнее */
-      padding: 1rem;
+      background-color: #111;
+      color: #999;
       text-align: center;
-      color: white;
-    }
-
-    footer a {
-      color: #31baeb;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 0.9rem;
+      padding: 1.2rem;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     footer img {
-      width: 3em;
-      margin-top: 0.5rem;
+      height: 1.2rem;
+    }
+
+    @media (min-width: 768px) {
+      summary {
+        font-size: 1.3rem;
+      }
+
+      .copy-box {
+        font-size: 0.8rem;
+      }
+
+      .plugin-content img {
+        max-width: 350px;
+      }
+
+      header .logo {
+        width: 7rem;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Шапка сайта -->
   <header>
-    <div class="header-inner">
-      <img src="kuv/img/logo-icon.svg" alt="Logo" class="logo-icon">
-      <h1 class="header-title">KUV плагины для Lampa</h1>
-      <p class="header-subtitle">Дополнительные возможности для улучшения интерфейса</p>
-    </div>
+    <img src="kuv/img/logo-icon.svg" alt="KUV Logo" class="logo" />
+    <h1>KUV плагины для Lampa</h1>
   </header>
 
-  <!-- Основной контент -->
   <main>
-    <section class="intro">
-      <h2>Краткое описание плагинов</h2>
-      <p>Этот набор плагинов позволяет улучшить визуальный стиль Lampa, добавляя новые возможности для фильтрации контента, отображения студий и улучшения интерфейса.</p>
-    </section>
+    <p>Коллекция визуально и функционально оформленных плагинов, улучшающих интерфейс и удобство использования Lampa TV. Подключаются через раздел "Плагины".</p>
 
-    <section class="plugin-list">
-      <h2>Плагины</h2>
-      
-      <details>
-        <summary><i class="ph-duotone ph-rabbit"></i> Плагин мультфильмов</summary>
-        <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
-        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+1" alt="Скриншот плагина мультфильмов">
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-multifilms')">
-          https://github.com/your-repo/your-plugin-multifilms
-          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
-        </a>
-      </details>
+    <details>
+      <summary><i class="ph ph-rabbit"></i> KUV Мультики</summary>
+      <div class="plugin-content">
+        <img src="screens/multikuv.jpg" alt="KUV Мультики">
+        <div class="plugin-info">
+          <p>Плагин добавляет в меню раздел с подборками мультфильмов по студиям, годам и другим категориям.</p>
+          <div class="copy-box" onclick="copyToClipboard('https://kuv.one/plugins/multikuv.js')">
+            <span>https://kuv.one/plugins/multikuv.js</span>
+            <i class="ph ph-link-simple"></i>
+            <i class="ph ph-copy"></i>
+          </div>
+        </div>
+      </div>
+    </details>
 
-      <details>
-        <summary><i class="ph-duotone ph-film-reel"></i> Плагин студий</summary>
-        <p>Позволяет отображать логотипы студий в карточках фильмов, а также открывать фильтры по студиям и жанрам.</p>
-        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+2" alt="Скриншот плагина студий">
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-studios')">
-          https://github.com/your-repo/your-plugin-studios
-          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
-        </a>
-      </details>
+    <details>
+      <summary><i class="ph ph-buildings"></i> KUV Студии</summary>
+      <div class="plugin-content">
+        <img src="screens/studiokuv.jpg" alt="KUV Студии">
+        <div class="plugin-info">
+          <p>Добавляет логотипы студий и телесетей на страницы фильмов и сериалов с возможностью перейти к другим работам студии.</p>
+          <div class="copy-box" onclick="copyToClipboard('https://kuv.one/plugins/studiokuv.js')">
+            <span>https://kuv.one/plugins/studiokuv.js</span>
+            <i class="ph ph-link-simple"></i>
+            <i class="ph ph-copy"></i>
+          </div>
+        </div>
+      </div>
+    </details>
 
-      <details>
-        <summary><i class="ph-duotone ph-paint-brush"></i> KUV стиль</summary>
-        <p>Плагин для кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
-        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+3" alt="Скриншот плагина стиля">
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-kuv-style')">
-          https://github.com/your-repo/your-plugin-kuv-style
-          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
-        </a>
-      </details>
+    <details>
+      <summary><i class="ph ph-paint-brush-broad"></i> KUV Style</summary>
+      <div class="plugin-content">
+        <img src="screens/stylekuv.jpg" alt="KUV Style">
+        <div class="plugin-info">
+          <p>Применяет визуальный стиль: иконки Phosphor, шрифт WixMadefor, кастомные фоны, лоадеры и прочие визуальные элементы.</p>
+          <div class="copy-box" onclick="copyToClipboard('https://kuv.one/plugins/stylekuv.js')">
+            <span>https://kuv.one/plugins/stylekuv.js</span>
+            <i class="ph ph-link-simple"></i>
+            <i class="ph ph-copy"></i>
+          </div>
+        </div>
+      </div>
+    </details>
 
-      <!-- Дополнительный текст -->
-      <section>
-        <p>Здесь может быть дополнительная информация или инструкции по использованию плагинов.</p>
-      </section>
+    <details>
+      <summary><i class="ph ph-unite"></i> Все плагины</summary>
+      <div class="plugin-content">
+        <img src="screens/allkuv.jpg" alt="Все плагины KUV">
+        <div class="plugin-info">
+          <p>Подключает сразу все KUV плагины для упрощения установки и оформления.</p>
+          <div class="copy-box" onclick="copyToClipboard('https://kuv.one/plugins/allkuv.js')">
+            <span>https://kuv.one/plugins/allkuv.js</span>
+            <i class="ph ph-link-simple"></i>
+            <i class="ph ph-copy"></i>
+          </div>
+        </div>
+      </div>
+    </details>
 
-      <!-- Новый пункт "Все плагины" -->
-      <details>
-        <summary><i class="ph-duotone ph-unite"></i> Все плагины</summary>
-        <p>Этот пункт позволяет подключить все плагины сразу, чтобы не подключать их по отдельности.</p>
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/kuv-all-plugins')">
-          https://github.com/your-repo/kuv-all-plugins
-          <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
-          <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
-        </a>
-      </details>
-    </section>
   </main>
 
-  <!-- Подвал сайта -->
   <footer>
-    <p>&copy; 2025 KUV плагины для Lampa | <a href="https://odr.su" target="_blank">odr.su</a></p>
-    <img src="https://odr.su/images/dist/logo.svg" alt="Логотип ODR" />
+    <img src="https://odr.su/images/dist/logo.svg" alt="ODR logo" />
+    <span>Developed by</span>
   </footer>
 
   <script>
-    function copyLink(event, link) {
-      event.preventDefault();
-      const textarea = document.createElement('textarea');
-      textarea.value = link;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-
-      const copyMessage = document.createElement('div');
-      copyMessage.className = 'copy-message';
-      copyMessage.textContent = 'Ссылка скопирована!';
-      document.body.appendChild(copyMessage);
-
-      setTimeout(() => {
-        copyMessage.remove();
-      }, 2000);
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const msg = document.createElement("div");
+        msg.textContent = "Ссылка скопирована";
+        msg.style.position = "fixed";
+        msg.style.bottom = "1rem";
+        msg.style.left = "50%";
+        msg.style.transform = "translateX(-50%)";
+        msg.style.background = "#333";
+        msg.style.color = "#fff";
+        msg.style.padding = "0.5em 1em";
+        msg.style.borderRadius = "1em";
+        msg.style.zIndex = "9999";
+        document.body.appendChild(msg);
+        setTimeout(() => msg.remove(), 1500);
+      });
     }
   </script>
+
 </body>
 </html>
