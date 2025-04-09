@@ -3,71 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>KUV плагины для Lampa</title>
-  
-  <!-- Предварительное подключение шрифтов -->
+
+  <!-- Подключение шрифта -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400..800&display=swap" rel="stylesheet">
 
-  <!-- Встроенные стили -->
   <style>
-    /* Основные стили */
     body {
       font-family: "Wix Madefor Display", sans-serif;
-      font-optical-sizing: auto;
       font-weight: 400;
       font-style: normal;
       margin: 0;
       padding: 0;
       background-color: #333;
-      color: white;
+      color: #fff;
     }
 
     header {
       background-color: #333;
-      color: white;
-      padding: 15px;
+      padding: 1em;
       text-align: center;
     }
 
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon {
+      width: 2em;
+      height: 2em;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      margin-left: 1rem;
+    }
+
     main {
-      padding: 20px;
+      padding: 2rem;
     }
 
-    .intro h1 {
-      font-size: 2em;
-      color: #333;
+    .intro p {
+      font-size: 1rem;
+      line-height: 1.6;
     }
 
-    .features ul {
-      padding: 0;
-      list-style-type: none;
+    .plugin-list {
+      margin-top: 2rem;
     }
 
-    .features ul li {
-      background: #fff;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    details {
+      background-color: #444;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    details summary {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5em;
+      outline: none;
     }
 
     footer {
       text-align: center;
-      padding: 10px;
+      padding: 1rem;
       background-color: #333;
       color: white;
       position: fixed;
       bottom: 0;
       width: 100%;
-    }
-
-    .logo-icon {
-      width: 50px;
-      height: 50px;
-      margin: 0 auto;
+      font-size: 0.9rem;
     }
   </style>
 </head>
@@ -75,41 +87,40 @@
 
   <!-- Шапка сайта -->
   <header>
-  <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
-    <img src="kuv/img/logo-icon.svg" alt="Логотип" class="logo-icon">
-    <h1 style="margin: 0; font-size: 1.5em;">KUV плагины для Lampa</h1>
-  </div>
-</header>
+    <div class="header-inner">
+      <img src="kuv/img/logo-icon.svg" alt="Логотип" class="logo-icon">
+      <h1 class="header-title">KUV плагины для Lampa</h1>
+    </div>
+  </header>
 
   <!-- Основной контент -->
   <main>
     <section class="intro">
-      <h1>Добро пожаловать в проект KUV плагины для Lampa!</h1>
-      <p>Описание вашего проекта или продукта.</p>
+      <p>Подборка плагинов для кастомизации и расширения функциональности Lampa TV. Все плагины интегрируются в интерфейс, сохраняя оригинальный стиль приложения.</p>
     </section>
 
-    <section class="features">
-      <h2>Особенности</h2>
-      <ul>
-        <li>Особенность 1</li>
-        <li>Особенность 2</li>
-        <li>Особенность 3</li>
-      </ul>
+    <section class="plugin-list">
+      <details>
+        <summary>1. KUV Style</summary>
+        <p>Плагин кастомизации интерфейса. Меняет иконки, шрифт, фон загрузки и визуальные элементы на стильные SVG из набора KUV. Использует шрифт Wix Madefor, адаптирован под Lampa UI.</p>
+      </details>
+
+      <details>
+        <summary>2. Studio Button</summary>
+        <p>Добавляет кнопку с логотипом студии или телесети в карточке фильма или сериала. При нажатии открывает подборку контента, выпущенного этой студией. Работает на основе данных TMDB.</p>
+      </details>
+
+      <details>
+        <summary>3. Мульт-подборки</summary>
+        <p>Создаёт отдельную страницу в меню с подборками мультфильмов, сгруппированными по студиям, годам и другим категориям. Поддерживает быстрый просмотр и выбор контента прямо из списка.</p>
+      </details>
     </section>
   </main>
 
   <!-- Подвал сайта -->
   <footer>
-    <p>&copy; 2025 KUV плагины для Lampa</p>
+    <p>&copy; 2025 KUV Plugins</p>
   </footer>
-
-  <!-- Встроенные скрипты -->
-  <script>
-    // Простой скрипт для демонстрации
-    document.querySelector('h1').addEventListener('click', function() {
-      alert('Вы нажали на заголовок!');
-    });
-  </script>
 
 </body>
 </html>
