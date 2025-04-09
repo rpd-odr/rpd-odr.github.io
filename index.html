@@ -127,6 +127,7 @@
 
     details .screenshot-container {
       display: flex;
+      flex-wrap: nowrap;
       gap: 1rem;
       margin-top: 1rem;
     }
@@ -136,15 +137,14 @@
       height: auto;
       border-radius: 0.75em;
       display: block;
-      flex: 1 1 calc(50% - 0.5rem);
+      flex: 1 1 50%;
       min-width: 0;
-      object-fit: cover; /* Для сохранения пропорций */
     }
 
-    details .instruction {
+    details .link-instruction {
       margin-top: 1rem;
       font-size: clamp(0.85rem, 2vw, 0.95rem);
-      color: var(--accent);
+      font-style: italic;
     }
 
     details a {
@@ -225,16 +225,31 @@
         padding: 2rem;
       }
 
+      .plugin-list {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 1rem;
+        align-items: stretch;
+      }
+
       details {
+        flex: 1;
+        margin-bottom: 0;
         padding: 1rem;
+        display: block; /* Убираем поведение details */
+      }
+
+      details[open] {
+        /* Убираем стандартное поведение открытия */
       }
 
       details summary {
+        cursor: default; /* Убираем указатель клика */
         padding: 0.75rem 0;
       }
 
-      details a {
-        padding: 0.75rem 1rem;
+      details summary ~ * {
+        display: block; /* Всегда показываем контент */
       }
     }
   </style>
@@ -264,7 +279,7 @@
           <img src="screens/IMG_7588.jpeg" alt="Скриншот плагина мультфильмов 1" loading="lazy">
           <img src="screens/IMG_7589.jpeg" alt="Скриншот плагина мультфильмов 2" loading="lazy">
         </div>
-        <p class="instruction">Вставьте эту ссылку в раздел расширений в Lampa.</p>
+        <p class="link-instruction">Вставьте ссылку в раздел «Расширения» в Lampa</p>
         <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/mult.js')">
           https://rpd-odr.github.io/mult.js
           <span class="icons-container">
@@ -281,7 +296,7 @@
           <img src="screens/IMG_7591.jpeg" alt="Скриншот плагина студий 1" loading="lazy">
           <img src="screens/IMG_7594.jpeg" alt="Скриншот плагина студий 2" loading="lazy">
         </div>
-        <p class="instruction">Вставьте эту ссылку в раздел расширений в Lampa.</p>
+        <p class="link-instruction">Вставьте ссылку в раздел «Расширения» в Lampa</p>
         <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/studios.js')">
           https://rpd-odr.github.io/studios.js
           <span class="icons-container">
@@ -298,7 +313,7 @@
           <img src="screens/IMG_7593.jpeg" alt="Скриншот плагина стиля 1" loading="lazy">
           <img src="screens/IMG_7585.jpeg" alt="Скриншот плагина стиля 2" loading="lazy">
         </div>
-        <p class="instruction">Вставьте эту ссылку в раздел расширений в Lampa.</p>
+        <p class="link-instruction">Вставьте ссылку в раздел «Расширения» в Lampa</p>
         <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/kuv-style.js')">
           https://rpd-odr.github.io/kuv-style.js
           <span class="icons-container">
@@ -311,7 +326,7 @@
       <details>
         <summary><i class="ph-duotone ph-unite"></i> Все плагины</summary>
         <p>Этот пункт позволяет подключить все плагины сразу, чтобы не подключать их по отдельности.</p>
-        <p class="instruction">Вставьте эту ссылку в раздел расширений в Lampa.</p>
+        <p class="link-instruction">Вставьте ссылку в раздел «Расширения» в Lampa</p>
         <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/kuv-git.js')">
           https://rpd-odr.github.io/kuv-git.js
           <span class="icons-container">
