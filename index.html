@@ -125,12 +125,20 @@
       font-size: clamp(0.85rem, 2vw, 0.95rem);
     }
 
+    details .screenshot-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
     details img {
       max-width: 100%;
       height: auto;
       border-radius: 0.75em;
-      margin-top: 1rem;
       display: block;
+      flex: 1 1 calc(50% - 0.5rem);
+      min-width: 0;
     }
 
     details a {
@@ -223,6 +231,12 @@
         padding: 0.75rem 1rem;
       }
     }
+
+    @media (max-width: 600px) {
+      details img {
+        flex: 1 1 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -246,10 +260,12 @@
       <details>
         <summary><i class="ph-duotone ph-rabbit"></i> Плагин мультфильмов</summary>
         <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
-        <img src="screens/IMG_7588.png" alt="Скриншот плагина мультфильмов 1">
-        <img src="screens/IMG_7589.png" alt="Скриншот плагина мультфильмов 2">
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-multifilms')">
-          https://github.com/your-repo/your-plugin-multifilms
+        <div class="screenshot-container">
+          <img src="screens/IMG_7588.jpeg" alt="Скриншот плагина мультфильмов 1">
+          <img src="screens/IMG_7589.jpeg" alt="Скриншот плагина мультфильмов 2">
+        </div>
+        <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/mult.js')">
+          https://rpd-odr.github.io/mult.js
           <span class="icons-container">
             <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
             <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
@@ -260,9 +276,12 @@
       <details>
         <summary><i class="ph-duotone ph-film-reel"></i> Плагин студий</summary>
         <p>Позволяет отображать логотипы студий в карточках фильмов, а также открывать фильтры по студиям и жанрам.</p>
-        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+2" alt="Скриншот плагина студий">
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-studios')">
-          https://github.com/your-repo/your-plugin-studios
+        <div class="screenshot-container">
+          <img src="screens/IMG_7591.jpeg" alt="Скриншот плагина студий 1">
+          <img src="screens/IMG_7594.jpeg" alt="Скриншот плагина студий 2">
+        </div>
+        <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/studios.js')">
+          https://rpd-odr.github.io/studios.js
           <span class="icons-container">
             <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
             <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
@@ -273,9 +292,12 @@
       <details>
         <summary><i class="ph-duotone ph-paint-brush"></i> KUV стиль</summary>
         <p>Плагин для кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
-        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+3" alt="Скриншот плагина стиля">
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-kuv-style')">
-          https://github.com/your-repo/your-plugin-kuv-style
+        <div class="screenshot-container">
+          <img src="screens/IMG_7593.jpeg" alt="Скриншот плагина стиля 1">
+          <img src="screens/IMG_7585.jpeg" alt="Скриншот плагина стиля 2">
+        </div>
+        <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/kuv-style.js')">
+          https://rpd-odr.github.io/kuv-style.js
           <span class="icons-container">
             <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
             <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
@@ -286,8 +308,8 @@
       <details>
         <summary><i class="ph-duotone ph-unite"></i> Все плагины</summary>
         <p>Этот пункт позволяет подключить все плагины сразу, чтобы не подключать их по отдельности.</p>
-        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/kuv-all-plugins')">
-          https://github.com/your-repo/kuv-all-plugins
+        <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/kuv-git.js')">
+          https://rpd-odr.github.io/kuv-git.js
           <span class="icons-container">
             <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
             <span class="copy-icon"><i class="ph-duotone ph-copy"></i></span>
