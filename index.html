@@ -24,6 +24,8 @@
       --text: #111;
       --card: #f2f2f2;
       --accent: #333;
+      --link-bg: #5bc0de;
+      --link-hover-bg: #31a8b0;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -32,6 +34,8 @@
         --text: #fff;
         --card: #444;
         --accent: #555;
+        --link-bg: #5bc0de;
+        --link-hover-bg: #31a8b0;
       }
     }
 
@@ -85,7 +89,7 @@
       background-color: var(--card);
       margin-bottom: 1.2rem;
       padding: 1rem;
-      border-radius: 1.5em;
+      border-radius: 1.6em;
       overflow: hidden;
       transition: background-color 0.3s ease;
     }
@@ -126,14 +130,18 @@
 
     details a {
       display: inline-block;
-      color: var(--accent);
+      color: var(--text);
+      background-color: var(--link-bg);
+      padding: 0.5rem 1rem;
+      border-radius: 1em;
+      text-decoration: none;
       font-weight: bold;
       margin-top: 1em;
-      text-decoration: none;
+      transition: background-color 0.3s ease;
     }
 
     details a:hover {
-      text-decoration: underline;
+      background-color: var(--link-hover-bg);
     }
 
     h2 {
@@ -179,21 +187,21 @@
         <summary><i class="ph-duotone ph-rabbit"></i> Плагин мультфильмов</summary>
         <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+1" alt="Скриншот плагина мультфильмов">
-        <a href="https://github.com/your-repo/your-plugin-multifilms" target="_blank" onclick="copyLink(event)">Ссылка на плагин</a>
+        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-multifilms')">https://github.com/your-repo/your-plugin-multifilms</a>
       </details>
 
       <details>
         <summary><i class="ph-duotone ph-film-reel"></i> Плагин студий</summary>
         <p>Позволяет отображать логотипы студий в карточках фильмов, а также открывать фильтры по студиям и жанрам.</p>
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+2" alt="Скриншот плагина студий">
-        <a href="https://github.com/your-repo/your-plugin-studios" target="_blank" onclick="copyLink(event)">Ссылка на плагин</a>
+        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-studios')">https://github.com/your-repo/your-plugin-studios</a>
       </details>
 
       <details>
         <summary><i class="ph-duotone ph-paint-brush"></i> KUV стиль</summary>
         <p>Плагин для кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
         <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+3" alt="Скриншот плагина стиля">
-        <a href="https://github.com/your-repo/your-plugin-kuv-style" target="_blank" onclick="copyLink(event)">Ссылка на плагин</a>
+        <a href="#" onclick="copyLink(event, 'https://github.com/your-repo/your-plugin-kuv-style')">https://github.com/your-repo/your-plugin-kuv-style</a>
       </details>
     </section>
   </main>
@@ -207,8 +215,8 @@
   <div id="copyMessage" class="copy-message">Ссылка скопирована!</div>
 
   <script>
-    function copyLink(event) {
-      const link = event.target.href;
+    function copyLink(event, link) {
+      event.preventDefault();
       navigator.clipboard.writeText(link).then(() => {
         const message = document.getElementById('copyMessage');
         message.style.display = 'block';
