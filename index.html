@@ -127,7 +127,6 @@
 
     details .screenshot-container {
       display: flex;
-      flex-wrap: wrap;
       gap: 1rem;
       margin-top: 1rem;
     }
@@ -139,6 +138,13 @@
       display: block;
       flex: 1 1 calc(50% - 0.5rem);
       min-width: 0;
+      object-fit: cover; /* Для сохранения пропорций */
+    }
+
+    details .instruction {
+      margin-top: 1rem;
+      font-size: clamp(0.85rem, 2vw, 0.95rem);
+      color: var(--accent);
     }
 
     details a {
@@ -151,7 +157,7 @@
       border-radius: 0.75em;
       text-decoration: none;
       font-weight: 600;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       font-size: clamp(0.7rem, 2vw, 0.85rem);
       transition: background-color 0.3s ease;
       word-break: break-all;
@@ -231,12 +237,6 @@
         padding: 0.75rem 1rem;
       }
     }
-
-    @media (max-width: 600px) {
-      details img {
-        flex: 1 1 100%;
-      }
-    }
   </style>
 </head>
 <body>
@@ -261,9 +261,10 @@
         <summary><i class="ph-duotone ph-rabbit"></i> Плагин мультфильмов</summary>
         <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
         <div class="screenshot-container">
-          <img src="screens/IMG_7588.jpeg" alt="Скриншот плагина мультфильмов 1">
-          <img src="screens/IMG_7589.jpeg" alt="Скриншот плагина мультфильмов 2">
+          <img src="screens/IMG_7588.jpeg" alt="Скриншот плагина мультфильмов 1" loading="lazy">
+          <img src="screens/IMG_7589.jpeg" alt="Скриншот плагина мультфильмов 2" loading="lazy">
         </div>
+        <p class="instruction">Вставьте эту ссылку в раздел расширений в Lampa.</p>
         <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/mult.js')">
           https://rpd-odr.github.io/mult.js
           <span class="icons-container">
@@ -277,9 +278,10 @@
         <summary><i class="ph-duotone ph-film-reel"></i> Плагин студий</summary>
         <p>Позволяет отображать логотипы студий в карточках фильмов, а также открывать фильтры по студиям и жанрам.</p>
         <div class="screenshot-container">
-          <img src="screens/IMG_7591.jpeg" alt="Скриншот плагина студий 1">
-          <img src="screens/IMG_7594.jpeg" alt="Скриншот плагина студий 2">
+          <img src="screens/IMG_7591.jpeg" alt="Скриншот плагина студий 1" loading="lazy">
+          <img src="screens/IMG_7594.jpeg" alt="Скриншот плагина студий 2" loading="lazy">
         </div>
+        <p class="instruction">Вставьте эту ссылку в раздел расширений в Lampa.</p>
         <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/studios.js')">
           https://rpd-odr.github.io/studios.js
           <span class="icons-container">
@@ -293,9 +295,10 @@
         <summary><i class="ph-duotone ph-paint-brush"></i> KUV стиль</summary>
         <p>Плагин для кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
         <div class="screenshot-container">
-          <img src="screens/IMG_7593.jpeg" alt="Скриншот плагина стиля 1">
-          <img src="screens/IMG_7585.jpeg" alt="Скриншот плагина стиля 2">
+          <img src="screens/IMG_7593.jpeg" alt="Скриншот плагина стиля 1" loading="lazy">
+          <img src="screens/IMG_7585.jpeg" alt="Скриншот плагина стиля 2" loading="lazy">
         </div>
+        <p class="instruction">Вставьте эту ссылку в раздел расширений в Lampa.</p>
         <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/kuv-style.js')">
           https://rpd-odr.github.io/kuv-style.js
           <span class="icons-container">
@@ -308,6 +311,7 @@
       <details>
         <summary><i class="ph-duotone ph-unite"></i> Все плагины</summary>
         <p>Этот пункт позволяет подключить все плагины сразу, чтобы не подключать их по отдельности.</p>
+        <p class="instruction">Вставьте эту ссылку в раздел расширений в Lampa.</p>
         <a href="#" onclick="copyLink(event, 'https://rpd-odr.github.io/kuv-git.js')">
           https://rpd-odr.github.io/kuv-git.js
           <span class="icons-container">
