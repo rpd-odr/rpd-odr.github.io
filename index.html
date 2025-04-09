@@ -85,8 +85,9 @@
       background-color: var(--card);
       margin-bottom: 1.2rem;
       padding: 1rem;
-      border-radius: 0.5rem;
+      border-radius: 1.5em;
       overflow: hidden;
+      transition: background-color 0.3s ease;
     }
 
     details summary {
@@ -117,9 +118,40 @@
       line-height: 1.5;
     }
 
+    details img {
+      max-width: 100%;
+      border-radius: 0.5em;
+      margin-top: 1rem;
+    }
+
+    details a {
+      display: inline-block;
+      color: var(--accent);
+      font-weight: bold;
+      margin-top: 1em;
+      text-decoration: none;
+    }
+
+    details a:hover {
+      text-decoration: underline;
+    }
+
     h2 {
       font-size: 1.25rem;
       margin-top: 1.5rem;
+    }
+
+    .copy-message {
+      display: none;
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #28a745;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
   </style>
 </head>
@@ -146,16 +178,22 @@
       <details>
         <summary><i class="ph-duotone ph-rabbit"></i> Плагин мультфильмов</summary>
         <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
+        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+1" alt="Скриншот плагина мультфильмов">
+        <a href="https://github.com/your-repo/your-plugin-multifilms" target="_blank" onclick="copyLink(event)">Ссылка на плагин</a>
       </details>
 
       <details>
         <summary><i class="ph-duotone ph-film-reel"></i> Плагин студий</summary>
         <p>Позволяет отображать логотипы студий в карточках фильмов, а также открывать фильтры по студиям и жанрам.</p>
+        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+2" alt="Скриншот плагина студий">
+        <a href="https://github.com/your-repo/your-plugin-studios" target="_blank" onclick="copyLink(event)">Ссылка на плагин</a>
       </details>
 
       <details>
         <summary><i class="ph-duotone ph-paint-brush"></i> KUV стиль</summary>
         <p>Плагин для кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
+        <img src="https://via.placeholder.com/400x200?text=Screenshot+of+Plugin+3" alt="Скриншот плагина стиля">
+        <a href="https://github.com/your-repo/your-plugin-kuv-style" target="_blank" onclick="copyLink(event)">Ссылка на плагин</a>
       </details>
     </section>
   </main>
@@ -164,6 +202,20 @@
   <footer>
     <p>&copy; 2025 KUV плагины для Lampa</p>
   </footer>
+
+  <!-- Сообщение о копировании -->
+  <div id="copyMessage" class="copy-message">Ссылка скопирована!</div>
+
+  <script>
+    function copyLink(event) {
+      const link = event.target.href;
+      navigator.clipboard.writeText(link).then(() => {
+        const message = document.getElementById('copyMessage');
+        message.style.display = 'block';
+        setTimeout(() => message.style.display = 'none', 2000);
+      });
+    }
+  </script>
 
 </body>
 </html>
