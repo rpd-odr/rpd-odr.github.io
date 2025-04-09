@@ -7,8 +7,10 @@
   
 Lampa.Utils.putScriptAsync([
 	"https://rpd-odr.github.io/kuv-style.js",
-        "https://rpd-odr.github.io/mult.js",
         "https://rpd-odr.github.io/studios.js"
+], function() {});
+Lampa.Utils.putScriptAsync([
+        "https://rpd-odr.github.io/mult.js"
 ], function() {});
         }
     },200);
