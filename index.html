@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400..800&display=swap" rel="stylesheet">
 
-  <!-- Подключение иконок Phosphor (веса duotone) -->
+  <!-- Подключение иконок Phosphor -->
   <link
     rel="stylesheet"
     type="text/css"
@@ -58,8 +58,8 @@
     }
 
     .logo-icon {
-      width: 2em;
-      height: 2em;
+      width: 2.5em;
+      height: 2.5em;
     }
 
     .header-title {
@@ -88,12 +88,10 @@
       border-radius: 0.5rem;
       transition: background-color 0.3s ease-in-out;
       overflow: hidden;
-      max-height: 10rem; /* Начальная высота, чтобы элементы не вылезали */
     }
 
     details[open] {
       background-color: var(--accent);
-      max-height: 30rem; /* Высота при открытии */
     }
 
     details summary {
@@ -115,15 +113,8 @@
     }
 
     details summary::before {
-      content: "▸";
-      display: inline-block;
-      margin-right: 0.6em;
-      transition: transform 0.2s ease, color 0.2s ease;
-    }
-
-    details[open] summary::before {
-      content: "▾";
-      transform: rotate(90deg); /* Поворот стрелки */
+      content: "";
+      display: none;
     }
 
     details summary:hover {
@@ -138,6 +129,11 @@
       margin-top: 1em;
       font-size: 0.95rem;
       line-height: 1.5;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
     }
   </style>
 </head>
@@ -162,17 +158,17 @@
       <h2>Плагины</h2>
       
       <details>
-        <summary><i class="ph-duotone ph-film-strip"></i> Плагин мультфильмов</summary>
+        <summary><i class="ph-duotone ph-rabbit" style="font-size: 2em; margin-right: 0.5em;"></i> Плагин мультфильмов</summary>
         <p>Этот плагин добавляет страницу с подборками мультфильмов по студиям, годам и другим критериям.</p>
       </details>
 
       <details>
-        <summary><i class="ph-duotone ph-film-reel"></i> Плагин студий</summary>
+        <summary><i class="ph-duotone ph-film-reel" style="font-size: 2em; margin-right: 0.5em;"></i> Плагин студий</summary>
         <p>Позволяет отображать логотипы студий в карточках фильмов, а также открывать фильтры по студиям и жанрам.</p>
       </details>
 
       <details>
-        <summary><i class="ph-duotone ph-tv"></i> KUV стиль</summary>
+        <summary><i class="ph-duotone ph-paint-brush" style="font-size: 2em; margin-right: 0.5em;"></i> KUV стиль</summary>
         <p>Плагин для кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами дизайна.</p>
       </details>
     </section>
