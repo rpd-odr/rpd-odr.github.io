@@ -4,7 +4,7 @@
 // Добавляет оригинальное название второй строкой в карточку.
 // Подходит как для отдельного использования, так и в комплексе с kuv-style.
 
-// Частично основано на плагине tmdb-networks v2.0.3 от levende (https://t.me/levende), за что ему большое спасибо.
+// Частично основано на плагине tmdb-networks v2.0.3 от levende (https://t.me/levende)
 // https://levende.github.io/lampa-plugins/tmdb-networks.js
 
 (function () {
@@ -13,6 +13,7 @@
     var network = new Lampa.Reguest();
     var cache = new Map();
 
+    // Получение провайдеров (по странам) с логотипами
     function getMovieProviders(movie, callback) {
         const cacheKey = `providers_${movie.id}`;
         if (cache.has(cacheKey)) {
@@ -25,6 +26,7 @@
                 const providers = [];
                 const allowedCountryCodes = ['US', 'RU'];
 
+                // Добавление доступных провайдеров
                 allowedCountryCodes.forEach(countryCode => {
                     if (data.results?.[countryCode]) {
                         providers.push(
@@ -35,6 +37,7 @@
                     }
                 });
 
+                // Фильтрация по наличию логотипа
                 const filteredProviders = providers.filter(p => p.logo_path);
                 cache.set(cacheKey, filteredProviders);
                 callback(filteredProviders);
@@ -46,6 +49,7 @@
         );
     }
 
+    // Получение сетей или студий (в зависимости от типа карточки)
     function getNetworks(object, callback) {
         if (!object?.card || object.card.source !== 'tmdb') {
             return callback([]);
@@ -61,6 +65,7 @@
         getMovieProviders(object.card, callback);
     }
 
+    // Меню фильтрации по студии/сети
     function showNetworkMenu(network, type, element) {
         const isTv = type === 'tv';
         const controller = Lampa.Controller.enabled().name;
@@ -70,19 +75,8 @@
         Lampa.Select.show({
             title: network.name || 'Network',
             items: [
-                {
-                    title: 'Популярные',
-                    sort: '',
-                    filter: { 'vote_count.gte': 10 }
-                },
-                {
-                    title: 'Новые',
-                    sort: `${dateField}.desc`,
-                    filter: { 
-                        'vote_count.gte': 10,
-                        [`${dateField}.lte`]: currentDate
-                    }
-                }
+                { title: 'Популярные', sort: '', filter: { 'vote_count.gte': 10 } },
+                { title: 'Новые', sort: `${dateField}.desc`, filter: { 'vote_count.gte': 10, [`${dateField}.lte`]: currentDate } }
             ],
             onBack: function() {
                 Lampa.Controller.toggle(controller);
@@ -91,6 +85,7 @@
                 }
             },
             onSelect: function(action) {
+                // Переход к фильтрованной категории
                 Lampa.Activity.push({
                     url: `discover/${type}`,
                     title: `${network.name || 'Network'} ${action.title}`,
@@ -108,6 +103,7 @@
         });
     }
 
+    // Добавление кнопки студии/сети в карточку
     function addNetworkButton(render, networks, type) {
         $('.button--network, .button--studio', render).remove();
 
@@ -127,7 +123,7 @@
                             .attr('src', imgSrc)
                             .attr('alt', imgAlt)
                             .on('error', function() {
-                                $(this).parent().parent().remove();
+                                $(this).parent().parent().remove(); // Удаление кнопки при ошибке загрузки логотипа
                             })
                     )
             )
@@ -138,7 +134,9 @@
         $('.full-start-new__buttons', render).append(btn);
     }
 
+    // Инициализация плагина
     function initPlugin() {
+        // Добавление CSS-стилей (однократно)
         if ($('style#network-plugin').length === 0) {
             $('<style>')
                 .attr('id', 'network-plugin')
@@ -184,13 +182,14 @@
                 .appendTo('head');
         }
 
+        // Слушаем событие открытия карточки
         Lampa.Listener.follow('full', function(e) {
             if (e.type === 'complite') {
-                // Добавление оригинального названия
                 const render = e.object.activity.render();
                 const card = e.object.card;
                 const titleElement = $('.full-start-new__title', render);
                 
+                // Добавление оригинального названия (если отличается)
                 if (card && titleElement.length) {
                     const originalTitle = card.original_title || card.original_name;
                     if (originalTitle && originalTitle !== card.title && originalTitle !== card.name) {
@@ -202,7 +201,7 @@
                     }
                 }
 
-                // Логика кнопки сети
+                // Добавление кнопки студии или телесети
                 getNetworks(e.object, networks => {
                     if (networks.length) {
                         addNetworkButton(render, networks, e.object.method);
@@ -212,6 +211,7 @@
         });
     }
 
+    // Инициализация при готовности приложения
     if (window.appready) initPlugin();
     else Lampa.Listener.follow('app', e => e.type === 'ready' && initPlugin());
 })();
