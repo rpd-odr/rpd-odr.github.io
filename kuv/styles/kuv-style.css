@@ -1,3 +1,14 @@
+/*
+Таблица стилей для плагина KUV style
+
+Обязательно наличие:
+/kuv/styles
+/kuv/img
+/kuv/icons
+/kuv/fonts
+*/
+
+/* Приветственный экран */
 .welcome {
 	position: fixed;
 	top: 0;
@@ -6,10 +17,11 @@
 	bottom: 0;
 	z-index: 100;
 	background: url(../img/welcome.jpg) no-repeat 50% 50% !important;
-   background-size: cover !important;
+	background-size: cover !important;
 	transition: all .3s ease-out; 
 } 
 
+/* Подключение кастомного шрифта WixMadefor в нескольких вариантах веса */
 @font-face {
   font-family: "WixMadefor";
   font-display: swap;
@@ -20,6 +32,7 @@
 	font-optical-sizing: auto;
   font-style: normal;
 }
+/* Medium */
 @font-face {
   font-family: "WixMadefor";
   font-display: swap;
@@ -30,6 +43,7 @@
 	font-optical-sizing: auto;
   font-style: normal;
 }
+/* SemiBold */
 @font-face {
   font-family: "WixMadefor";
   font-display: swap;
@@ -40,6 +54,7 @@
 	font-optical-sizing: auto;
   font-style: normal;
 }
+/* Bold */
 @font-face {
   font-family: "WixMadefor";
   font-display: swap;
@@ -51,21 +66,23 @@
   font-style: normal;
 }
 
-.simple-keyboard-input {
-font-family: "WixMadefor" !important;
-}
+/* Применение кастомного шрифта */
+.simple-keyboard-input,
 body {
-font-family: "WixMadefor" !important;
+	font-family: "WixMadefor" !important;
 }
 
+/* Логотип в шапке */
 .head__logo-icon svg {
-height: auto!important;
+	height: auto!important;
 }
 
+/* Иконка "помечено как просмотрено" */
 .info__icon.active::after {
 	background: #fff url(../img/icons/check-fat-duotone.svg) no-repeat 50% 50%;
 }
 
+/* Кастомизация иконок карточек */
 .card__icon.icon--book,
 .info__icon.icon--book,
 .feed-item__tags::before {
@@ -84,6 +101,7 @@ height: auto!important;
 	background-image: url(../icons/play-circle-duotone.svg) !important;
 }
 
+/* Иконка загрузки (для разных случаев) */
 .content-loading::after, 
 .processing__loader, 
 .activity__loader,
@@ -97,11 +115,12 @@ height: auto!important;
 .screensaver__preload,
 .extensions__item-check,
 .iframe__body,
-.lampac-balanser-loader{
+.lampac-balanser-loader {
 	background: url(../icons/spinner-ball-duotone.svg) no-repeat 50% 50% !important;
-		background-size: clamp(8px, 100%, 32px)!important;
+	background-size: clamp(8px, 100%, 32px)!important;
 }
 
+/* Размер иконок загрузки */
 .content-loading::after,
 .processing__loader, 
 .loading-layer__ico,
@@ -111,121 +130,131 @@ height: auto!important;
 	background-size: contain;
 }
 
-  
- .head__split {
+/* Иконка разделителя в шапке */
+.head__split {
 	background: url(../icons/dots-three-vertical-duotone.svg) no-repeat 50% 50% !important;
 	background-size: contain !important;
 }
 
+/* Иконка добавления отзыва */
 .full-review-add::before {
-  background: url(../icons/plus-circle-duotone.svg) no-repeat 50% 50%;
+	background: url(../icons/plus-circle-duotone.svg) no-repeat 50% 50%;
 }
 
+/* Заглушка при отсутствии изображения */
 .empty__img {
-  background: url(../icons/robot-duotone.svg) no-repeat 50% 50%;
-  background-size: contain;
-  height: 5em;
+	background: url(../icons/robot-duotone.svg) no-repeat 50% 50%;
+	background-size: contain;
+	height: 5em;
 }
 
+/* Иконка ошибки */
 .error__ico {
-  background: url(../icons/smiley-sad-duotone.svg) no-repeat 50% 50%;
+	background: url(../icons/smiley-sad-duotone.svg) no-repeat 50% 50%;
 }
 
+/* Иконки кодеков и субтитров в торрентах */
 .torrent-item__ffprobe > div.m-video::before {
-  background-image: url(../icons/film-strip-duotone.svg);
-  
+	background-image: url(../icons/film-strip-duotone.svg);
 }
-
 .torrent-item__ffprobe > div.m-channels::before {
-  content: '';
-  background-image: url(../icons/waveform-duotone.svg);
+	content: '';
+	background-image: url(../icons/waveform-duotone.svg);
 }
 .torrent-item__ffprobe > div.m-audio::before {
-  content: '';
-  background-image: url(../icons/microphone-duotone.svg);
+	content: '';
+	background-image: url(../icons/microphone-duotone.svg);
 }
 .torrent-item__ffprobe > div.m-subtitle::before {
-  content: '';
-  background-image: url(../icons/subtitles-duotone.svg);
+	content: '';
+	background-image: url(../icons/subtitles-duotone.svg);
 }
 
+/* История поиска */
 .search-history-key:before {
-  content: "";
+	content: "";
 	background-image: url(../icons/clock-countdown-duotone.svg);
 }
 
+/* Иконка для папки торрентов */
 .torrnet-folder-name::before {
-  content: "";
+	content: "";
 	background: url(../icons/cards-three-duotone.svg) no-repeat 50% 50%;
-  background-size: contain;
+	background-size: contain;
 }
 
+/* Теги в ленте */
 .feed-item__tags::before {
-  content: url(../icons/heart-duotone.svg);
+	content: url(../icons/heart-duotone.svg);
 }
 
-/* Стили для всех иконок с классом 'kuvicon' */
+/* Универсальный стиль для SVG иконок плагина */
 svg.kuvicon {
 	fill: currentColor !important;
 	/* stroke: currentColor; */
 	/* transition: all .2s ease-out; */
 }
 
+/* Скругления для элементов интерфейса */
 .full-start__button,
 .menu-item,
 .tag-count,
 .tag-count__count,
 .simple-button,
-.simple-button--filter > div
-{
+.simple-button--filter > div {
 	border-radius: 2em !important;
 }
 
+/* Счётчик внутри тега */
 .tag-count__count {
 	min-width: 1.8em;
 	text-align: center;
 }
 
+/* Паддинги кнопок */
 .simple-button {
 	padding: .3em .8em;
 }
-
 .simple-button > span {
 	margin-left: .8em;
 	margin-right: .8em;
 }
-
 .simple-button--filter > div {
 	padding: .3em 1em !important;
 	margin-left: 0!important;
 }
 
-.lampac-balanser-loader{
+/* Правка внешнего отступа иконки баланcера */
+.lampac-balanser-loader {
 	margin-right: 0!important;
 }
 
+/* Стили для просмотров в блоке "престиж" */
 .online-prestige-watched__body {
 	padding-top: .3em;
 }
 
+/* Заголовок в карточке */
 .full-start-new__title {
 	line-clamp: 2!important;
 }
 
+/* Убираем фокус */
 .full-start-new__right {
 	outline: none!important;
 }
 
+/* Скругления фото актёров */
 .full-person,
-.full-person__photo{
-		border-radius: 7em;
+.full-person__photo {
+	border-radius: 7em;
 }
-
-.full-person{
+.full-person {
 	padding: .5em;
 	padding-right: 2em;
 }
 
+/* Скругления для сети (например, Netflix и др.) */
 .network-innie {
 	border-radius: 2em !important;
 }
