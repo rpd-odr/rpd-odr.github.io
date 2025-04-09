@@ -176,7 +176,7 @@
     if (!document.querySelector('link[href="https://rpd-odr.github.io/kuv/styles/kuv-style.css"]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = "https://rpd-odr.github.io/kuv/styles/kuv-style.css";
+      link.href = gitpath + "styles/kuv-style.css"; // тут тоже можно поменять на localpath
       document.head.appendChild(link);
     }
   }
