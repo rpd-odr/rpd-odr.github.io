@@ -36,6 +36,7 @@
     "nt-backup": { main: gitpath + "icons/vault-duotone.svg" },
     "button--book": { main: gitpath + "icons/heart-fill.svg", alt: gitpath + "icons/heart-duotone.svg" },
     "button--play": { main: gitpath + "icons/play-duotone.svg" },
+    "button--subscribe": { main: gitpath + "icons/bell-fill.svg", alt: gitpath + "icons/bell-duotone.svg"},
     "view--trailer": { main: gitpath + "icons/youtube-logo-duotone.svg" },
     "view--online": { main: gitpath + "icons/queue-duotone.svg" },
     "view--torrent": { main: gitpath + "icons/download-simple-duotone.svg" },
