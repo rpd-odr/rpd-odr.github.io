@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Мой проект</title>
 
-  <!-- Подключение шрифтов -->
+  <!-- Подключение шрифта -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400..800&display=swap" rel="stylesheet">
@@ -21,153 +21,183 @@
       font-style: normal;
       margin: 0;
       padding: 0;
-      background-color: #f1f1f1;
-      color: #333;
+      background-color: #333;
+      color: white;
     }
 
-    /* Шапка сайта */
+    /* Шапка */
     header {
-      background-color: #283593; /* Темно-синий */
+      background-color: #2c2c2c; /* Темнее оттенок */
       color: white;
-      padding: 1.5rem;
+      padding: 1.6rem;
       text-align: center;
     }
 
     header img {
-      max-width: 250px; /* Увеличенный логотип */
+      width: 8rem; /* Увеличим размер логотипа в шапке */
+      height: auto;
     }
 
-    header h1 {
-      font-size: 2.5rem;
+    /* Футер */
+    footer {
+      background-color: #1f1f1f; /* Темнее оттенок футера */
+      color: white;
+      padding: 1.6rem;
+      text-align: center;
+    }
+
+    footer img {
+      width: 4rem; /* Размер логотипа в футере */
+      height: auto;
+    }
+
+    footer a {
+      color: #31baeb;
+      text-decoration: none;
+    }
+
+    /* Сообщение о копировании ссылки */
+    .copy-message {
+      display: none;
+      background-color: #31baeb;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
       margin-top: 1rem;
+      text-align: center;
     }
 
-    /* Основной контент */
-    main {
-      padding: 2rem;
+    /* Внешний вид кнопки ссылки */
+    .copy-link {
+      background-color: rgba(49, 186, 235, 0.2);
+      border-radius: 1.6rem;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      width: auto;
+      text-align: left;
+      border: none; /* Убрали обводку */
     }
 
-    .intro h1 {
-      font-size: 2rem;
-      color: #333;
+    .copy-link span {
+      font-size: 1rem;
+      color: white;
+      flex-grow: 1;
     }
 
-    .features ul {
-      padding: 0;
-      list-style-type: none;
+    .copy-link svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      margin-left: 1rem;
+      color: white;
     }
 
-    .features ul li {
-      background: #fff;
-      margin: 0.6rem 0;
+    .copy-link .ph-link {
+      margin-right: 1rem;
+    }
+
+    .copy-link .ph-copy {
+      margin-left: 0.5rem;
+    }
+
+    /* Пункты списка */
+    .plugin-item {
+      background: #444;
+      margin: 1.5rem 0;
       padding: 1rem;
       border-radius: 1.5rem;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    /* Стили для ссылок и кнопок */
-    .copy-link-container {
-      display: flex;
-      align-items: center;
-      background: rgba(49, 186, 235, 0.2);
-      border: 2px solid #31baeb;
-      border-radius: 1.6rem;
-      padding: 0.6rem 1rem;
-      margin-top: 1rem;
+    .plugin-item h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
     }
 
-    .copy-link-container span {
-      font-size: 1rem;
-      flex-grow: 1;
-      word-wrap: break-word;
-      color: #333;
+    .plugin-item p {
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
     }
 
-    .copy-link-container .icon {
-      width: 1.4rem;
-      height: 1.4rem;
-      margin-left: 1rem;
-      cursor: pointer;
+    .plugin-item img {
+      width: 100%;
+      border-radius: 1.2rem;
+      object-fit: cover;
     }
 
-    /* Футер */
-    footer {
-      background-color: #283593; /* Темно-синий */
-      color: white;
-      padding: 1rem;
-      text-align: center;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    footer a {
-      color: white;
-      text-decoration: none;
-      font-size: 1rem;
-    }
-
-    footer img {
-      max-width: 100px;
-    }
-
-    /* Стили для сообщения копирования */
-    .copy-message {
-      display: none;
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: rgba(49, 186, 235, 0.8);
-      padding: 1rem;
-      border-radius: 0.6rem;
-      color: white;
-      font-size: 1rem;
-    }
   </style>
 </head>
 <body>
 
-  <!-- Шапка сайта -->
+  <!-- Шапка -->
   <header>
-    <img src="https://odr.su/images/dist/logo.svg" alt="Logo">
+    <img src="https://odr.su/images/dist/logo.svg" alt="Логотип">
     <h1>KUV плагины для Lampa</h1>
   </header>
 
   <!-- Основной контент -->
   <main>
-    <section class="intro">
-      <h1>Добро пожаловать в наш проект!</h1>
-      <p>Подключите плагины для Lampa и управляйте ими удобно. Ниже представлены плагины с подробным описанием и ссылками.</p>
+    <!-- Дополнительный текст -->
+    <section>
+      <h2>О проекте</h2>
+      <p>Этот проект включает набор плагинов для Lampa, который позволяет подключать мультфильмы, студийные данные и стили, оптимизированные для различных платформ.</p>
     </section>
 
-    <section class="features">
-      <h2>Плагины</h2>
-      
-      <!-- Пример пункта с плагином -->
-      <ul>
-        <li>
-          <div class="copy-link-container">
-            <span>https://example.com/plugin1</span>
-            <i class="ph-link icon"></i>
-            <i class="ph-copy icon" onclick="copyLink(event, 'https://example.com/plugin1')"></i>
-          </div>
-        </li>
-        <li>
-          <div class="copy-link-container">
-            <span>https://example.com/plugin2</span>
-            <i class="ph-link icon"></i>
-            <i class="ph-copy icon" onclick="copyLink(event, 'https://example.com/plugin2')"></i>
-          </div>
-        </li>
-      </ul>
+    <!-- Пункт 1 -->
+    <section class="plugin-item">
+      <h3>Плагин для мультфильмов</h3>
+      <p>Плагин, который добавляет мультфильмы в ваш интерфейс, предоставляя информацию о каждом фильме.</p>
+      <img src="https://via.placeholder.com/500x300" alt="Пример скриншота плагина">
+      <div class="copy-link" onclick="copyLink(event, 'https://example.com/plugin1')">
+        <span>https://example.com/plugin1</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="ph-link" viewBox="0 0 256 256" fill="none"><path d="M208,48h-32a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8h32a8,8,0,0,0,8-8V56A8,8,0,0,0,208,48Z"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="ph-copy" viewBox="0 0 256 256" fill="none"><path d="M200,32H56A24,24,0,0,0,32,56V200a24,24,0,0,0,24,24H200a24,24,0,0,0,24-24V56A24,24,0,0,0,200,32Zm8,168a8,8,0,0,1-8,8H56a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8H200a8,8,0,0,1,8,8Z"></path></svg>
+      </div>
     </section>
+
+    <!-- Пункт 2 -->
+    <section class="plugin-item">
+      <h3>Плагин для студий</h3>
+      <p>Плагин, который отображает информацию о студиях, использующих Lampa, и их фильмах/сериалах.</p>
+      <img src="https://via.placeholder.com/500x300" alt="Пример скриншота плагина">
+      <div class="copy-link" onclick="copyLink(event, 'https://example.com/plugin2')">
+        <span>https://example.com/plugin2</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="ph-link" viewBox="0 0 256 256" fill="none"><path d="M208,48h-32a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8h32a8,8,0,0,0,8-8V56A8,8,0,0,0,208,48Z"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="ph-copy" viewBox="0 0 256 256" fill="none"><path d="M200,32H56A24,24,0,0,0,32,56V200a24,24,0,0,0,24,24H200a24,24,0,0,0,24-24V56A24,24,0,0,0,200,32Zm8,168a8,8,0,0,1-8,8H56a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8H200a8,8,0,0,1,8,8Z"></path></svg>
+      </div>
+    </section>
+
+    <!-- Пункт 3 -->
+    <section class="plugin-item">
+      <h3>Плагин для стилей</h3>
+      <p>Этот плагин позволяет настраивать визуальные стили для Lampa, включая цветовую гамму, шрифты и иконки.</p>
+      <img src="https://via.placeholder.com/500x300" alt="Пример скриншота плагина">
+      <div class="copy-link" onclick="copyLink(event, 'https://example.com/plugin3')">
+        <span>https://example.com/plugin3</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="ph-link" viewBox="0 0 256 256" fill="none"><path d="M208,48h-32a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8h32a8,8,0,0,0,8-8V56A8,8,0,0,0,208,48Z"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="ph-copy" viewBox="0 0 256 256" fill="none"><path d="M200,32H56A24,24,0,0,0,32,56V200a24,24,0,0,0,24,24H200a24,24,0,0,0,24-24V56A24,24,0,0,0,200,32Zm8,168a8,8,0,0,1-8,8H56a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8H200a8,8,0,0,1,8,8Z"></path></svg>
+      </div>
+    </section>
+
+    <!-- Пункт Все плагины -->
+    <section class="plugin-item">
+      <h3>Все плагины</h3>
+      <p>Скачайте и подключите все плагины сразу, чтобы не подключать их по отдельности. Это удобный способ управлять всеми плагинами Lampa.</p>
+      <div class="copy-link" onclick="copyLink(event, 'https://example.com/allplugins')">
+        <span>https://example.com/allplugins</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="ph-link" viewBox="0 0 256 256" fill="none"><path d="M208,48h-32a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8h32a8,8,0,0,0,8-8V56A8,8,0,0,0,208,48Z"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="ph-copy" viewBox="0 0 256 256" fill="none"><path d="M200,32H56A24,24,0,0,0,32,56V200a24,24,0,0,0,24,24H200a24,24,0,0,0,24-24V56A24,24,0,0,0,200,32Zm8,168a8,8,0,0,1-8,8H56a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8H200a8,8,0,0,1,8,8Z"></path></svg>
+      </div>
+    </section>
+
   </main>
 
   <!-- Футер -->
   <footer>
-    <a href="https://odr.su" target="_blank">ODR.su</a>
-    <img src="https://odr.su/images/dist/logo.svg" alt="ODR Logo">
+    <a href="https://odr.su" target="_blank">
+      <img src="https://odr.su/images/dist/logo.svg" alt="ODR">
+    </a>
+    <p><a href="https://odr.su" target="_blank">Перейти на сайт</a></p>
   </footer>
 
   <!-- Сообщение о копировании ссылки -->
