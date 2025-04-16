@@ -1,178 +1,688 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>KUV плагины для Lampa</title>
-
-  <!-- Подключение шрифта и стилей -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <!-- Подключение иконок Phosphor -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css" />
-
-  <style>
-    :root {
-      --bg: #fff;
-      --text: #111;
-      --card: #f2f2f2;
-      --accent: #333;
-      --link-bg: rgba(49, 186, 235, 0.2);
-      --link-hover-bg: #31a8b0;
-    }
-
-    @media (prefers-color-scheme: dark) {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KUV плагины для Lampa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
       :root {
-        --bg: #333;
-        --text: #fff;
-        --card: #444;
-        --accent: #555;
+        --bg: #fff;
+        --text: #111;
+        --card: #f2f2f2;
+        --accent: #333;
+        --link-bg: rgba(49, 186, 235, 0.2);
+        --link-hover-bg: #31a8b0; /* used for border of main plugin */
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
       }
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: "Wix Madefor Display", sans-serif;
-      font-weight: 400;
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    header {
-      background-color: #292929;
-      padding: 1.5rem;
-      text-align: center;
-    }
-
-    .header-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .logo-icon {
-      width: 2.5em;
-      height: 2.5em;
-    }
-
-    main {
-      padding: 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .plugin-list, .monetization, .gratitude {
-      margin-top: 2rem;
-    }
-
-    .plugin-wrapper {
-      margin-top: 1rem;
-    }
-
-    .plugin-item {
-      background-color: var(--card);
-      margin-bottom: 1rem;
-      padding: 0.75rem;
-      border-radius: 1.5em;
-      transition: background-color 0.3s ease;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .plugin-title {
-      font-weight: 600;
-      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .plugin-content {
-      display: flex;
-      flex-direction: column;
-    }
-
-    h2 {
-      font-size: clamp(1.1rem, 3vw, 1.25rem);
-      margin: 1.5rem 0 1rem;
-    }
-
-    footer {
-      background-color: #292929;
-      padding: 1rem;
-      text-align: center;
-      color: white;
-    }
-
-    footer a {
-      color: #31baeb;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: clamp(0.85rem, 2vw, 0.9rem);
-    }
-
-    footer img {
-      width: 3em;
-      margin-top: 0.5rem;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="header-inner">
-      <img src="kuv/img/logo-icon.svg" alt="Logo" class="logo-icon">
-    </div>
-  </header>
-
-  <main>
-    <section class="plugin-list">
-      <h2>Плагины</h2>
-      <div class="plugin-wrapper">
-        <div class="plugin-item plugin-closed">
-          <div class="plugin-title"><i class="ph-duotone ph-rabbit"></i> Мультики</div>
-          <div class="plugin-content">
-            <p class="plugin-description">Добавляет страницу с мультфильмами...</p>
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #333;
+          --text: #fff;
+          --card: #444;
+          --accent: #555;
+        }
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Wix Madefor Display", sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        opacity: 0;
+        animation: fadeIn 0.5s ease forwards;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      @keyframes fadeIn {
+        to { opacity: 1; }
+      }
+      header {
+        background-color: #292929;
+        padding: clamp(0.75rem, 2vw, 1rem);
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .header-inner {
+        display: flex;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        min-height: clamp(2.5em, 5vw, 3em);
+      }
+      .logo-icon {
+        width: clamp(2.5em, 5vw, 3em);
+        height: clamp(2.5em, 5vw, 3em);
+        flex-shrink: 0;
+      }
+      main {
+        padding: clamp(1rem, 3vw, 2rem);
+        max-width: 1200px;
+        margin: 0 auto;
+        flex-grow: 1;
+      }
+      section {
+        margin-top: 2rem;
+      }
+      section:first-child {
+        margin-top: 0;
+      }
+      h2 {
+        font-size: clamp(1.1rem, 3vw, 1.5rem);
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+      p {
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        margin-bottom: 1.5rem;
+      }
+      .wrapper {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+      }
+      .item {
+        background-color: var(--card);
+        padding: 1rem;
+        border-radius: 1.5em;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: var(--transition);
+        margin-bottom: 1rem;
+      }
+      .item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      }
+      /* Выделяем основной плагин с обводкой нужного цвета */
+      .main-plugin {
+        border: 2px solid var(--link-hover-bg);
+        margin-bottom: 2rem; /* отделим основной плагин от остальных */
+      }
+      /* Поддержка: обводки для Тинькофф и Сбер */
+      .tinkoff-support {
+        border: 2px solid #ffcc00;
+      }
+      .sber-support {
+        border: 2px solid #3c9b35;
+      }
+      /* Уменьшаем стрелочки до 50% от прежнего размера */
+      .item > .title .accordion-icon {
+        font-size: 0.6em;
+        transition: transform 0.3s ease;
+        margin-left: auto;
+        flex-shrink: 0;
+        display: inline-block;
+      }
+      .item > .title {
+        font-weight: 600;
+        font-size: clamp(1rem, 2.5vw, 1.25rem);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        outline: none;
+        position: relative;
+        justify-content: flex-start;
+      }
+      .item > .title:focus-visible {
+        outline: 2px solid var(--link-hover-bg);
+        outline-offset: 3px;
+        border-radius: 0.25em;
+      }
+      .item > .title i {
+        font-size: 1.2em;
+        flex-shrink: 0;
+      }
+      .item > .title .title-text {
+        flex-grow: 1;
+        margin-right: 0.5rem;
+      }
+      .item > .content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .description {
+        margin: 0.75rem 0 0.5rem;
+        font-size: clamp(0.85rem, 2vw, 1rem);
+      }
+      .bottom-section {
+        margin-top: auto;
+      }
+      .screenshot-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+      }
+      .screenshot-container img {
+        max-width: 100%;
+        height: 150px;
+        width: auto;
+        object-fit: cover;
+        border-radius: 1.25em;
+        flex: 0 0 45%;
+        background-color: rgba(128, 128, 128, 0.1);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      .screenshot-container img[src] {
+        background-color: transparent;
+      }
+      /* Стили для ссылок: выравнивание иконок в одном контейнере, зафиксированном справа */
+      .copy-link-btn {
+        display: block;
+        position: relative;
+        padding-right: 2.5em;
+        color: var(--text);
+        background-color: var(--link-bg);
+        padding: 0.75rem;
+        border-radius: 1.25em;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: clamp(0.7rem, 2vw, 1rem);
+        word-break: break-all;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        outline: none;
+        transition: background-color 0.3s ease, transform 0.2s ease-out;
+      }
+      .copy-link-btn:hover {
+        background-color: var(--link-hover-bg);
+        transform: scale(1.03);
+      }
+      .copy-link-btn:focus-visible {
+        background-color: var(--link-hover-bg);
+        transform: scale(1.02);
+        outline: none;
+      }
+      .copy-link-btn span:first-child {
+        margin-right: 0.75rem;
+      }
+      .icons-container {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        flex-shrink: 0;
+      }
+      .link-icon,
+      .copy-icon {
+        font-size: 1.2em;
+      }
+      .copy-icon {
+        position: relative;
+        width: 1.2em;
+        height: 1.2em;
+      }
+      .copy-icon i {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+      }
+      .copy-icon .check-state {
+        opacity: 0;
+        transform: scale(0.7);
+        color: #28a745;
+      }
+      .copy-icon .copy-state {
+        opacity: 1;
+        transform: scale(1);
+      }
+      .copy-icon.copied .copy-state {
+        opacity: 0;
+        transform: scale(0.7);
+      }
+      .copy-icon.copied .check-state {
+        opacity: 1;
+        transform: scale(1);
+      }
+      .copy-message {
+        position: fixed;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #28a745;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        z-index: 1000;
+        animation: slideUpFadeOut 2.3s ease forwards;
+      }
+      @keyframes slideUpFadeOut {
+        0% { transform: translateX(-50%) translateY(20px); opacity: 0; }
+        15%, 85% { transform: translateX(-50%) translateY(0); opacity: 1; }
+        100% { transform: translateX(-50%) translateY(-10px); opacity: 0; }
+      }
+      /* Мобильная версия */
+      @media (max-width: 767px) {
+        .title { cursor: pointer; }
+        .title .accordion-icon { display: inline-block; }
+        .item.open .title .accordion-icon { transform: rotate(-180deg); }
+        .item .content {
+          max-height: 0;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-10px);
+          transition: max-height 0.4s ease-out, opacity 0.3s ease-out, transform 0.3s ease-out, visibility 0s linear 0.4s, margin-top 0.4s ease-out;
+          overflow: hidden;
+        }
+        .item.open .content {
+          max-height: 1000px;
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+          margin-top: 0.75rem;
+          transition: max-height 0.4s ease-in, opacity 0.3s ease-in 0.1s, transform 0.3s ease-in 0.1s, visibility 0s linear, margin-top 0.4s ease-in;
+        }
+        .item:not(.open) { min-height: 0; }
+      }
+      /* Десктопная версия */
+      @media (min-width: 768px) {
+        .item { min-height: 250px; }
+        .title { cursor: default; }
+        .title .accordion-icon { display: none; }
+        .item .content { max-height: none; opacity: 1; visibility: visible; margin-top: 0.75rem; transform: none; }
+      }
+      footer {
+        background-color: #292929;
+        padding: clamp(1rem, 3vw, 1.5rem);
+        text-align: center;
+        color: #fff;
+        flex-shrink: 0;
+        margin-top: auto;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .footer-inner p {
+        margin-bottom: 0;
+        font-size: clamp(0.8rem, 2vw, 0.9rem);
+        text-align: left;
+      }
+      .footer-inner img {
+        width: clamp(2.5em, 4vw, 3em);
+        height: auto;
+        margin-top: 0;
+        flex-shrink: 0;
+      }
+      footer a {
+        color: #31baeb;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      footer a:hover,
+      footer a:focus-visible { text-decoration: underline; outline: none; }
+      /* Секция благодарности */
+      .gratitude {
+        margin-top: 3rem;
+        padding: 1rem;
+        background-color: var(--card);
+        border-radius: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <img src="kuv/img/logo-icon.svg" alt="Логотип KUV" class="logo-icon" />
+      </div>
+    </header>
+    <main>
+      <section class="intro">
+        <h2>Если коротко...</h2>
+        <p>
+          Этот набор плагинов позволяет частично поменять интерфейс Lampa в сторону более единого и лаконичного стиля.
+        </p>
+      </section>
+      <section class="plugin-list">
+        <h2>Плагины</h2>
+        <div class="wrapper">
+          <!-- Основной плагин: KUV стиль с обводкой -->
+          <div class="item main-plugin">
+            <div class="title" role="button" tabindex="0">
+              <i class="ph-duotone ph-paint-brush"></i>
+              <span class="title-text">KUV стиль</span>
+              <span class="accordion-icon"><i class="ph-duotone ph-caret-down"></i></span>
+            </div>
+            <div class="content">
+              <p class="description">
+                Плагин для частичной кастомизации интерфейса Lampa с новым визуальным стилем, улучшенной типографикой и элементами интерфейса.
+              </p>
+              <div class="bottom-section">
+                <div class="screenshot-container">
+                  <img src="screens/IMG_7593.jpeg" alt="Скриншот плагина KUV Стиль 1" loading="lazy" />
+                  <img src="screens/IMG_7585.jpeg" alt="Скриншот плагина KUV Стиль 2" loading="lazy" />
+                </div>
+                <div class="link-section">
+                  <p class="link-instruction">Вставьте ссылку в «Настройки - Расширения - Добавить плагин»:</p>
+                  <a href="#" class="copy-link-btn" data-copy-text="https://rpd-odr.github.io/kuv-style.js">
+                    <span>https://rpd-odr.github.io/kuv-style.js</span>
+                    <span class="icons-container">
+                      <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+                      <span class="copy-icon" aria-label="Скопировать ссылку">
+                        <i class="ph-duotone ph-copy copy-state"></i>
+                        <i class="ph-duotone ph-check check-state"></i>
+                      </span>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Дополнительные плагины -->
+          <div class="item">
+            <div class="title" role="button" tabindex="0">
+              <i class="ph-duotone ph-rabbit"></i>
+              <span class="title-text">Мультики</span>
+              <span class="accordion-icon"><i class="ph-duotone ph-caret-down"></i></span>
+            </div>
+            <div class="content">
+              <p class="description">
+                Добавляет страницу с мультфильмами, учитывая источник: TMDb или CUB, выставленный в настройках.
+              </p>
+              <div class="bottom-section">
+                <div class="screenshot-container">
+                  <img src="screens/IMG_7588.jpeg" alt="Скриншот плагина Мультики 1" loading="lazy" />
+                  <img src="screens/IMG_7589.jpeg" alt="Скриншот плагина Мультики 2" loading="lazy" />
+                </div>
+                <div class="link-section">
+                  <p class="link-instruction">Вставьте ссылку в «Настройки - Расширения - Добавить плагин»:</p>
+                  <a href="#" class="copy-link-btn" data-copy-text="https://rpd-odr.github.io/mult.js">
+                    <span>https://rpd-odr.github.io/mult.js</span>
+                    <span class="icons-container">
+                      <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+                      <span class="copy-icon" aria-label="Скопировать ссылку">
+                        <i class="ph-duotone ph-copy copy-state"></i>
+                        <i class="ph-duotone ph-check check-state"></i>
+                      </span>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="title" role="button" tabindex="0">
+              <i class="ph-duotone ph-film-reel"></i>
+              <span class="title-text">Студии и телесети</span>
+              <span class="accordion-icon"><i class="ph-duotone ph-caret-down"></i></span>
+            </div>
+            <div class="content">
+              <p class="description">
+                Позволяет отображать логотипы студий в карточках фильмов и каналов, а также открывать фильтры по студиям или каналам.
+                <br /><br />
+                Плагин основан на <a href="https://levende.github.io/lampa-plugins/tmdb-networks.js" target="_blank" rel="noopener noreferrer">tmdb-networks.js</a> от levende, за что большое спасибо.
+              </p>
+              <div class="bottom-section">
+                <div class="screenshot-container">
+                  <img src="screens/IMG_7591.jpeg" alt="Скриншот плагина Студии 1" loading="lazy" />
+                  <img src="screens/IMG_7594.jpeg" alt="Скриншот плагина Студии 2" loading="lazy" />
+                </div>
+                <div class="link-section">
+                  <p class="link-instruction">Вставьте ссылку в «Настройки - Расширения - Добавить плагин»:</p>
+                  <a href="#" class="copy-link-btn" data-copy-text="https://rpd-odr.github.io/studios.js">
+                    <span>https://rpd-odr.github.io/studios.js</span>
+                    <span class="icons-container">
+                      <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+                      <span class="copy-icon" aria-label="Скопировать ссылку">
+                        <i class="ph-duotone ph-copy copy-state"></i>
+                        <i class="ph-duotone ph-check check-state"></i>
+                      </span>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Остальные плагины -->
+          <div class="item">
+            <div class="title" role="button" tabindex="0">
+              <i class="ph-duotone ph-unite"></i>
+              <span class="title-text">Все плагины</span>
+              <span class="accordion-icon"><i class="ph-duotone ph-caret-down"></i></span>
+            </div>
+            <div class="content">
+              <p class="description">
+                Позволяет подключить все плагины сразу. Убедитесь, что вышеперечисленные плагины не подключены!
+              </p>
+              <div class="bottom-section">
+                <div class="screenshot-container"></div>
+                <div class="link-section">
+                  <p class="link-instruction">Вставьте ссылку в «Настройки - Расширения - Добавить плагин»:</p>
+                  <a href="#" class="copy-link-btn" data-copy-text="https://rpd-odr.github.io/kuv-git.js">
+                    <span>https://rpd-odr.github.io/kuv-git.js</span>
+                    <span class="icons-container">
+                      <span class="link-icon"><i class="ph-duotone ph-link"></i></span>
+                      <span class="copy-icon" aria-label="Скопировать ссылку">
+                        <i class="ph-duotone ph-copy copy-state"></i>
+                        <i class="ph-duotone ph-check check-state"></i>
+                      </span>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="monetization">
-      <h2>Поддержать копеечкой</h2>
-      <div class="plugin-item plugin-closed">
-        <div class="plugin-title"><i class="ph-duotone ph-bank"></i> Сбер</div>
-        <div class="plugin-content">
-          <p class="plugin-description">Номер счёта: 1234 5678 9012 3456</p>
+      </section>
+      <section class="support">
+        <h2>Поддержать копеечкой</h2>
+        <p>
+          Если вам нравятся плагины и вы хотите поддержать их разработку, можете перевести любую сумму на один из счетов ниже. Спасибо за ваш вклад!
+        </p>
+        <div class="wrapper">
+          <div class="item tinkoff-support">
+            <div class="title" role="button" tabindex="0">
+              <i class="ph-duotone ph-coin"></i>
+              <span class="title-text">Тинькофф</span>
+              <span class="accordion-icon"><i class="ph-duotone ph-caret-down"></i></span>
+            </div>
+            <div class="content">
+              <p class="description">Поддержите разработку через Тинькофф.</p>
+              <div class="bottom-section">
+                <div class="link-section">
+                  <p class="link-instruction">Номер карты:</p>
+                  <a href="#" class="copy-link-btn" data-copy-text="5536 9140 3548 3758">
+                    <span>5536 9140 3548 3758</span>
+                    <span class="icons-container">
+                      <span class="copy-icon" aria-label="Скопировать номер">
+                        <i class="ph-duotone ph-copy copy-state"></i>
+                        <i class="ph-duotone ph-check check-state"></i>
+                      </span>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item sber-support">
+            <div class="title" role="button" tabindex="0">
+              <i class="ph-duotone ph-coin"></i>
+              <span class="title-text">Сбер</span>
+              <span class="accordion-icon"><i class="ph-duotone ph-caret-down"></i></span>
+            </div>
+            <div class="content">
+              <p class="description">Поддержите разработку через Сбер.</p>
+              <div class="bottom-section">
+                <div class="link-section">
+                  <p class="link-instruction">Номер карты:</p>
+                  <a href="#" class="copy-link-btn" data-copy-text="5228 6010 3498 3657">
+                    <span>5228 6010 3498 3657</span>
+                    <span class="icons-container">
+                      <span class="copy-icon" aria-label="Скопировать номер">
+                        <i class="ph-duotone ph-copy copy-state"></i>
+                        <i class="ph-duotone ph-check check-state"></i>
+                      </span>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
+      <!-- Секция Благодарностей с дополнениями -->
+      <section class="gratitude">
+        <h2>Особая благодарность</h2>
+        <p>
+          Огромное спасибо разработчикам Лампы, разработчику lampac, участникам <a href="https://t.me/+TIXtgvGBBOc3ZTUy" target="_blank" rel="noopener noreferrer">чата в Telegram</a> и, конечно, levende.
+        </p>
+      </section>
+    </main>
+    <footer>
+      <div class="footer-inner">
+        <p>
+          © 2025 KUV | Developed by
+          <a href="https://odr.su" target="_blank" rel="noopener noreferrer">odr.su</a>
+        </p>
+        <img src="https://odr.su/images/dist/logo.svg" alt="Логотип ODR" />
       </div>
-      <div class="plugin-item plugin-closed">
-        <div class="plugin-title"><i class="ph-duotone ph-credit-card"></i> Тиньков</div>
-        <div class="plugin-content">
-          <p class="plugin-description">Номер счёта: 9876 5432 1098 7654</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="gratitude">
-      <h2>Особая благодарность</h2>
-      <p>Заглушка: здесь будут перечислены имена.</p>
-    </section>
-  </main>
-
-  <footer>
-    <p>© 2025 KUV | Developed by <a href="https://odr.su" target="_blank">odr.su</a></p>
-    <img src="https://odr.su/images/dist/logo.svg" alt="Логотип ODR" />
-  </footer>
-</body>
+    </footer>
+    <script src="script.js" defer></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const items = document.querySelectorAll(".item");
+        const copyButtons = document.querySelectorAll(".copy-link-btn");
+        const lazyImages = document.querySelectorAll('.screenshot-container img[loading="lazy"]');
+        const isMobile = () => window.innerWidth <= 767;
+        const setupAccordion = () => {
+          items.forEach((item) => {
+            const title = item.querySelector(".title");
+            const content = item.querySelector(".content");
+            if (!title || !content) return;
+            if (isMobile()) {
+              title.setAttribute("role", "button");
+              title.setAttribute("tabindex", "0");
+              if (!item.classList.contains("open")) {
+                item.classList.add("closed");
+                content.style.maxHeight = "0";
+              }
+              if (!title.dataset.accordionInitialized) {
+                title.addEventListener("click", toggleAccordion);
+                title.addEventListener("keydown", handleAccordionKeydown);
+                title.dataset.accordionInitialized = "true";
+              }
+            } else {
+              title.removeAttribute("role");
+              title.removeAttribute("tabindex");
+              item.classList.remove("closed");
+              item.classList.add("open");
+              content.style.maxHeight = null;
+              if (title.dataset.accordionInitialized) {
+                title.removeEventListener("click", toggleAccordion);
+                title.removeEventListener("keydown", handleAccordionKeydown);
+                delete title.dataset.accordionInitialized;
+              }
+            }
+          });
+        };
+        function toggleAccordion() {
+          const item = this.closest(".item");
+          if (!item || !isMobile()) return;
+          const content = item.querySelector(".content");
+          const isOpening = !item.classList.contains("open");
+          item.classList.toggle("open");
+          item.classList.toggle("closed");
+          if (isOpening) {
+            content.style.maxHeight = content.scrollHeight + "px";
+          } else {
+            content.style.maxHeight = "0";
+          }
+        }
+        function handleAccordionKeydown(event) {
+          if (!isMobile()) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            toggleAccordion.call(this);
+          }
+        }
+        copyButtons.forEach((button) => {
+          button.addEventListener("click", (event) => {
+            event.preventDefault();
+            const textToCopy = button.dataset.copyText;
+            if (!textToCopy) return;
+            const copyIconSpan = button.querySelector(".copy-icon");
+            navigator.clipboard
+              .writeText(textToCopy)
+              .then(() => {
+                showCopyMessage(
+                  textToCopy.includes("http") ? "Ссылка скопирована!" : "Номер скопирован!"
+                );
+                if (copyIconSpan) {
+                  copyIconSpan.classList.add("copied");
+                  setTimeout(() => {
+                    copyIconSpan.classList.remove("copied");
+                  }, 1500);
+                }
+              })
+              .catch((err) => {
+                console.error("Ошибка копирования в буфер обмена: ", err);
+                showCopyMessage("Не удалось скопировать", true);
+              });
+          });
+        });
+        function showCopyMessage(messageText, isError = false) {
+          const existingMessage = document.querySelector(".copy-message");
+          if (existingMessage) {
+            existingMessage.remove();
+          }
+          const message = document.createElement("div");
+          message.className = "copy-message";
+          message.textContent = messageText;
+          message.style.backgroundColor = isError ? "#dc3545" : "#28a745";
+          document.body.appendChild(message);
+          setTimeout(() => message.remove(), 2000);
+        }
+        lazyImages.forEach((img) => {
+          img.addEventListener(
+            "load",
+            () => {
+              img.style.backgroundColor = "transparent";
+              img.classList.add("loaded");
+            },
+            { once: true }
+          );
+        });
+        let resizeTimeout;
+        window.addEventListener("resize", () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(setupAccordion, 250);
+        });
+        setupAccordion();
+      });
+    </script>
+  </body>
 </html>
