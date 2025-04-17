@@ -1,6 +1,6 @@
 // Плагин KUV Rating для Lampa.
 // Заменяет возрастной рейтинг в .full-start__pg на SVG-иконку с диапазонной проверкой.
-// Опционально добавляет статус сериала в .full-start-new__rate-line.
+// Добавляет статус сериала в .full-start-new__rate-line.
 // Совместим с KUV style и KUV studios.
 
 (function () {
@@ -30,7 +30,6 @@
   // Получение нормализованного рейтинга по диапазону
   function getNormalizedRating(ageText) {
     console.log("KUV Rating: Обрабатываем рейтинг:", ageText);
-    // Извлекаем число из текста (например, "7+" → 7)
     const match = ageText.match(/^(\d+)\+?$/);
     if (!match) {
       console.warn("KUV Rating: Неверный формат рейтинга:", ageText);
@@ -48,7 +47,17 @@
     return null;
   }
 
-  // Основная функция обработки рейтингов
+  // Перевод статуса сериала
+  function getStatusText(status) {
+    console.log("KUV Rating: Обрабатываем статус:", status);
+    if (status === "Ended") return "Завершён";
+    if (status === "Canceled") return "Отменён";
+    if (status === "Returning Series") return "Выходит";
+    if (status === "In Production") return "В производстве";
+    return "";
+  }
+
+  // Обработка возрастных рейтингов
   async function processRatings() {
     const ratingBlocks = document.querySelectorAll(".full-start__pg, [class*='pg']");
     console.log("KUV Rating: Найдено блоков рейтинга:", ratingBlocks.length);
@@ -86,18 +95,9 @@
     }
   }
 
-  // [Опционально] Обработка статуса сериала
-  
-  function getStatusText(status) {
-    console.log("KUV Rating: Обрабатываем статус:", status);
-    if (status === "Ended") return "Завершён";
-    if (status === "Canceled") return "Отменён";
-    if (status === "Returning Series") return "Выходит";
-    if (status === "In Production") return "В производстве";
-    return status || "Неизвестно";
-  }
-
-  async function processSeriesStatus(render, card) {
+  // Обработка статуса сериала
+  function processSeriesStatus(render, card) {
+    console.log("KUV Rating: Запуск processSeriesStatus, render:", !!render, "card:", !!card);
     if (!card || (!card.number_of_seasons && !card.status)) {
       console.warn("KUV Rating: Данные сериала отсутствуют");
       return;
@@ -115,15 +115,16 @@
     }
 
     const status = getStatusText(card.status);
-    if (status && status !== "Неизвестно") {
+    if (status) {
       const statusElement = document.createElement("span");
       statusElement.className = "status-text";
       statusElement.textContent = status;
       rateLine.appendChild(statusElement);
       console.log("KUV Rating: Статус сериала вставлен:", status);
+    } else {
+      console.warn("KUV Rating: Статус пустой или неизвестный");
     }
   }
-  
 
   // Инициализация плагина
   function initPlugin() {
@@ -143,8 +144,8 @@
         height: 22px;
       }
       .status-text {
-        font-size: 0.9em;
-        color: rgba(255, 255, 255, 0.8);
+        font-size: .9em;
+        color: rgba(255, 255, 255, .8);
         margin-left: 8px;
         vertical-align: middle;
       }
@@ -155,7 +156,7 @@
     // Обрабатываем рейтинги сразу
     processRatings();
 
-    // Наблюдаем за изменениями DOM
+    // Наблюдаем за изменениями DOM для рейтингов
     const observer = new MutationObserver((mutations) => {
       let needsUpdate = false;
       mutations.forEach((mutation) => {
@@ -171,17 +172,15 @@
     observer.observe(document.body, { childList: true, subtree: true });
     console.log("KUV Rating: MutationObserver запущен");
 
-    // [Опционально] Обработка статуса сериала через событие full
-    
+    // Обработка статуса сериала через событие full
     Lampa.Listener.follow("full", async function (e) {
       if (e.type === "complite") {
         console.log("KUV Rating: Событие full complite");
         const render = e.object.activity.render();
         const card = e.object.card;
-        await processSeriesStatus(render, card);
+        processSeriesStatus(render, card);
       }
     });
-    
   }
 
   // Запуск плагина
