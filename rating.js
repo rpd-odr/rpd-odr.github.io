@@ -43,12 +43,14 @@
   // Получение российского рейтинга из TMDb
   function getRussianRating(card) {
     console.log("KUV Rating: Проверяем card для рейтинга:", card?.title || card?.name || "неизвестный");
+    console.log("KUV Rating: release_dates:", card?.release_dates);
     if (!card || !card.release_dates || !card.release_dates.results) {
-      console.warn("KUV Rating: Данные release_dates отсутствуют:", card?.release_dates);
+      console.warn("KUV Rating: Данные release_dates отсутствуют");
       return null;
     }
 
     const ruRelease = card.release_dates.results.find((release) => release.iso_3166_1 === "RU");
+    console.log("KUV Rating: ruRelease:", ruRelease);
     if (ruRelease && ruRelease.release_dates && ruRelease.release_dates.length > 0) {
       const certification = ruRelease.release_dates[0].certification;
       console.log("KUV Rating: Найден certification:", certification);
@@ -96,14 +98,17 @@
     console.log("KUV Rating: Найдено элементов .full-start-new__rate-line:", rateLineElements.length);
 
     if (!rateLineElements.length) {
-      console.warn("KUV Rating: Элементы .full-start-new__rate-line не найдены в render");
-      return;
+      console.warn("KUV Rating: Элементы .full-start-new__rate-line не найдены, пробуем альтернативные селекторы");
+      const altRateLineElements = render.querySelectorAll("[class*='rate-line']");
+      console.log("KUV Rating: Найдено альтернативных rate-line:", altRateLineElements.length);
+      if (!altRateLineElements.length) return;
     }
 
     for (const rateLine of rateLineElements) {
-      // Проверяем, не вставлена ли уже иконка или статус
+      // Проверяем наличие дубликатов
+      console.log("KUV Rating: Проверка дублирования, .ageicon:", !!rateLine.querySelector(".ageicon"), ".status-text:", !!rateLine.querySelector(".status-text"));
       if (rateLine.querySelector(".ageicon") || rateLine.querySelector(".status-text")) {
-        console.log("KUV Rating: Иконка рейтинга или статус уже вставлены в:", rateLine);
+        console.log("KUV Rating: Иконка рейтинга или статус уже вставлены");
         continue;
       }
 
@@ -113,8 +118,8 @@
         const cardElement = rateLine.closest(".card");
         const id = cardElement?.dataset.id;
         const type = cardElement?.dataset.type || (localCard?.number_of_seasons ? 'tv' : 'movie');
+        console.log("KUV Rating: Card отсутствует или неполный, ID:", id, "Тип:", type);
         if (id) {
-          console.log("KUV Rating: Card отсутствует или неполный, загружаем для ID:", id);
           localCard = await fetchCardData(id, type);
         } else {
           console.warn("KUV Rating: Не удалось определить ID карточки");
@@ -126,6 +131,10 @@
         console.warn("KUV Rating: Объект card не удалось получить");
         continue;
       }
+
+      // Тестовая вставка для проверки DOM
+      console.log("KUV Rating: Тестовая вставка");
+      rateLine.insertAdjacentHTML("beforeend", '<span class="kuv-test">TEST</span>');
 
       // Получаем российский рейтинг
       let addedContent = false;
@@ -139,7 +148,7 @@
         else if (rating === "0+") key = "age-0";
 
         if (key && ICONS[key]) {
-          console.log("KUV Rating: Заменяем рейтинг:", key);
+          console.log("KUV Rating: Подготовка вставки рейтинга:", key);
           const paths = ICONS[key];
           const svgContent = await fetchIcon(paths.main);
           if (svgContent) {
@@ -147,7 +156,7 @@
             const svgElement = svgDoc.querySelector("svg");
             if (svgElement) {
               svgElement.classList.add("ageicon");
-              rateLine.insertAdjacentHTML("beforeend", svgElement.outerHTML); // Вставляем иконку
+              rateLine.insertAdjacentHTML("beforeend", svgElement.outerHTML);
               console.log("KUV Rating: Иконка рейтинга вставлена:", rating);
               addedContent = true;
             } else {
@@ -162,6 +171,7 @@
       }
 
       // Добавляем статус для сериалов
+      console.log("KUV Rating: Проверка сериала, number_of_seasons:", localCard.number_of_seasons, "status:", localCard.status);
       if (localCard.number_of_seasons || localCard.status) {
         const status = getStatusText(localCard.status);
         if (status && status !== 'Неизвестно') {
@@ -174,9 +184,10 @@
         }
       }
 
-      // Удаляем старый .full-start__pg, если добавлены иконка или статус
+      // Удаляем старый .full-start__pg
       if (addedContent) {
-        const pgElement = rateLine.closest(".card")?.querySelector(".full-start__pg");
+        const pgElement = rateLine.closest(".card")?.querySelector(".full-start__pg, [class*='pg']");
+        console.log("KUV Rating: Поиск .full-start__pg, найдено:", !!pgElement);
         if (pgElement) {
           pgElement.remove();
           console.log("KUV Rating: Старый элемент .full-start__pg удален");
@@ -206,6 +217,11 @@
             color: rgba(255, 255, 255, 0.8);
             margin-left: 8px;
             vertical-align: middle;
+          }
+          .kuv-test {
+            color: red;
+            font-size: 0.8em;
+            margin-left: 5px;
           }
         `)
         .appendTo('head');
@@ -256,7 +272,9 @@
     // Обработка активности
     Lampa.Listener.follow("activity:start", async () => {
       console.log("KUV Rating: Событие activity:start");
-      await replaceAgeRatings(document.body, Lampa.Activity.active()?.movie);
+      document.querySelectorAll(".card").forEach(card => {
+        replaceAgeRatings(card, Lampa.Activity.active()?.movie);
+      });
     });
 
     // Отслеживание изменений DOM
