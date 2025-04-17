@@ -37,7 +37,7 @@
     "nt-backup": { main: gitpath + "icons/vault-duotone.svg" },
     "button--book": { main: gitpath + "icons/heart-fill.svg", alt: gitpath + "icons/heart-duotone.svg" },
     "button--play": { main: gitpath + "icons/play-duotone.svg" },
-    "button--subscribe": { main: gitpath + "icons/bell-duotone.svg"},
+    "button--subscribe": { main: gitpath + "icons/bell-duotone.svg" },
     "view--trailer": { main: gitpath + "icons/youtube-logo-duotone.svg" },
     "view--online": { main: gitpath + "icons/queue-duotone.svg" },
     "view--torrent": { main: gitpath + "icons/download-simple-duotone.svg" },
@@ -62,6 +62,13 @@
     "nt-pirate_store": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
     "simple-keyboard-mic": { main: gitpath + "icons/microphone-duotone.svg" },
     "close-button": { main: gitpath + "icons/x-circle-duotone.svg" },
+    // Добавляем замены для возрастных рейтингов:
+    // Обратите внимание, что теперь замена выполняется не по классу, а по содержимому элемента
+    "age-18": { main: gitpath + "icons/age18.svg" },
+    "age-16": { main: gitpath + "icons/age16.svg" },
+    "age-12": { main: gitpath + "icons/age12.svg" },
+    "age-6":  { main: gitpath + "icons/age6.svg" },
+    "age-0":  { main: gitpath + "icons/age0.svg" }
   };
 
   const iconCache = {}; // Кэш иконок
@@ -157,6 +164,33 @@
     }
   }
 
+  // Функция замены возрастных рейтингов на инлайн SVG согласно текстовому содержимому элемента
+  async function replaceAgeRatings(targetElement) {
+    const ratingElements = targetElement.querySelectorAll(".full-start__pg");
+    for (const el of ratingElements) {
+      const ratingText = el.textContent.trim();
+      let key = null;
+      if (ratingText === "18+") key = "age-18";
+      else if (ratingText === "16+") key = "age-16";
+      else if (ratingText === "12+") key = "age-12";
+      else if (ratingText === "6+") key = "age-6";
+      else if (ratingText === "0+") key = "age-0";
+
+      if (key && ICONS[key]) {
+        const paths = ICONS[key];
+        const svgContent = await fetchIcon(paths.main);
+        if (svgContent) {
+          const svgDoc = new DOMParser().parseFromString(svgContent, "image/svg+xml");
+          const svgElement = svgDoc.querySelector("svg");
+          if (svgElement) {
+            svgElement.classList.add("kuvicon");
+            el.innerHTML = svgElement.outerHTML;
+          }
+        }
+      }
+    }
+  }
+
   // Добавляет кнопку "Перезагрузить" в шапку
   function addReloadButton() {
     const reloadButton = $(
@@ -195,23 +229,26 @@
     assignActionClasses(document.body);
     assignComponentClasses(document.body);
     await replaceIcons(document.body);
+    await replaceAgeRatings(document.body); // Замена возрастных рейтингов
 
     Lampa.Listener.follow("activity:start", async () => {
       assignActionClasses(document.body);
       assignComponentClasses(document.body);
       await replaceIcons(document.body);
+      await replaceAgeRatings(document.body); // Замена для новых элементов
     });
 
     Lampa.Listener.follow("activity:archive", async () => {
       assignActionClasses(document.body);
       assignComponentClasses(document.body);
       await replaceIcons(document.body);
+      await replaceAgeRatings(document.body); // Замена для новых элементов
     });
 
-    observeDOMChanges(); // отслеживаем изменения DOM
+    observeDOMChanges(); // Отслеживаем изменения DOM
   }
 
-  // Следим за DOM и заменяем иконки при динамических изменениях
+  // Следим за DOM и заменяем иконки и возрастные рейтинги при динамических изменениях
   function observeDOMChanges() {
     if (typeof MutationObserver === "undefined") return;
     const observer = new MutationObserver((mutations) => {
@@ -222,6 +259,7 @@
               assignActionClasses(node);
               assignComponentClasses(node);
               replaceIcons(node);
+              replaceAgeRatings(node);
             }
           }
         }
@@ -230,7 +268,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  // Запуск при готовности приложения
+  // Запуск плагина: если приложение готово, сразу инициализируем, иначе слушаем событие "ready"
   if (window.appready) {
     initPlugin();
   } else {
