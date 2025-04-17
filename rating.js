@@ -1,6 +1,6 @@
 // Плагин KUV Rating для Lampa.
 // Заменяет возрастной рейтинг в .full-start__pg на SVG-иконку с диапазонной проверкой.
-// Иконка добавляется в конец строки .full-start-new__rate-line.
+// Иконка добавляется в начало строки .full-start-new__rate-line.
 // Совместим с KUV style и KUV studios.
 
 (function () {
@@ -82,8 +82,8 @@
           targetElement = block.parentNode;
         }
 
-        // Вставляем иконку в конец целевого элемента
-        targetElement.appendChild(iconContainer);
+        // Вставляем иконку в начало целевого элемента
+        targetElement.insertBefore(iconContainer, targetElement.firstChild);
         block.style.display = "none";
       } catch (e) {
         console.error("KUV Rating: Ошибка при обработке рейтинга:", e);
@@ -99,6 +99,7 @@
     style.textContent = `
       .kuv-age-icon {
         display: inline-block;
+        margin: 0;
         vertical-align: middle;
       }
       .kuv-age-icon svg {
