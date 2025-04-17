@@ -1,7 +1,6 @@
 // Плагин KUV style для Lampa.
 // Заменяет большинство иконок и шрифты в интерфейсе.
 // Частично переработан интерфейс.
-// Заменяет возрастной рейтинг на SVG-иконку из TMDb данных.
 // Добавлена кнопка перезагрузки в шапку.
 
 // Для корректной работы из локального источника необходима папка kuv со всеми подпапками.
@@ -38,7 +37,7 @@
     "nt-backup": { main: gitpath + "icons/vault-duotone.svg" },
     "button--book": { main: gitpath + "icons/heart-fill.svg", alt: gitpath + "icons/heart-duotone.svg" },
     "button--play": { main: gitpath + "icons/play-duotone.svg" },
-    "button--subscribe": { main: gitpath + "icons/bell-duotone.svg" },
+    "button--subscribe": { main: gitpath + "icons/bell-duotone.svg"},
     "view--trailer": { main: gitpath + "icons/youtube-logo-duotone.svg" },
     "view--online": { main: gitpath + "icons/queue-duotone.svg" },
     "view--torrent": { main: gitpath + "icons/download-simple-duotone.svg" },
@@ -63,11 +62,6 @@
     "nt-pirate_store": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
     "simple-keyboard-mic": { main: gitpath + "icons/microphone-duotone.svg" },
     "close-button": { main: gitpath + "icons/x-circle-duotone.svg" },
-    "age-18": { main: gitpath + "icons/age18.svg" },
-    "age-16": { main: gitpath + "icons/age16.svg" },
-    "age-12": { main: gitpath + "icons/age12.svg" },
-    "age-6":  { main: gitpath + "icons/age6.svg" },
-    "age-0":  { main: gitpath + "icons/age0.svg" }
   };
 
   const iconCache = {}; // Кэш иконок
@@ -82,113 +76,8 @@
       iconCache[path] = svgContent;
       return svgContent;
     } catch (error) {
-      console.error("KUV style: Ошибка загрузки иконки:", error);
+      console.error(error);
       return null;
-    }
-  }
-
-  // Получение российского рейтинга из TMDb
-  function getRussianRating(card) {
-    if (!card || !card.release_dates || !card.release_dates.results) {
-      console.warn("KUV style: Данные release_dates отсутствуют:", card.title || card.name || "неизвестный фильм");
-      return null;
-    }
-
-    const ruRelease = card.release_dates.results.find((release) => release.iso_3166_1 === "RU");
-    if (ruRelease && ruRelease.release_dates && ruRelease.release_dates.length > 0) {
-      const certification = ruRelease.release_dates[0].certification;
-      if (certification) {
-        // Нормализуем рейтинг
-        if (certification.match(/18/)) return "18+";
-        if (certification.match(/16/)) return "16+";
-        if (certification.match(/12/)) return "12+";
-        if (certification.match(/6/)) return "6+";
-        if (certification.match(/0/)) return "0+";
-      }
-    }
-    console.warn("KUV style: Российский рейтинг не найден для:", card.title || card.name || "неизвестный фильм");
-    return null;
-  }
-
-  // Перевод статуса сериала
-  function getStatusText(status) {
-    if (status === 'Ended') return 'Завершён';
-    if (status === 'Canceled') return 'Отменён';
-    if (status === 'Returning Series') return 'Выходит';
-    if (status === 'In Production') return 'В производстве';
-    return status || 'Неизвестно';
-  }
-
-  // Замена возрастного рейтинга и добавление статуса сериала
-  async function replaceAgeRatings(targetElement, card) {
-    const rateLineElements = targetElement.querySelectorAll(".full-start-new__rate-line");
-    console.log("KUV style: Найдено элементов .full-start-new__rate-line:", rateLineElements.length);
-
-    for (const rateLine of rateLineElements) {
-      // Проверяем, не вставлена ли уже иконка или статус
-      if (rateLine.querySelector(".ageicon") || rateLine.querySelector(".status-text")) {
-        console.log("KUV style: Иконка рейтинга или статус уже вставлены");
-        continue;
-      }
-
-      // Если card не передан, пропускаем
-      if (!card) {
-        console.warn("KUV style: Объект card не предоставлен");
-        continue;
-      }
-
-      // Получаем российский рейтинг
-      const rating = getRussianRating(card);
-      if (rating) {
-        let key = null;
-        if (rating === "18+") key = "age-18";
-        else if (rating === "16+") key = "age-16";
-        else if (rating === "12+") key = "age-12";
-        else if (rating === "6+") key = "age-6";
-        else if (rating === "0+") key = "age-0";
-
-        if (key && ICONS[key]) {
-          console.log("KUV style: Заменяем рейтинг:", key);
-          const paths = ICONS[key];
-          const svgContent = await fetchIcon(paths.main);
-          if (svgContent) {
-            const svgDoc = new DOMParser().parseFromString(svgContent, "image/svg+xml");
-            const svgElement = svgDoc.querySelector("svg");
-            if (svgElement) {
-              svgElement.classList.add("ageicon");
-              rateLine.insertAdjacentHTML("beforeend", svgElement.outerHTML); // Вставляем иконку
-              console.log("KUV style: Иконка рейтинга вставлена:", rating);
-            } else {
-              console.error("KUV style: SVG не найден в содержимом:", paths.main);
-            }
-          } else {
-            console.error("KUV style: Не удалось загрузить SVG:", paths.main);
-          }
-        } else {
-          console.warn("KUV style: Рейтинг не поддерживается или отсутствует в ICONS:", rating);
-        }
-      }
-
-      // Добавляем статус для сериалов
-      if (card.number_of_seasons || card.status) {
-        const status = getStatusText(card.status);
-        if (status && status !== 'Неизвестно') {
-          const statusElement = document.createElement("span");
-          statusElement.className = "status-text";
-          statusElement.textContent = status;
-          rateLine.appendChild(statusElement);
-          console.log("KUV style: Статус сериала вставлен:", status);
-        }
-      }
-
-      // Удаляем старый .full-start__pg, если иконка или статус добавлены
-      if (rateLine.querySelector(".ageicon") || rateLine.querySelector(".status-text")) {
-        const pgElement = rateLine.closest(".card")?.querySelector(".full-start__pg");
-        if (pgElement) {
-          pgElement.remove();
-          console.log("KUV style: Старый элемент .full-start__pg удален");
-        }
-      }
     }
   }
 
@@ -307,39 +196,22 @@
     assignComponentClasses(document.body);
     await replaceIcons(document.body);
 
-    // Обработка карточек через событие full
-    Lampa.Listener.follow('full', async function(e) {
-      if (e.type === 'complite') {
-        const render = e.object.activity.render();
-        const card = e.object.card;
-        assignActionClasses(render);
-        assignComponentClasses(render);
-        await replaceIcons(render);
-        await replaceAgeRatings(render, card); // Передаем card
-      }
-    });
-
-    // Обработка активности
     Lampa.Listener.follow("activity:start", async () => {
       assignActionClasses(document.body);
       assignComponentClasses(document.body);
       await replaceIcons(document.body);
-      // Для активности используем movie из активной карточки
-      await replaceAgeRatings(document.body, Lampa.Activity.active()?.movie);
     });
 
     Lampa.Listener.follow("activity:archive", async () => {
       assignActionClasses(document.body);
       assignComponentClasses(document.body);
       await replaceIcons(document.body);
-      // Для архива используем movie из активной карточки
-      await replaceAgeRatings(document.body, Lampa.Activity.active()?.movie);
     });
 
-    observeDOMChanges(); // Отслеживаем изменения DOM
+    observeDOMChanges(); // отслеживаем изменения DOM
   }
 
-  // Следим за DOM и заменяем иконки и возрастные рейтинги при динамических изменениях
+  // Следим за DOM и заменяем иконки при динамических изменениях
   function observeDOMChanges() {
     if (typeof MutationObserver === "undefined") return;
     const observer = new MutationObserver((mutations) => {
@@ -350,8 +222,6 @@
               assignActionClasses(node);
               assignComponentClasses(node);
               replaceIcons(node);
-              // Для новых узлов используем активный movie
-              replaceAgeRatings(node, Lampa.Activity.active()?.movie);
             }
           }
         }
@@ -360,7 +230,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  // Запуск плагина
+  // Запуск при готовности приложения
   if (window.appready) {
     initPlugin();
   } else {
