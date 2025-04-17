@@ -99,6 +99,7 @@
     style.textContent = `
       .kuv-age-icon {
         display: inline-block;
+        font-size: 1.45rem;
         margin-righr: 1em;
         vertical-align: middle;
       }
