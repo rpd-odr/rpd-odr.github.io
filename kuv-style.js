@@ -163,72 +163,43 @@
     }
   }
 
-  // Заменяет возрастные рейтинги на иконки с проверкой дублирования
+// Замена возрастных рейтингов (упрощённая версия)
 async function replaceAgeRatings(targetElement) {
-    // Ищем все блоки с рейтингами
+    // Ищем все строки с рейтингом
     const ratingLines = targetElement.querySelectorAll('.full-start-new__rate-line');
     
     for (const line of ratingLines) {
-        try {
-            // Пропускаем если уже есть наша иконка
-            if (line.querySelector('.ageicon')) continue;
+        // Пропускаем если уже есть наша иконка
+        if (line.querySelector('.ageicon')) continue;
+        
+        // Находим родительскую карточку
+        const card = line.closest('.card, .full, .item');
+        if (!card) continue;
+        
+        // Получаем возрастной рейтинг из атрибута data-age
+        const ageRating = card.dataset.age || '';
+        
+        // Определяем нужную иконку
+        let iconName = '';
+        if (ageRating.includes('18')) iconName = 'age-18';
+        else if (ageRating.includes('16')) iconName = 'age-16';
+        else if (ageRating.includes('12')) iconName = 'age-12';
+        else if (ageRating.includes('6')) iconName = 'age-6';
+        else if (ageRating.includes('0')) iconName = 'age-0';
+        
+        if (!iconName) continue;
+        
+        // Вставляем SVG иконку
+        const svg = await fetchIcon(ICONS[iconName].main);
+        if (svg) {
+            line.insertAdjacentHTML('beforeend', 
+                `<div class="ageicon">${svg}</div>`);
             
-            // Находим ближайший родительский элемент с данными
-            const card = line.closest('.card, .full, .item, [data-card]');
-            if (!card) continue;
-
-            // Получаем данные карточки
-            const itemData = card.dataset.item ? JSON.parse(card.dataset.item) : null;
-            if (!itemData) continue;
-
-            // Получаем российский рейтинг из TMDB или существующий
-            const ageRating = getRussianAgeRating(itemData) || itemData.age_rating;
-            if (!ageRating) continue;
-
-            // Определяем ключ иконки
-            const key = getAgeIconKey(ageRating);
-            if (!key || !ICONS[key]) continue;
-
-            // Вставляем иконку в указанный блок
-            await insertAgeIcon(line, key);
-            
-            // Удаляем старый блок с рейтингом если существует
-            const oldRatingBlock = card.querySelector('.full-start__pg');
-            if (oldRatingBlock) oldRatingBlock.remove();
-            
-        } catch (e) {
-            console.error('Ошибка обработки рейтинга:', e);
+            // Удаляем старый текстовый рейтинг если есть
+            const oldRating = card.querySelector('.full-start__pg');
+            if (oldRating) oldRating.remove();
         }
     }
-}
-
-// Вспомогательные функции:
-
-function getRussianAgeRating(itemData) {
-    return itemData.tmdb?.release_dates?.results
-        ?.find(r => r.iso_3166_1 === 'RU')?.release_dates
-        ?.find(d => d.certification)?.certification;
-}
-
-function getAgeIconKey(ageRating) {
-    if (/18/.test(ageRating)) return "age-18";
-    if (/16/.test(ageRating)) return "age-16";
-    if (/12/.test(ageRating)) return "age-12";
-    if (/6/.test(ageRating)) return "age-6";
-    if (/0/.test(ageRating)) return "age-0";
-    return null;
-}
-
-async function insertAgeIcon(element, iconKey) {
-    const svgContent = await fetchIcon(ICONS[iconKey].main);
-    if (!svgContent) return;
-    
-    const svgDoc = new DOMParser().parseFromString(svgContent, "image/svg+xml");
-    const svgElement = svgDoc.querySelector("svg");
-    if (!svgElement) return;
-    
-    svgElement.classList.add("ageicon");
-    element.insertAdjacentHTML('beforeend', svgElement.outerHTML);
 }
 
   // Добавляет кнопку "Перезагрузить" в шапку
