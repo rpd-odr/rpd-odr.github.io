@@ -99,12 +99,11 @@
     style.textContent = `
       .kuv-age-icon {
         display: inline-block;
-        margin-left: 6px;
         vertical-align: middle;
       }
       .kuv-age-icon svg {
-        width: 22px;
-        height: 22px;
+        width: 2em;
+        height: 2em;
       }
     `;
     document.head.appendChild(style);
