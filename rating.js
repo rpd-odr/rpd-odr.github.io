@@ -1,73 +1,85 @@
-// Плагин KUV Rating для Lampa (с диапазонными проверками)
+// Плагин KUV Rating для Lampa (финальная рабочая версия)
 (function() {
     "use strict";
 
     const gitpath = "https://rpd-odr.github.io/kuv/";
     
-    // Иконки возрастных рейтингов с диапазонами
+    // Диапазоны возрастных рейтингов
     const AGE_RATINGS = {
         "18+": { 
             icon: gitpath + "icons/age18.svg",
-            range: [18, Infinity] // 18 и выше
+            min: 18
         },
         "16+": {
             icon: gitpath + "icons/age16.svg",
-            range: [16, 17] // 16-17
+            min: 16,
+            max: 17
         },
         "12+": {
             icon: gitpath + "icons/age12.svg",
-            range: [12, 15] // 12-15
+            min: 12,
+            max: 15
         },
         "6+": {
             icon: gitpath + "icons/age6.svg",
-            range: [6, 11] // 6-11
+            min: 6,
+            max: 11
         },
         "0+": {
             icon: gitpath + "icons/age0.svg",
-            range: [0, 5] // 0-5
+            min: 0,
+            max: 5
         }
     };
 
-    // Тексты статусов сериалов
-    const STATUS_TEXTS = {
+    // Полные соответствия статусов
+    const STATUS_MAP = {
         "Ended": "Завершён",
         "Returning Series": "Выходит",
+        "Ongoing": "Выходит",
         "Canceled": "Отменён",
         "In Production": "В производстве",
-        "Planned": "Запланирован"
+        "Planned": "Запланирован",
+        "Released": "Вышел",
+        "Post Production": "Постпродакшн"
     };
 
-    // Определяем рейтинг по числовому значению
-    function getAgeRating(ageNum) {
-        ageNum = parseInt(ageNum) || 0;
+    // Определение возрастного рейтинга
+    function determineAgeRating(ageText) {
+        // Извлекаем число из текста (поддержка форматов: "12", "12+", "16-18")
+        const ageNum = parseInt(ageText) || 0;
         
-        for (const [label, data] of Object.entries(AGE_RATINGS)) {
-            const [min, max] = data.range;
-            if (ageNum >= min && ageNum <= max) {
-                return label;
-            }
-        }
-        return null;
+        // Проверяем диапазоны от старшего к младшему
+        if (ageNum >= 18) return "18+";
+        if (ageNum >= 16) return "16+";
+        if (ageNum >= 12) return "12+";
+        if (ageNum >= 6) return "6+";
+        return "0+";
     }
 
-    // Основная функция обработки
+    // Обработка одной карточки
     async function processCard(card) {
         if (card.dataset.kuvProcessed) return;
         card.dataset.kuvProcessed = "true";
         
-        // 1. Обработка возрастного рейтинга
-        const ageBlock = card.querySelector('.full-start__pg');
+        // 1. Возрастной рейтинг
+        const ageBlock = card.querySelector('.full-start__pg, .age-rating, [class*="age"]');
         if (ageBlock) {
-            const ageText = ageBlock.textContent.trim();
+            const ageText = (ageBlock.textContent || '').trim();
+            const ageRating = determineAgeRating(ageText);
             
-            // Пробуем извлечь число из текста (например "12" из "12+")
-            const ageNum = parseInt(ageText) || 0;
-            const ageRating = getAgeRating(ageNum);
-            
-            if (ageRating && AGE_RATINGS[ageRating]) {
+            if (AGE_RATINGS[ageRating]) {
                 try {
-                    const response = await fetch(AGE_RATINGS[ageRating].icon);
-                    const svg = await response.text();
+                    const iconUrl = AGE_RATINGS[ageRating].icon;
+                    const cachedIcon = localStorage.getItem(`kuv-icon-${ageRating}`);
+                    
+                    let svg = cachedIcon;
+                    if (!svg) {
+                        const response = await fetch(iconUrl);
+                        svg = await response.text();
+                        localStorage.setItem(`kuv-icon-${ageRating}`, svg);
+                    }
+                    
                     const iconContainer = document.createElement('div');
                     iconContainer.className = 'kuv-age-icon';
                     iconContainer.innerHTML = svg;
@@ -78,24 +90,50 @@
             }
         }
         
-        // 2. Добавление статуса сериала
+        // 2. Статус сериала
         try {
-            const cardData = card.dataset.item ? JSON.parse(card.dataset.item) : null;
+            const cardData = getCardData(card);
             if (cardData) {
-                const status = cardData.tmdb?.status || cardData.status;
-                if (status && STATUS_TEXTS[status]) {
-                    const statusElement = document.createElement('div');
-                    statusElement.className = 'kuv-show-status';
-                    statusElement.textContent = STATUS_TEXTS[status];
-                    
-                    const rateLine = card.querySelector('.full-start-new__rate-line, .full-start__rate-line');
-                    if (rateLine && !rateLine.querySelector('.kuv-show-status')) {
-                        rateLine.appendChild(statusElement);
+                const rawStatus = cardData.status || cardData.tmdb?.status;
+                const status = STATUS_MAP[rawStatus] || rawStatus;
+                
+                if (status) {
+                    const existingStatus = card.querySelector('.kuv-show-status');
+                    if (existingStatus) {
+                        existingStatus.textContent = status;
+                    } else {
+                        const statusElement = document.createElement('div');
+                        statusElement.className = 'kuv-show-status';
+                        statusElement.textContent = status;
+                        
+                        const rateLine = card.querySelector('.full-start-new__rate-line, .full-start__rate-line, .card__info');
+                        if (rateLine) {
+                            rateLine.appendChild(statusElement);
+                        }
                     }
                 }
             }
         } catch (e) {
             console.error("Ошибка обработки статуса:", e);
+        }
+    }
+
+    // Получение данных карточки
+    function getCardData(card) {
+        try {
+            // Пробуем разные способы получения данных
+            if (card.dataset.item) return JSON.parse(card.dataset.item);
+            if (card.dataset.params) return JSON.parse(card.dataset.params);
+            if (card.dataset.card) return JSON.parse(card.dataset.card);
+            
+            // Для полноэкранного режима
+            const activity = Lampa.Activity.active();
+            if (activity && activity.movie) return activity.movie;
+            
+            return null;
+        } catch (e) {
+            console.error("Ошибка парсинга данных карточки:", e);
+            return null;
         }
     }
 
@@ -112,6 +150,7 @@
             .kuv-age-icon svg {
                 width: 22px;
                 height: 22px;
+                fill: currentColor;
             }
             .kuv-show-status {
                 display: inline-block;
@@ -124,27 +163,39 @@
         `;
         document.head.appendChild(style);
         
-        // Обработка существующих карточек
-        document.querySelectorAll('.card').forEach(processCard);
+        // Обработка карточек
+        const processAllCards = () => {
+            document.querySelectorAll('.card, .item, [data-card]').forEach(processCard);
+        };
         
-        // Наблюдатель за изменениями DOM
+        // Первичная обработка
+        processAllCards();
+        
+        // Наблюдатель за изменениями
         const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === 1) {
-                        node.querySelectorAll('.card').forEach(processCard);
-                    }
-                });
+            let needsUpdate = false;
+            mutations.forEach((m) => {
+                if (m.addedNodes.length) needsUpdate = true;
             });
+            if (needsUpdate) processAllCards();
         });
         
         observer.observe(document.body, { childList: true, subtree: true });
+        
+        // Обработка полноэкранного режима
+        Lampa.Listener.follow('full', (e) => {
+            if (e.type === 'complite') {
+                setTimeout(() => processCard(e.object.activity.render()), 300);
+            }
+        });
     }
 
     // Запуск
-    if (document.readyState === 'complete') {
+    if (window.appready) {
         initPlugin();
     } else {
-        window.addEventListener('DOMContentLoaded', initPlugin);
+        Lampa.Listener.follow('app', (e) => {
+            if (e.type === 'ready') initPlugin();
+        });
     }
 })();
