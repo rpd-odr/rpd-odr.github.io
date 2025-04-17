@@ -57,6 +57,20 @@
     return "";
   }
 
+  // Асинхронное получение данных TMDb
+  async function fetchCardData(id, type) {
+    if (!id) return null;
+    try {
+      console.log("KUV Rating: Запрашиваем данные TMDb для ID:", id, "Тип:", type);
+      const data = await Lampa.TMDB.getMovie(id, { extended: true, type: type || "movie" });
+      console.log("KUV Rating: Получены данные TMDb:", data);
+      return data;
+    } catch (error) {
+      console.error("KUV Rating: Ошибка загрузки данных TMDb:", error);
+      return null;
+    }
+  }
+
   // Обработка возрастных рейтингов
   async function processRatings() {
     const ratingBlocks = document.querySelectorAll(".full-start__pg, [class*='pg']");
@@ -96,30 +110,74 @@
   }
 
   // Обработка статуса сериала
-  function processSeriesStatus(render, card) {
+  async function processSeriesStatus(render, card) {
     console.log("KUV Rating: Запуск processSeriesStatus, render:", !!render, "card:", !!card);
-    if (!card || (!card.number_of_seasons && !card.status)) {
-      console.warn("KUV Rating: Данные сериала отсутствуют");
+    if (!render) {
+      console.warn("KUV Rating: render отсутствует");
       return;
     }
 
-    const rateLine = render.querySelector(".full-start-new__rate-line, .full-start__rate-line, [class*='rate-line']");
+    let localCard = card;
+    if (!localCard || (!localCard.number_of_seasons && !localCard.status)) {
+      console.log("KUV Rating: Данные сериала отсутствуют, пробуем загрузить");
+      const cardElement = render.querySelector(".card, [class*='card']");
+      let id = cardElement?.dataset.id;
+      if (!id && cardElement?.dataset.params) {
+        try {
+          const params = JSON.parse(cardElement.dataset.params);
+          id = params?.id || params?.movie?.id;
+          console.log("KUV Rating: ID из dataset.params:", id);
+        } catch (e) {
+          console.warn("KUV Rating: Ошибка парсинга dataset.params:", e);
+        }
+      }
+      const type = localCard?.number_of_seasons ? "tv" : "movie";
+      if (id) {
+        localCard = await fetchCardData(id, type);
+      } else {
+        console.warn("KUV Rating: ID карточки не найден");
+        return;
+      }
+    }
+
+    if (!localCard) {
+      console.warn("KUV Rating: Объект card не удалось получить");
+      return;
+    }
+
+    console.log("KUV Rating: card:", localCard, "status:", localCard.status, "number_of_seasons:", localCard.number_of_seasons);
+    if (!localCard.number_of_seasons && !localCard.status) {
+      console.warn("KUV Rating: Это не сериал или данные отсутствуют");
+      return;
+    }
+
+    const rateLine = render.querySelector(".full-start-new__rate-line, .full-start__rate-line, .card__rate, [class*='rate-line']");
+    console.log("KUV Rating: rateLine найден:", !!rateLine);
+    let targetElement = rateLine;
     if (!rateLine) {
-      console.warn("KUV Rating: Элемент rate-line не найден");
-      return;
+      console.warn("KUV Rating: Элемент rate-line не найден, пробуем .full-start__pg");
+      targetElement = render.querySelector(".full-start__pg, [class*='pg']")?.parentNode;
+      if (!targetElement) {
+        console.warn("KUV Rating: Альтернативный элемент не найден");
+        return;
+      }
     }
 
-    if (rateLine.querySelector(".status-text")) {
+    if (targetElement.querySelector(".status-text")) {
       console.log("KUV Rating: Статус уже вставлен");
       return;
     }
 
-    const status = getStatusText(card.status);
+    // Тестовая вставка
+    console.log("KUV Rating: Тестовая вставка");
+    targetElement.insertAdjacentHTML("beforeend", '<span class="kuv-test">TEST</span>');
+
+    const status = getStatusText(localCard.status);
     if (status) {
       const statusElement = document.createElement("span");
       statusElement.className = "status-text";
       statusElement.textContent = status;
-      rateLine.appendChild(statusElement);
+      targetElement.appendChild(statusElement);
       console.log("KUV Rating: Статус сериала вставлен:", status);
     } else {
       console.warn("KUV Rating: Статус пустой или неизвестный");
@@ -149,6 +207,11 @@
         margin-left: 8px;
         vertical-align: middle;
       }
+      .kuv-test {
+        color: red;
+        font-size: .8em;
+        margin-left: 5px;
+      }
     `;
     document.head.appendChild(style);
     console.log("KUV Rating: Стили добавлены");
@@ -174,12 +237,21 @@
 
     // Обработка статуса сериала через событие full
     Lampa.Listener.follow("full", async function (e) {
+      console.log("KUV Rating: Событие full, тип:", e.type);
       if (e.type === "complite") {
-        console.log("KUV Rating: Событие full complite");
+        console.log("KUV Rating: Событие full complite, card:", e.object.card?.title || e.object.card?.name);
         const render = e.object.activity.render();
         const card = e.object.card;
-        processSeriesStatus(render, card);
+        await processSeriesStatus(render, card);
       }
+    });
+
+    // Альтернативная обработка статуса через activity:start
+    Lampa.Listener.follow("activity:start", async () => {
+      console.log("KUV Rating: Событие activity:start");
+      const render = document.body;
+      const card = Lampa.Activity.active()?.movie;
+      await processSeriesStatus(render, card);
     });
   }
 
