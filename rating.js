@@ -1,201 +1,197 @@
-// Плагин KUV Rating для Lampa (финальная рабочая версия)
-(function() {
-    "use strict";
+// Плагин KUV Rating для Lampa.
+// Заменяет возрастной рейтинг в .full-start__pg на SVG-иконку с диапазонной проверкой.
+// Опционально добавляет статус сериала в .full-start-new__rate-line.
+// Совместим с KUV style и KUV studios.
 
-    const gitpath = "https://rpd-odr.github.io/kuv/";
+(function () {
+  "use strict";
+
+  // const localpath = "/plugins/kuv/"; // раскомментировать для локального использования
+  const gitpath = "https://rpd-odr.github.io/kuv/";
+
+  // Иконки возрастных рейтингов
+  const AGE_ICONS = {
+    "0+": gitpath + "icons/age0.svg",
+    "6+": gitpath + "icons/age6.svg",
+    "12+": gitpath + "icons/age12.svg",
+    "16+": gitpath + "icons/age16.svg",
+    "18+": gitpath + "icons/age18.svg"
+  };
+
+  // Диапазоны для возрастных рейтингов
+  const RATING_RANGES = [
+    { min: 0, max: 5, rating: "0+" },
+    { min: 6, max: 11, rating: "6+" },
+    { min: 12, max: 15, rating: "12+" },
+    { min: 16, max: 17, rating: "16+" },
+    { min: 18, max: Infinity, rating: "18+" }
+  ];
+
+  // Получение нормализованного рейтинга по диапазону
+  function getNormalizedRating(ageText) {
+    console.log("KUV Rating: Обрабатываем рейтинг:", ageText);
+    // Извлекаем число из текста (например, "7+" → 7)
+    const match = ageText.match(/^(\d+)\+?$/);
+    if (!match) {
+      console.warn("KUV Rating: Неверный формат рейтинга:", ageText);
+      return null;
+    }
+
+    const age = parseInt(match[1], 10);
+    const range = RATING_RANGES.find((r) => age >= r.min && age <= r.max);
+    if (range) {
+      console.log("KUV Rating: Нормализованный рейтинг:", range.rating);
+      return range.rating;
+    }
+
+    console.warn("KUV Rating: Рейтинг вне диапазона:", age);
+    return null;
+  }
+
+  // Основная функция обработки рейтингов
+  async function processRatings() {
+    const ratingBlocks = document.querySelectorAll(".full-start__pg, [class*='pg']");
+    console.log("KUV Rating: Найдено блоков рейтинга:", ratingBlocks.length);
+
+    for (const block of ratingBlocks) {
+      if (block.dataset.kuvProcessed) {
+        console.log("KUV Rating: Блок уже обработан:", block.textContent);
+        continue;
+      }
+      block.dataset.kuvProcessed = "true";
+
+      const ageText = block.textContent.trim();
+      const normalizedRating = getNormalizedRating(ageText);
+      if (!normalizedRating || !AGE_ICONS[normalizedRating]) {
+        console.warn("KUV Rating: Иконка для рейтинга не найдена:", normalizedRating || ageText);
+        continue;
+      }
+
+      try {
+        console.log("KUV Rating: Загружаем иконку для:", normalizedRating);
+        const response = await fetch(AGE_ICONS[normalizedRating]);
+        if (!response.ok) throw new Error(`Ошибка загрузки SVG: ${response.status}`);
+        const svg = await response.text();
+
+        const iconContainer = document.createElement("div");
+        iconContainer.className = "kuv-age-icon";
+        iconContainer.innerHTML = svg;
+
+        block.parentNode.insertBefore(iconContainer, block.nextSibling);
+        block.style.display = "none";
+        console.log("KUV Rating: Иконка вставлена для:", normalizedRating);
+      } catch (e) {
+        console.error("KUV Rating: Ошибка при обработке рейтинга:", e);
+      }
+    }
+  }
+
+  // [Опционально] Обработка статуса сериала
+  
+  function getStatusText(status) {
+    console.log("KUV Rating: Обрабатываем статус:", status);
+    if (status === "Ended") return "Завершён";
+    if (status === "Canceled") return "Отменён";
+    if (status === "Returning Series") return "Выходит";
+    if (status === "In Production") return "В производстве";
+    return status || "Неизвестно";
+  }
+
+  async function processSeriesStatus(render, card) {
+    if (!card || (!card.number_of_seasons && !card.status)) {
+      console.warn("KUV Rating: Данные сериала отсутствуют");
+      return;
+    }
+
+    const rateLine = render.querySelector(".full-start-new__rate-line, .full-start__rate-line, [class*='rate-line']");
+    if (!rateLine) {
+      console.warn("KUV Rating: Элемент rate-line не найден");
+      return;
+    }
+
+    if (rateLine.querySelector(".status-text")) {
+      console.log("KUV Rating: Статус уже вставлен");
+      return;
+    }
+
+    const status = getStatusText(card.status);
+    if (status && status !== "Неизвестно") {
+      const statusElement = document.createElement("span");
+      statusElement.className = "status-text";
+      statusElement.textContent = status;
+      rateLine.appendChild(statusElement);
+      console.log("KUV Rating: Статус сериала вставлен:", status);
+    }
+  }
+  
+
+  // Инициализация плагина
+  function initPlugin() {
+    console.log("KUV Rating: Инициализация плагина");
+
+    // Добавляем стили
+    const style = document.createElement("style");
+    style.id = "kuv-rating-plugin";
+    style.textContent = `
+      .kuv-age-icon {
+        display: inline-block;
+        margin-left: 6px;
+        vertical-align: middle;
+      }
+      .kuv-age-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+      .status-text {
+        font-size: 0.9em;
+        color: rgba(255, 255, 255, 0.8);
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+    `;
+    document.head.appendChild(style);
+    console.log("KUV Rating: Стили добавлены");
+
+    // Обрабатываем рейтинги сразу
+    processRatings();
+
+    // Наблюдаем за изменениями DOM
+    const observer = new MutationObserver((mutations) => {
+      let needsUpdate = false;
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length) {
+          needsUpdate = true;
+        }
+      });
+      if (needsUpdate) {
+        console.log("KUV Rating: Обнаружены изменения DOM, обновляем рейтинги");
+        processRatings();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    console.log("KUV Rating: MutationObserver запущен");
+
+    // [Опционально] Обработка статуса сериала через событие full
     
-    // Диапазоны возрастных рейтингов
-    const AGE_RATINGS = {
-        "18+": { 
-            icon: gitpath + "icons/age18.svg",
-            min: 18
-        },
-        "16+": {
-            icon: gitpath + "icons/age16.svg",
-            min: 16,
-            max: 17
-        },
-        "12+": {
-            icon: gitpath + "icons/age12.svg",
-            min: 12,
-            max: 15
-        },
-        "6+": {
-            icon: gitpath + "icons/age6.svg",
-            min: 6,
-            max: 11
-        },
-        "0+": {
-            icon: gitpath + "icons/age0.svg",
-            min: 0,
-            max: 5
-        }
-    };
+    Lampa.Listener.follow("full", async function (e) {
+      if (e.type === "complite") {
+        console.log("KUV Rating: Событие full complite");
+        const render = e.object.activity.render();
+        const card = e.object.card;
+        await processSeriesStatus(render, card);
+      }
+    });
+    
+  }
 
-    // Полные соответствия статусов
-    const STATUS_MAP = {
-        "Ended": "Завершён",
-        "Returning Series": "Выходит",
-        "Ongoing": "Выходит",
-        "Canceled": "Отменён",
-        "In Production": "В производстве",
-        "Planned": "Запланирован",
-        "Released": "Вышел",
-        "Post Production": "Постпродакшн"
-    };
-
-    // Определение возрастного рейтинга
-    function determineAgeRating(ageText) {
-        // Извлекаем число из текста (поддержка форматов: "12", "12+", "16-18")
-        const ageNum = parseInt(ageText) || 0;
-        
-        // Проверяем диапазоны от старшего к младшему
-        if (ageNum >= 18) return "18+";
-        if (ageNum >= 16) return "16+";
-        if (ageNum >= 12) return "12+";
-        if (ageNum >= 6) return "6+";
-        return "0+";
-    }
-
-    // Обработка одной карточки
-    async function processCard(card) {
-        if (card.dataset.kuvProcessed) return;
-        card.dataset.kuvProcessed = "true";
-        
-        // 1. Возрастной рейтинг
-        const ageBlock = card.querySelector('.full-start__pg, .age-rating, [class*="age"]');
-        if (ageBlock) {
-            const ageText = (ageBlock.textContent || '').trim();
-            const ageRating = determineAgeRating(ageText);
-            
-            if (AGE_RATINGS[ageRating]) {
-                try {
-                    const iconUrl = AGE_RATINGS[ageRating].icon;
-                    const cachedIcon = localStorage.getItem(`kuv-icon-${ageRating}`);
-                    
-                    let svg = cachedIcon;
-                    if (!svg) {
-                        const response = await fetch(iconUrl);
-                        svg = await response.text();
-                        localStorage.setItem(`kuv-icon-${ageRating}`, svg);
-                    }
-                    
-                    const iconContainer = document.createElement('div');
-                    iconContainer.className = 'kuv-age-icon';
-                    iconContainer.innerHTML = svg;
-                    ageBlock.replaceWith(iconContainer);
-                } catch (e) {
-                    console.error("Ошибка загрузки иконки:", e);
-                }
-            }
-        }
-        
-        // 2. Статус сериала
-        try {
-            const cardData = getCardData(card);
-            if (cardData) {
-                const rawStatus = cardData.status || cardData.tmdb?.status;
-                const status = STATUS_MAP[rawStatus] || rawStatus;
-                
-                if (status) {
-                    const existingStatus = card.querySelector('.kuv-show-status');
-                    if (existingStatus) {
-                        existingStatus.textContent = status;
-                    } else {
-                        const statusElement = document.createElement('div');
-                        statusElement.className = 'kuv-show-status';
-                        statusElement.textContent = status;
-                        
-                        const rateLine = card.querySelector('.full-start-new__rate-line, .full-start__rate-line, .card__info');
-                        if (rateLine) {
-                            rateLine.appendChild(statusElement);
-                        }
-                    }
-                }
-            }
-        } catch (e) {
-            console.error("Ошибка обработки статуса:", e);
-        }
-    }
-
-    // Получение данных карточки
-    function getCardData(card) {
-        try {
-            // Пробуем разные способы получения данных
-            if (card.dataset.item) return JSON.parse(card.dataset.item);
-            if (card.dataset.params) return JSON.parse(card.dataset.params);
-            if (card.dataset.card) return JSON.parse(card.dataset.card);
-            
-            // Для полноэкранного режима
-            const activity = Lampa.Activity.active();
-            if (activity && activity.movie) return activity.movie;
-            
-            return null;
-        } catch (e) {
-            console.error("Ошибка парсинга данных карточки:", e);
-            return null;
-        }
-    }
-
-    // Инициализация плагина
-    function initPlugin() {
-        // Стили
-        const style = document.createElement('style');
-        style.textContent = `
-            .kuv-age-icon {
-                display: inline-block;
-                margin-right: 6px;
-                vertical-align: middle;
-            }
-            .kuv-age-icon svg {
-                width: 22px;
-                height: 22px;
-                fill: currentColor;
-            }
-            .kuv-show-status {
-                display: inline-block;
-                font-size: 12px;
-                color: rgba(255,255,255,0.8);
-                margin-left: 8px;
-                vertical-align: middle;
-                font-style: italic;
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Обработка карточек
-        const processAllCards = () => {
-            document.querySelectorAll('.card, .item, [data-card]').forEach(processCard);
-        };
-        
-        // Первичная обработка
-        processAllCards();
-        
-        // Наблюдатель за изменениями
-        const observer = new MutationObserver((mutations) => {
-            let needsUpdate = false;
-            mutations.forEach((m) => {
-                if (m.addedNodes.length) needsUpdate = true;
-            });
-            if (needsUpdate) processAllCards();
-        });
-        
-        observer.observe(document.body, { childList: true, subtree: true });
-        
-        // Обработка полноэкранного режима
-        Lampa.Listener.follow('full', (e) => {
-            if (e.type === 'complite') {
-                setTimeout(() => processCard(e.object.activity.render()), 300);
-            }
-        });
-    }
-
-    // Запуск
-    if (window.appready) {
-        initPlugin();
-    } else {
-        Lampa.Listener.follow('app', (e) => {
-            if (e.type === 'ready') initPlugin();
-        });
-    }
+  // Запуск плагина
+  if (document.readyState === "complete") {
+    console.log("KUV Rating: Документ готов, запускаем плагин");
+    initPlugin();
+  } else {
+    window.addEventListener("DOMContentLoaded", () => {
+      console.log("KUV Rating: DOMContentLoaded, запускаем плагин");
+      initPlugin();
+    });
+  }
 })();
