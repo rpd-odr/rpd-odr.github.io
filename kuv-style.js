@@ -62,8 +62,7 @@
     "nt-pirate_store": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
     "simple-keyboard-mic": { main: gitpath + "icons/microphone-duotone.svg" },
     "close-button": { main: gitpath + "icons/x-circle-duotone.svg" },
-    // Добавляем замены для возрастных рейтингов:
-    // Обратите внимание, что теперь замена выполняется не по классу, а по содержимому элемента
+    // Иконки возрастных рейтингов
     "age-18": { main: gitpath + "icons/age18.svg" },
     "age-16": { main: gitpath + "icons/age16.svg" },
     "age-12": { main: gitpath + "icons/age12.svg" },
@@ -164,29 +163,51 @@
     }
   }
 
-  // Функция замены возрастных рейтингов на инлайн SVG согласно текстовому содержимому элемента
+  // Заменяет возрастные рейтинги на основе данных TMDB
   async function replaceAgeRatings(targetElement) {
-    const ratingElements = targetElement.querySelectorAll(".full-start__pg");
-    for (const el of ratingElements) {
-      const ratingText = el.textContent.trim();
-      let key = null;
-      if (ratingText === "18+") key = "age-18";
-      else if (ratingText === "16+") key = "age-16";
-      else if (ratingText === "12+") key = "age-12";
-      else if (ratingText === "6+") key = "age-6";
-      else if (ratingText === "0+") key = "age-0";
+    const cards = targetElement.querySelectorAll('.card, .full, .item, [data-card]');
+    
+    for (const card of cards) {
+      try {
+        // Получаем данные карточки
+        const itemData = card.dataset.item ? JSON.parse(card.dataset.item) : null;
+        if (!itemData) continue;
 
-      if (key && ICONS[key]) {
-        const paths = ICONS[key];
-        const svgContent = await fetchIcon(paths.main);
+        // Получаем российский возрастной рейтинг из TMDB
+        const ruRating = itemData.tmdb?.release_dates?.results
+          ?.find(r => r.iso_3166_1 === 'RU')?.release_dates
+          ?.find(d => d.certification)?.certification;
+
+        // Или используем существующий рейтинг из карточки
+        const ageRating = ruRating || itemData.age_rating;
+        if (!ageRating) continue;
+
+        // Определяем ключ иконки
+        let key = null;
+        if (/18/.test(ageRating)) key = "age-18";
+        else if (/16/.test(ageRating)) key = "age-16";
+        else if (/12/.test(ageRating)) key = "age-12";
+        else if (/6/.test(ageRating)) key = "age-6";
+        else if (/0/.test(ageRating)) key = "age-0";
+
+        if (!key || !ICONS[key]) continue;
+
+        // Ищем блок для вставки иконки
+        const ratingBlock = card.querySelector('.full-start__pg, .card__age, .age-rating, [class*="age"]');
+        if (!ratingBlock) continue;
+
+        // Загружаем и вставляем SVG
+        const svgContent = await fetchIcon(ICONS[key].main);
         if (svgContent) {
           const svgDoc = new DOMParser().parseFromString(svgContent, "image/svg+xml");
           const svgElement = svgDoc.querySelector("svg");
           if (svgElement) {
-            svgElement.classList.add("kuvicon");
-            el.innerHTML = svgElement.outerHTML;
+            svgElement.classList.add("ageicon");
+            ratingBlock.innerHTML = svgElement.outerHTML;
           }
         }
+      } catch (e) {
+        console.error('Ошибка обработки возрастного рейтинга:', e);
       }
     }
   }
@@ -198,7 +219,7 @@
       '<div class="reload-icon"><svg></svg></div>' +
       '</div>'
     );
-    replaceIcons(reloadButton[0]); // применяем иконку
+    replaceIcons(reloadButton[0]);
     $('.head__actions').append(reloadButton);
     $('#RELOAD').on('hover:enter hover:click hover:touch', function () {
       location.reload();
@@ -210,7 +231,7 @@
     if (!document.querySelector('link[href="' + gitpath + 'styles/kuv-style.css"]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = gitpath + "styles/kuv-style.css"; // заменить на localpath при необходимости
+      link.href = gitpath + "styles/kuv-style.css";
       document.head.appendChild(link);
     }
   }
@@ -229,26 +250,26 @@
     assignActionClasses(document.body);
     assignComponentClasses(document.body);
     await replaceIcons(document.body);
-    await replaceAgeRatings(document.body); // Замена возрастных рейтингов
+    await replaceAgeRatings(document.body);
 
     Lampa.Listener.follow("activity:start", async () => {
       assignActionClasses(document.body);
       assignComponentClasses(document.body);
       await replaceIcons(document.body);
-      await replaceAgeRatings(document.body); // Замена для новых элементов
+      await replaceAgeRatings(document.body);
     });
 
     Lampa.Listener.follow("activity:archive", async () => {
       assignActionClasses(document.body);
       assignComponentClasses(document.body);
       await replaceIcons(document.body);
-      await replaceAgeRatings(document.body); // Замена для новых элементов
+      await replaceAgeRatings(document.body);
     });
 
-    observeDOMChanges(); // Отслеживаем изменения DOM
+    observeDOMChanges();
   }
 
-  // Следим за DOM и заменяем иконки и возрастные рейтинги при динамических изменениях
+  // Следим за DOM и заменяем иконки при динамических изменениях
   function observeDOMChanges() {
     if (typeof MutationObserver === "undefined") return;
     const observer = new MutationObserver((mutations) => {
@@ -268,7 +289,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  // Запуск плагина: если приложение готово, сразу инициализируем, иначе слушаем событие "ready"
+  // Запуск плагина
   if (window.appready) {
     initPlugin();
   } else {
