@@ -14,7 +14,7 @@
   Lampa.Storage.set('torrserver_url', '{localhost}/ts');
 
   Lampa.Utils.putScriptAsync(["{localhost}/online.js", "{localhost}/sync.js", "{localhost}/backup.js", "{localhost}/tracks.js"], function() {});
-  Lampa.Utils.putScriptAsync(["https://rpd-odr.github.io/kuv-style.js"], function() {});
+  Lampa.Utils.putScriptAsync(["https://rpd-odr.github.io/kuv-git.js"], function() {});
 
   var network = new Lampa.Reguest();
   network.silent('{localhost}/reqinfo?uid='+uid, function(req) {
