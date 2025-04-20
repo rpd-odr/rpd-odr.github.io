@@ -103,8 +103,13 @@
         vertical-align: middle;
       }
       .kuv-age-icon svg {
-        width: 2.5em;
-        height: 2.5em;
+        width: 2.2em;
+        height: 2.2em;
+      }
+      .full-start__pg, .full-start__status {
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: 0.3em;
+        border: none!important;
       }
     `;
     document.head.appendChild(style);
