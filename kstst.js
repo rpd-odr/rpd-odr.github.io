@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    // const localpath = "/plugins/kuv/"; // раскомментировать и заменить gitpath на localpath, если расположен локально
+    // const localpath = "/plugins/kuv/"; // раскомментировать для локального использования
     var gitpath = "https://rpd-odr.github.io/kuv/";
     var CACHE_VERSION = '1.0';
     var CACHE_PREFIX = 'kuv_icon_';
@@ -65,6 +65,24 @@
         "simple-keyboard-mic": { main: gitpath + "icons/microphone-duotone.svg" },
         "close-button": { main: gitpath + "icons/x-circle-duotone.svg" }
     };
+
+    // Иконки возрастных рейтингов
+    var AGE_ICONS = {
+        "0+": gitpath + "icons/age0.svg",
+        "6+": gitpath + "icons/age6.svg",
+        "12+": gitpath + "icons/age12.svg",
+        "16+": gitpath + "icons/age16.svg",
+        "18+": gitpath + "icons/age18.svg"
+    };
+
+    // Диапазоны для возрастных рейтингов
+    var RATING_RANGES = [
+        { min: 0, max: 5, rating: "0+" },
+        { min: 6, max: 11, rating: "6+" },
+        { min: 12, max: 15, rating: "12+" },
+        { min: 16, max: 17, rating: "16+" },
+        { min: 18, max: Infinity, rating: "18+" }
+    ];
 
     var iconCache = {}; // Кэш иконок
 
@@ -235,6 +253,54 @@
         });
     }
 
+    // Получение нормализованного рейтинга по диапазону
+    function getNormalizedRating(ageText) {
+        var match = ageText.match(/^(\d+)\+?$/);
+        if (!match) return null;
+
+        var age = parseInt(match[1], 10);
+        for (var i = 0; i < RATING_RANGES.length; i++) {
+            var range = RATING_RANGES[i];
+            if (age >= range.min && age <= range.max) {
+                return range.rating;
+            }
+        }
+        return null;
+    }
+
+    // Обработка возрастных рейтингов
+    function processRatings() {
+        var ratingBlocks = document.querySelectorAll(".full-start__pg, [class*='pg']");
+        Array.prototype.forEach.call(ratingBlocks, function(block) {
+            if (block.dataset.kuvProcessed) return;
+            block.dataset.kuvProcessed = "true";
+
+            var ageText = block.textContent.trim();
+            var normalizedRating = getNormalizedRating(ageText);
+            if (!normalizedRating || !AGE_ICONS[normalizedRating]) return;
+
+            fetchIcon(AGE_ICONS[normalizedRating])
+                .then(function(svg) {
+                    if (!svg) return;
+
+                    var iconContainer = document.createElement("div");
+                    iconContainer.className = "kuv-age-icon";
+                    iconContainer.innerHTML = svg;
+
+                    var targetElement = block.closest(".full-start-new__rate-line, .full-start__rate-line, [class*='rate-line']");
+                    if (!targetElement) {
+                        targetElement = block.parentNode;
+                    }
+
+                    targetElement.insertBefore(iconContainer, targetElement.firstChild);
+                    block.style.display = "none";
+                })
+                .catch(function(error) {
+                    console.error("KUV Rating: Ошибка при обработке рейтинга:", error);
+                });
+        });
+    }
+
     // Добавляет кнопку "Перезагрузить" в шапку
     function addReloadButton() {
         var reloadButton = $(
@@ -257,40 +323,32 @@
             link.href = gitpath + "styles/kuv-style.css"; // заменить на localpath при необходимости
             document.head.appendChild(link);
         }
+
+        // Добавляем стили для рейтинга
+        var ratingStyle = document.createElement("style");
+        ratingStyle.textContent = [
+            '.kuv-age-icon {',
+            '    display: inline-block;',
+            '    margin-right: 1.5em!important;',
+            '    vertical-align: middle;',
+            '}',
+            '.kuv-age-icon svg {',
+            '    width: 2.2em;',
+            '    height: 2.2em;',
+            '}',
+            '.full-start__pg, .full-start__status {',
+            '    background: rgba(0, 0, 0, 0.15);',
+            '    border-radius: 0.3em;',
+            '    border: none!important;',
+            '}'
+        ].join('\n');
+        document.head.appendChild(ratingStyle);
     }
 
     // Настраивает левое меню
     function customizeMenu() {
         Lampa.Storage.set("menu_hide", JSON.stringify(["Персоны", "Аниме", "Лента", "История", "Расписание", "Подписки", "Фильтр", "Каталог"]));
         Lampa.Storage.set("menu_sort", JSON.stringify(["Главная", "Фильмы", "Сериалы", "Мультики", "Избранное", "Релизы", "Торренты"]));
-    }
-
-    // Инициализация плагина
-    function initPlugin() {
-        Promise.resolve()
-            .then(function() {
-                addReloadButton();
-                addStyles();
-                customizeMenu();
-                assignActionClasses(document.body);
-                assignComponentClasses(document.body);
-                return replaceIcons(document.body);
-            })
-            .then(function() {
-                observeDOMChanges();
-            });
-
-        Lampa.Listener.follow("activity:start", function() {
-            assignActionClasses(document.body);
-            assignComponentClasses(document.body);
-            replaceIcons(document.body);
-        });
-
-        Lampa.Listener.follow("activity:archive", function() {
-            assignActionClasses(document.body);
-            assignComponentClasses(document.body);
-            replaceIcons(document.body);
-        });
     }
 
     // Следим за DOM и заменяем иконки при динамических изменениях
@@ -319,6 +377,7 @@
                         assignComponentClasses(node);
                         replaceIcons(node);
                     });
+                    processRatings();
                 }
 
                 timeout = null;
@@ -328,6 +387,37 @@
         observer.observe(document.body, {
             childList: true,
             subtree: true
+        });
+    }
+
+    // Инициализация плагина
+    function initPlugin() {
+        Promise.resolve()
+            .then(function() {
+                addReloadButton();
+                addStyles();
+                customizeMenu();
+                assignActionClasses(document.body);
+                assignComponentClasses(document.body);
+                processRatings();
+                return replaceIcons(document.body);
+            })
+            .then(function() {
+                observeDOMChanges();
+            });
+
+        Lampa.Listener.follow("activity:start", function() {
+            assignActionClasses(document.body);
+            assignComponentClasses(document.body);
+            replaceIcons(document.body);
+            processRatings();
+        });
+
+        Lampa.Listener.follow("activity:archive", function() {
+            assignActionClasses(document.body);
+            assignComponentClasses(document.body);
+            replaceIcons(document.body);
+            processRatings();
         });
     }
 
