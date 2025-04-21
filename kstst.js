@@ -9,22 +9,6 @@
 (function () {
     'use strict';
 
-    // Метаданные плагина для Lampa
-    var manifest = {
-        name: 'KUV Style',
-        version: '25.4.21',
-        description: 'Изменяет внешний вид приложения, заменяя иконки и шрифты. Добавляет кнопку перезагрузки в шапку и кастомные элементы интерфейса.',
-        author: 'rpd@odr.su',
-        site: 'https://odr.su',
-        type: 'style',
-        component: 'kuv_style',
-        icon: 'https://rpd-odr.github.io/kuv/icons/layout-duotone.svg'
-    };
-
-    // Регистрируем плагин в Lampa
-    Lampa.Manifest.plugins = manifest;
-    };
-
     // const localpath = "/plugins/kuv/"; // раскомментировать для локального использования
     var gitpath = "https://rpd-odr.github.io/kuv/";
     var CACHE_VERSION = '1.0';
