@@ -416,12 +416,10 @@
     // Запуск при готовности приложения
     if (window.appready) {
         initPlugin();
-        window.lampa_settings.plugins.push(manifest);
     } else {
         Lampa.Listener.follow("app", function(e) {
             if (e.type === "ready") {
                 initPlugin();
-                window.lampa_settings.plugins.push(manifest);
             }
         });
     }
