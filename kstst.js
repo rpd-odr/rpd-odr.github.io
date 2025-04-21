@@ -323,6 +323,7 @@
             link.href = gitpath + "styles/kuv-style.css"; // заменить на localpath при необходимости
             document.head.appendChild(link);
         }
+    }
 
 
     // Настраивает левое меню
