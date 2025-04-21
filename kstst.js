@@ -324,26 +324,6 @@
             document.head.appendChild(link);
         }
 
-        // Добавляем стили для рейтинга
-        var ratingStyle = document.createElement("style");
-        ratingStyle.textContent = [
-            '.kuv-age-icon {',
-            '    display: inline-block;',
-            '    margin-right: 1.5em!important;',
-            '    vertical-align: middle;',
-            '}',
-            '.kuv-age-icon svg {',
-            '    width: 2.2em;',
-            '    height: 2.2em;',
-            '}',
-            '.full-start__pg, .full-start__status {',
-            '    background: rgba(0, 0, 0, 0.15);',
-            '    border-radius: 0.3em;',
-            '    border: none!important;',
-            '}'
-        ].join('\n');
-        document.head.appendChild(ratingStyle);
-    }
 
     // Настраивает левое меню
     function customizeMenu() {
