@@ -20,9 +20,6 @@
         type: 'style'
     };
 
-    // Сообщаем Lampa о существовании плагина
-    window.lampa_settings.plugins.push(manifest);
-
     // const localpath = "/plugins/kuv/"; // раскомментировать для локального использования
     var gitpath = "https://rpd-odr.github.io/kuv/";
     var CACHE_VERSION = '1.0';
@@ -419,10 +416,12 @@
     // Запуск при готовности приложения
     if (window.appready) {
         initPlugin();
+        window.lampa_settings.plugins.push(manifest);
     } else {
         Lampa.Listener.follow("app", function(e) {
             if (e.type === "ready") {
                 initPlugin();
+                window.lampa_settings.plugins.push(manifest);
             }
         });
     }
