@@ -14,10 +14,15 @@
         name: 'KUV Style',
         version: '25.4.21',
         description: 'Изменяет внешний вид приложения, заменяя иконки и шрифты. Добавляет кнопку перезагрузки в шапку и кастомные элементы интерфейса.',
-        author: 'rpd-odr',
+        author: 'rpd@odr.su',
         site: 'https://odr.su',
-        icon: 'https://rpd-odr.github.io/kuv/icons/layout-duotone.svg',
-        type: 'style'
+        type: 'style',
+        component: 'kuv_style',
+        icon: 'https://rpd-odr.github.io/kuv/icons/layout-duotone.svg'
+    };
+
+    // Регистрируем плагин в Lampa
+    Lampa.Manifest.plugins = manifest;
     };
 
     // const localpath = "/plugins/kuv/"; // раскомментировать для локального использования
