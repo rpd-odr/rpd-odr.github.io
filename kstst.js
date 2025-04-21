@@ -7,7 +7,21 @@
 // А также нужно заменить gitpath на localpath в коде ниже!
 
 (function () {
-    "use strict";
+    'use strict';
+
+    // Метаданные плагина для Lampa
+    var manifest = {
+        name: 'KUV Style',
+        version: '25.4.21',
+        description: 'Изменяет внешний вид приложения, заменяя иконки и шрифты. Добавляет кнопку перезагрузки в шапку и кастомные элементы интерфейса.',
+        author: 'rpd-odr',
+        site: 'https://odr.su',
+        icon: 'https://rpd-odr.github.io/kuv/icons/layout-duotone.svg',
+        type: 'style'
+    };
+
+    // Сообщаем Lampa о существовании плагина
+    window.lampa_settings.plugins.push(manifest);
 
     // const localpath = "/plugins/kuv/"; // раскомментировать для локального использования
     var gitpath = "https://rpd-odr.github.io/kuv/";
