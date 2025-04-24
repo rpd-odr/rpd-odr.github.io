@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Slider Demo - KUV плагины</title>
+    <!-- Подключаем необходимые библиотеки -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #333;
+        --text: #fff;
+        --card: #444;
+        --accent: #555;
+        --link-bg: rgba(49, 186, 235, 0.2);
+        --link-hover-bg: #31a8b0;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Wix Madefor Display", sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background-color: #292929;
+        padding: clamp(0.75rem, 2vw, 1rem);
+        color: #fff;
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        min-height: clamp(2.5em, 5vw, 3em);
+      }
+
+      .logo-icon {
+        width: clamp(2.5em, 5vw, 3em);
+        height: clamp(2.5em, 5vw, 3em);
+      }
+
+      main {
+        flex: 1;
+        padding: clamp(1rem, 3vw, 2rem);
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      /* Стили для слайдера */
+      .swiper-container {
+        width: 100%;
+        height: 500px;
+        margin: 2rem 0;
+        background: var(--card);
+        border-radius: 1.5em;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+
+      .swiper-slide {
+        position: relative;
+        background: var(--card);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .three-scene {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Кастомизация навигации слайдера */
+      .swiper-button-next,
+      .swiper-button-prev {
+        color: var(--link-hover-bg);
+      }
+
+      .swiper-pagination-bullet {
+        background: var(--link-hover-bg);
+      }
+
+      .swiper-pagination-bullet-active {
+        background: var(--link-hover-bg);
+      }
+
+      /* Стили для описания */
+      .description {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: var(--card);
+        border-radius: 1.5em;
+        box-shadow: var(--shadow);
+      }
+
+      h1, h2 {
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+
+      .code-block {
+        background: #292929;
+        padding: 1rem;
+        border-radius: 0.5em;
+        margin: 1rem 0;
+        overflow-x: auto;
+      }
+
+      footer {
+        background-color: #292929;
+        padding: clamp(1rem, 3vw, 1.5rem);
+        margin-top: auto;
+      }
+
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .footer-inner p {
+        margin-bottom: 0;
+        font-size: clamp(0.8rem, 2vw, 0.9rem);
+      }
+
+      footer a {
+        color: #31baeb;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <img src="kuv/img/logo-icon.svg" alt="Логотип KUV" class="logo-icon" />
+      </div>
+    </header>
+
+    <main>
+      <h1>3D Slider Demo</h1>
+      
+      <!-- Слайдер с 3D объектами -->
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">
+            <div class="three-scene" id="scene1"></div>
+          </div>
+          <div class="swiper-slide">
+            <div class="three-scene" id="scene2"></div>
+          </div>
+          <div class="swiper-slide">
+            <div class="three-scene" id="scene3"></div>
+          </div>
+        </div>
+        <!-- Добавляем навигацию -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+      </div>
+
+      <div class="description">
+        <h2>О демонстрации</h2>
+        <p>
+          Этот демо-слайдер показывает возможности интеграции 3D объектов в Swiper.
+          Каждый слайд содержит уникальную 3D анимацию, созданную с помощью Three.js.
+        </p>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <p>
+          © 2025 KUV | Developed by
+          <a href="https://odr.su" target="_blank" rel="noopener noreferrer">odr.su</a>
+        </p>
+      </div>
+    </footer>
+
+    <!-- Подключаем скрипты -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Инициализация Swiper
+        const swiper = new Swiper('.swiper-container', {
+          loop: true,
+          speed: 800,
+          effect: 'fade', // Эффект смены слайдов
+          fadeEffect: {
+            crossFade: true
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          on: {
+            slideChange: function() {
+              // Приостанавливаем анимации на скрытых слайдах
+              scenes.forEach((scene, index) => {
+                if (index !== this.realIndex) {
+                  scene.pause = true;
+                } else {
+                  scene.pause = false;
+                }
+              });
+            }
+          }
+        });
+
+        // Массив для хранения сцен
+        const scenes = [];
+
+        // Функция создания геометрии в зависимости от индекса слайда
+        function createGeometry(index) {
+          switch(index) {
+            case 0:
+              return new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
+            case 1:
+              return new THREE.IcosahedronGeometry(1, 0);
+            case 2:
+              return new THREE.OctahedronGeometry(1, 0);
+            default:
+              return new THREE.BoxGeometry(1, 1, 1);
+          }
+        }
+
+        // Создаем 3D сцены для каждого слайда
+        document.querySelectorAll('.three-scene').forEach((element, index) => {
+          const scene = new THREE.Scene();
+          
+          // Настраиваем камеру
+          const camera = new THREE.PerspectiveCamera(
+            75,
+            element.clientWidth / element.clientHeight,
+            0.1,
+            1000
+          );
+          
+          // Создаем рендерер
+          const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true
+          });
+          
+          renderer.setSize(element.clientWidth, element.clientHeight);
+          element.appendChild(renderer.domElement);
+
+          // Создаем объект с уникальной геометрией для каждого слайда
+          const geometry = createGeometry(index);
+          const material = new THREE.MeshPhongMaterial({
+            color: 0x31baeb,
+            shininess: 100,
+            specular: 0x31baeb,
+          });
+          
+          const mesh = new THREE.Mesh(geometry, material);
+          scene.add(mesh);
+
+          // Добавляем освещение
+          const light1 = new THREE.DirectionalLight(0xffffff, 1);
+          light1.position.set(1, 1, 1);
+          scene.add(light1);
+          
+          const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+          light2.position.set(-1, -1, -1);
+          scene.add(light2);
+          
+          const ambientLight = new THREE.AmbientLight(0x404040);
+          scene.add(ambientLight);
+
+          camera.position.z = 5;
+
+          // Создаем объект сцены с настройками анимации
+          const sceneObj = {
+            scene,
+            camera,
+            renderer,
+            mesh,
+            pause: index !== 0,
+            animate: function() {
+              if (!this.pause) {
+                this.mesh.rotation.x += 0.01;
+                this.mesh.rotation.y += 0.02;
+                this.renderer.render(this.scene, this.camera);
+              }
+              requestAnimationFrame(() => this.animate());
+            }
+          };
+
+          scenes.push(sceneObj);
+          sceneObj.animate();
+        });
+
+        // Обработчик изменения размера окна
+        function handleResize() {
+          scenes.forEach((sceneObj) => {
+            const element = sceneObj.renderer.domElement.parentElement;
+            const width = element.clientWidth;
+            const height = element.clientHeight;
+            
+            sceneObj.camera.aspect = width / height;
+            sceneObj.camera.updateProjectionMatrix();
+            sceneObj.renderer.setSize(width, height);
+          });
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        // Добавляем обработчик видимости вкладки
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            scenes.forEach(scene => scene.pause = true);
+          } else {
+            const activeIndex = swiper.realIndex;
+            scenes.forEach((scene, index) => {
+              scene.pause = index !== activeIndex;
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
