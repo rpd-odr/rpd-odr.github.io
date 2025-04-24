@@ -11,109 +11,140 @@
     'use strict';
 
     var network = new Lampa.Reguest();
-    var cache = new Map();
+    var cache = {
+        data: new Map(),
+        ttl: 3600000, // 1 час в миллисекундах
+        set: function(key, value) {
+            this.data.set(key, {
+                value: value,
+                timestamp: Date.now()
+            });
+        },
+        get: function(key) {
+            var item = this.data.get(key);
+            if (item && Date.now() - item.timestamp < this.ttl) {
+                return item.value;
+            }
+            this.data.delete(key);
+            return null;
+        }
+    };
 
-    // Получение провайдеров (по странам) с логотипами
     function getMovieProviders(movie, callback) {
-        const cacheKey = `providers_${movie.id}`;
-        if (cache.has(cacheKey)) {
-            return callback(cache.get(cacheKey));
+        var cacheKey = 'providers_' + movie.id;
+        var cachedData = cache.get(cacheKey);
+        if (cachedData) {
+            return callback(cachedData);
         }
 
-        const url = Lampa.TMDB.api(`movie/${movie.id}/watch/providers`);
+        var url = Lampa.TMDB.api('movie/' + movie.id + '/watch/providers');
         network.silent(url, 
-            function (data) {
-                const providers = [];
-                const allowedCountryCodes = ['US', 'RU'];
+            function(data) {
+                var providers = [];
+                var allowedCountryCodes = ['US', 'RU'];
 
-                // Добавление доступных провайдеров
-                allowedCountryCodes.forEach(countryCode => {
-                    if (data.results?.[countryCode]) {
-                        providers.push(
-                            ...(data.results[countryCode].flatrate || []),
-                            ...(data.results[countryCode].rent || []),
-                            ...(data.results[countryCode].buy || [])
-                        );
+                allowedCountryCodes.forEach(function(countryCode) {
+                    var countryData = data.results && data.results[countryCode];
+                    if (countryData) {
+                        if (countryData.flatrate) providers = providers.concat(countryData.flatrate);
+                        if (countryData.rent) providers = providers.concat(countryData.rent);
+                        if (countryData.buy) providers = providers.concat(countryData.buy);
                     }
                 });
 
-                // Фильтрация по наличию логотипа
-                const filteredProviders = providers.filter(p => p.logo_path);
+                var filteredProviders = providers.filter(function(p) {
+                    return p.logo_path;
+                });
                 cache.set(cacheKey, filteredProviders);
                 callback(filteredProviders);
             },
-            function (error) {
-                console.error('Provider fetch error:', error);
+            function() {
                 callback([]);
             }
         );
     }
 
-    // Получение сетей или студий (в зависимости от типа карточки)
     function getNetworks(object, callback) {
-        if (!object?.card || object.card.source !== 'tmdb') {
+        if (!object || !object.card || object.card.source !== 'tmdb') {
             return callback([]);
         }
 
-        if (object.card.networks?.length) {
+        if (object.card.networks && object.card.networks.length) {
             return callback(object.card.networks);
         }
-        if (object.card.production_companies?.length) {
+        if (object.card.production_companies && object.card.production_companies.length) {
             return callback(object.card.production_companies);
         }
 
         getMovieProviders(object.card, callback);
     }
 
-    // Меню фильтрации по студии/сети
     function showNetworkMenu(network, type, element) {
-        const isTv = type === 'tv';
-        const controller = Lampa.Controller.enabled().name;
-        const dateField = isTv ? 'first_air_date' : 'primary_release_date';
-        const currentDate = new Date().toISOString().split('T')[0];
+        var isTv = type === 'tv';
+        var controller = Lampa.Controller.enabled().name;
+        var dateField = isTv ? 'first_air_date' : 'primary_release_date';
+        var currentDate = new Date().toISOString().split('T')[0];
+
+        var menuItems = [
+            { 
+                title: 'Популярные', 
+                sort: '', 
+                filter: { 'vote_count.gte': 10 } 
+            },
+            { 
+                title: 'Новые', 
+                sort: dateField + '.desc', 
+                filter: { 
+                    'vote_count.gte': 10
+                } 
+            }
+        ];
+        // Добавляем дату динамически для избежания проблем с ES5
+        menuItems[1].filter[dateField + '.lte'] = currentDate;
 
         Lampa.Select.show({
             title: network.name || 'Network',
-            items: [
-                { title: 'Популярные', sort: '', filter: { 'vote_count.gte': 10 } },
-                { title: 'Новые', sort: `${dateField}.desc`, filter: { 'vote_count.gte': 10, [`${dateField}.lte`]: currentDate } }
-            ],
+            items: menuItems,
             onBack: function() {
                 Lampa.Controller.toggle(controller);
                 if (element) {
-                    Lampa.Controller.collectionFocus(element, Lampa.Activity.active().activity.render());
+                    Lampa.Controller.collectionFocus(
+                        element, 
+                        Lampa.Activity.active().activity.render()
+                    );
                 }
             },
             onSelect: function(action) {
-                // Переход к фильтрованной категории
+                var filter = { 'vote_count.gte': action.filter['vote_count.gte'] };
+                filter[isTv ? 'with_networks' : 'with_companies'] = network.id;
+                if (action.filter[dateField + '.lte']) {
+                    filter[dateField + '.lte'] = action.filter[dateField + '.lte'];
+                }
+
                 Lampa.Activity.push({
-                    url: `discover/${type}`,
-                    title: `${network.name || 'Network'} ${action.title}`,
+                    url: 'discover/' + type,
+                    title: (network.name || 'Network') + ' ' + action.title,
                     component: 'category_full',
                     source: 'tmdb',
                     card_type: true,
                     page: 1,
                     sort_by: action.sort,
-                    filter: {
-                        [isTv ? 'with_networks' : 'with_companies']: network.id,
-                        ...action.filter
-                    }
+                    filter: filter
                 });
             }
         });
     }
 
-    // Добавление кнопки студии/сети в карточку
     function addNetworkButton(render, networks, type) {
         $('.button--network, .button--studio', render).remove();
 
-        if (!networks?.length || !networks[0]?.logo_path) return;
+        if (!networks || !networks.length || !networks[0] || !networks[0].logo_path) return;
 
-        const network = networks[0];
-        const imgSrc = Lampa.TMDB.image(`t/p/w154${network.logo_path}`);
-        const imgAlt = (network.name || '').replace(/"/g, '"');
+        var network = networks[0];
+        var imgSrc = Lampa.TMDB.image('t/p/w154' + network.logo_path);
+        var imgAlt = (network.name || '').replace(/"/g, '"');
 
-        const btn = $('<div>')
+        var $networkButton = $('<div>')
             .addClass('full-start__button selector button--network')
             .append(
                 $('<div>')
@@ -123,86 +154,79 @@
                             .attr('src', imgSrc)
                             .attr('alt', imgAlt)
                             .on('error', function() {
-                                $(this).parent().parent().remove(); // Удаление кнопки при ошибке загрузки логотипа
+                                $(this).parent().parent().remove();
                             })
                     )
-            )
-            .on('hover:enter', function() {
-                showNetworkMenu(network, type, this);
-            });
+            );
 
-        $('.full-start-new__buttons', render).append(btn);
+        $networkButton.on('hover:enter', function() {
+            showNetworkMenu(network, type, this);
+        });
+
+        $('.full-start-new__buttons', render).append($networkButton);
     }
 
-    // Инициализация плагина
+    function addOriginalTitle(render, card) {
+        var $titleElement = $('.full-start-new__title', render);
+        if (!card || !$titleElement.length) return;
+
+        var originalTitle = card.original_title || card.original_name;
+        var currentTitle = card.title || card.name;
+
+        if (originalTitle && originalTitle !== currentTitle) {
+            $titleElement.find('.original-title').remove();
+            $('<div>')
+                .addClass('original-title')
+                .text(originalTitle)
+                .appendTo($titleElement);
+        }
+    }
+
     function initPlugin() {
         // Добавление CSS-стилей (однократно)
         if ($('style#network-plugin').length === 0) {
             $('<style>')
                 .attr('id', 'network-plugin')
-                .html(`
-                    .button--network, 
-                    .button--studio {
-                        padding: .3em;
-                    }
-                    
-                    .network-innie {
-                        background-color: #fff;
-                        width: 100%;
-                        height: 100%;
-                        border-radius: .7em;
-                        display: flex;
-                        align-items: center;
-                        padding: 0 1em;
-                    }
-
-                    .button--network img,
-                    .button--studio img {
-                        height: 100%;
-                        max-height: 1.5em;
-                        max-width: 4.5em;
-                        object-fit: contain;
-                    }
-
-                    .full-start-new__title {
-                        position: relative;
-                        margin-bottom: 0.6em !important;
-                    }
-                    
-                    .full--tagline {
-                        margin-bottom: 0.6em !important;
-                    }
-
-                    .original-title {
-                        font-size: 0.8em;
-                        color: rgba(255, 255, 255, 0.7);
-                        font-weight: normal;
-                    }
-                `)
+                .html([
+                    '.button--network, .button--studio { padding: .3em; }',
+                    '.network-innie {',
+                    '    background-color: #fff;',
+                    '    width: 100%;',
+                    '    height: 100%;',
+                    '    border-radius: .7em;',
+                    '    display: flex;',
+                    '    align-items: center;',
+                    '    padding: 0 1em;',
+                    '}',
+                    '.button--network img, .button--studio img {',
+                    '    height: 100%;',
+                    '    max-height: 1.5em;',
+                    '    max-width: 4.5em;',
+                    '    object-fit: contain;',
+                    '}',
+                    '.full-start-new__title {',
+                    '    position: relative;',
+                    '    margin-bottom: 0.6em !important;',
+                    '}',
+                    '.full--tagline {',
+                    '    margin-bottom: 0.6em !important;',
+                    '}',
+                    '.original-title {',
+                    '    font-size: 0.8em;',
+                    '    color: rgba(255, 255, 255, 0.7);',
+                    '    font-weight: normal;',
+                    '}'
+                ].join('\n'))
                 .appendTo('head');
         }
 
-        // Слушаем событие открытия карточки
         Lampa.Listener.follow('full', function(e) {
             if (e.type === 'complite') {
-                const render = e.object.activity.render();
-                const card = e.object.card;
-                const titleElement = $('.full-start-new__title', render);
+                var render = e.object.activity.render();
                 
-                // Добавление оригинального названия (если отличается)
-                if (card && titleElement.length) {
-                    const originalTitle = card.original_title || card.original_name;
-                    if (originalTitle && originalTitle !== card.title && originalTitle !== card.name) {
-                        titleElement.find('.original-title').remove();
-                        $('<div>')
-                            .addClass('original-title')
-                            .text(originalTitle)
-                            .appendTo(titleElement);
-                    }
-                }
-
-                // Добавление кнопки студии или телесети
-                getNetworks(e.object, networks => {
+                addOriginalTitle(render, e.object.card);
+                
+                getNetworks(e.object, function(networks) {
                     if (networks.length) {
                         addNetworkButton(render, networks, e.object.method);
                     }
@@ -211,7 +235,13 @@
         });
     }
 
-    // Инициализация при готовности приложения
-    if (window.appready) initPlugin();
-    else Lampa.Listener.follow('app', e => e.type === 'ready' && initPlugin());
+    if (window.appready) {
+        initPlugin();
+    } else {
+        Lampa.Listener.follow('app', function(e) {
+            if (e.type === 'ready') {
+                initPlugin();
+            }
+        });
+    }
 })();
