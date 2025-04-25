@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3D Scenes Slider</title>
+    <title>3D Scenes Demo</title>
     
-    <!-- Обновленные версии библиотек -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     
     <style>
@@ -15,12 +14,12 @@
         background: #1a1a1a;
         color: #fff;
         font-family: Arial, sans-serif;
-        overflow: hidden;  /* Предотвращаем прокрутку */
+        overflow: hidden;
       }
 
       .swiper {
         width: 100%;
-        height: 100vh;  /* Используем полную высоту экрана */
+        height: 100vh;
       }
       
       .swiper-slide {
@@ -33,7 +32,6 @@
         position: relative;
       }
 
-      /* Делаем кнопки навигации более заметными */
       .swiper-button-next,
       .swiper-button-prev {
         color: #31baeb;
@@ -46,39 +44,96 @@
         background: #31baeb;
       }
 
-      .model-info {
+      .scene-info {
         position: absolute;
         bottom: 20px;
         left: 20px;
         background: rgba(0, 0, 0, 0.7);
-        padding: 10px 20px;
-        border-radius: 5px;
+        padding: 15px 25px;
+        border-radius: 8px;
         z-index: 1;
+        max-width: 300px;
+      }
+
+      .scene-info h3 {
+        margin: 0 0 10px 0;
+        color: #31baeb;
+        font-size: 1.4em;
+      }
+
+      .scene-info p {
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .loading-text {
+        color: #31baeb;
+        font-size: 1.2em;
+        margin-bottom: 20px;
+      }
+
+      .loading-bar {
+        width: 200px;
+        height: 4px;
+        background: #333;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .loading-progress {
+        width: 0%;
+        height: 100%;
+        background: #31baeb;
+        transition: width 0.3s ease;
       }
     </style>
   </head>
   <body>
+    <div class="loading-overlay">
+      <div class="loading-text">Загрузка сцен...</div>
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+    </div>
+
     <div class="swiper">
       <div class="swiper-wrapper">
         <div class="swiper-slide">
-          <div class="three-scene" id="scene1"></div>
-          <div class="model-info">
-            <h3>Сцена 1</h3>
-            <p>Интерактивный куб с освещением</p>
+          <div class="three-scene">
+            <div class="scene-info">
+              <h3>Портал</h3>
+              <p>Магический портал с частицами и свечением</p>
+            </div>
           </div>
         </div>
         <div class="swiper-slide">
-          <div class="three-scene" id="scene2"></div>
-          <div class="model-info">
-            <h3>Сцена 2</h3>
-            <p>Сфера с динамическим освещением</p>
+          <div class="three-scene">
+            <div class="scene-info">
+              <h3>Космическая станция</h3>
+              <p>Детализированная модель с динамическим освещением</p>
+            </div>
           </div>
         </div>
         <div class="swiper-slide">
-          <div class="three-scene" id="scene3"></div>
-          <div class="model-info">
-            <h3>Сцена 3</h3>
-            <p>Тороид с отражениями</p>
+          <div class="three-scene">
+            <div class="scene-info">
+              <h3>Природная сцена</h3>
+              <p>Пейзаж с water shader и динамической растительностью</p>
+            </div>
           </div>
         </div>
       </div>
@@ -87,12 +142,264 @@
       <div class="swiper-button-next"></div>
     </div>
 
-    <!-- Обновленные версии скриптов -->
+    <!-- Three.js и зависимости -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.150.1/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/RGBELoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/postprocessing/UnrealBloomPass.js"></script>
     
     <script>
+      // Создаем директорию models в репозитории и загрузим туда модели и текстуры
+      const MODELS_PATH = '/models/';
+      
+      class SceneManager {
+        constructor(element, index) {
+          this.container = element;
+          this.index = index;
+          
+          this.init();
+          this.createScene();
+          this.createLights();
+          this.createContent();
+          this.setupPostprocessing();
+        }
+
+        init() {
+          this.scene = new THREE.Scene();
+          this.camera = new THREE.PerspectiveCamera(
+            75,
+            this.container.clientWidth / this.container.clientHeight,
+            0.1,
+            1000
+          );
+          this.camera.position.set(0, 2, 5);
+
+          this.renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: true
+          });
+          this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+          this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+          this.renderer.toneMappingExposure = 1;
+          this.renderer.outputEncoding = THREE.sRGBEncoding;
+          
+          this.container.appendChild(this.renderer.domElement);
+
+          this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+          this.controls.enableDamping = true;
+          this.controls.dampingFactor = 0.05;
+          
+          this.clock = new THREE.Clock();
+        }
+
+        createScene() {
+          // Уникальный фон для каждой сцены
+          const colors = [0x000000, 0x001a2c, 0x1a1a1a];
+          this.scene.background = new THREE.Color(colors[this.index]);
+          
+          // Туман для создания глубины
+          if (this.index === 1) {
+            this.scene.fog = new THREE.FogExp2(colors[1], 0.05);
+          }
+        }
+
+        createLights() {
+          const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+          this.scene.add(ambientLight);
+
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+          directionalLight.position.set(5, 5, 5);
+          this.scene.add(directionalLight);
+
+          if (this.index === 0) {
+            // Добавляем точечный свет для портала
+            const portalLight = new THREE.PointLight(0x31baeb, 2, 10);
+            portalLight.position.set(0, 0, 2);
+            this.scene.add(portalLight);
+          }
+        }
+
+        createContent() {
+          switch (this.index) {
+            case 0:
+              this.createPortalScene();
+              break;
+            case 1:
+              this.createSpaceScene();
+              break;
+            case 2:
+              this.createNatureScene();
+              break;
+          }
+        }
+
+        createPortalScene() {
+          // Создаем портал
+          const portalGeometry = new THREE.TorusGeometry(2, 0.3, 16, 100);
+          const portalMaterial = new THREE.MeshPhongMaterial({
+            color: 0x31baeb,
+            emissive: 0x31baeb,
+            emissiveIntensity: 0.5,
+            shininess: 100
+          });
+          this.portal = new THREE.Mesh(portalGeometry, portalMaterial);
+          this.scene.add(this.portal);
+
+          // Добавляем частицы
+          const particlesGeometry = new THREE.BufferGeometry();
+          const particlesCount = 1000;
+          const positions = new Float32Array(particlesCount * 3);
+          
+          for(let i = 0; i < particlesCount * 3; i++) {
+            positions[i] = (Math.random() - 0.5) * 10;
+          }
+          
+          particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+          
+          const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            color: 0x31baeb
+          });
+          
+          this.particles = new THREE.Points(particlesGeometry, particlesMaterial);
+          this.scene.add(this.particles);
+        }
+
+        createSpaceScene() {
+          // Создаем космическую станцию из базовых геометрий
+          const station = new THREE.Group();
+
+          // Основной модуль
+          const mainModule = new THREE.Mesh(
+            new THREE.CylinderGeometry(1, 1, 4, 16),
+            new THREE.MeshPhongMaterial({ color: 0x666666 })
+          );
+          station.add(mainModule);
+
+          // Солнечные панели
+          const panel1 = new THREE.Mesh(
+            new THREE.BoxGeometry(4, 0.1, 1),
+            new THREE.MeshPhongMaterial({ color: 0x31baeb })
+          );
+          panel1.position.x = 2;
+          station.add(panel1);
+
+          const panel2 = panel1.clone();
+          panel2.position.x = -2;
+          station.add(panel2);
+
+          this.station = station;
+          this.scene.add(station);
+        }
+
+        createNatureScene() {
+          // Создаем ландшафт
+          const groundGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
+          const groundMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x31eb7d,
+            shininess: 0
+          });
+          const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+          ground.rotation.x = -Math.PI / 2;
+          this.scene.add(ground);
+
+          // Добавляем "деревья"
+          for(let i = 0; i < 20; i++) {
+            const tree = new THREE.Group();
+            
+            const trunk = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.1, 0.1, 1, 8),
+              new THREE.MeshPhongMaterial({ color: 0x4d2926 })
+            );
+            
+            const leaves = new THREE.Mesh(
+              new THREE.ConeGeometry(0.5, 1, 8),
+              new THREE.MeshPhongMaterial({ color: 0x31eb7d })
+            );
+            leaves.position.y = 1;
+            
+            tree.add(trunk);
+            tree.add(leaves);
+            
+            tree.position.x = (Math.random() - 0.5) * 15;
+            tree.position.z = (Math.random() - 0.5) * 15;
+            tree.scale.setScalar(1 + Math.random());
+            
+            this.scene.add(tree);
+          }
+        }
+
+        setupPostprocessing() {
+          this.composer = new THREE.EffectComposer(this.renderer);
+          
+          const renderPass = new THREE.RenderPass(this.scene, this.camera);
+          this.composer.addPass(renderPass);
+
+          if (this.index === 0) {
+            // Добавляем bloom эффект для портала
+            const bloomPass = new THREE.UnrealBloomPass(
+              new THREE.Vector2(window.innerWidth, window.innerHeight),
+              1.5,  // strength
+              0.4,  // radius
+              0.85  // threshold
+            );
+            this.composer.addPass(bloomPass);
+          }
+        }
+
+        update() {
+          const elapsedTime = this.clock.getElapsedTime();
+
+          // Обновляем контролы
+          this.controls.update();
+
+          // Уникальные анимации для каждой сцены
+          switch (this.index) {
+            case 0:
+              // Анимация портала
+              if (this.portal) {
+                this.portal.rotation.z = elapsedTime * 0.5;
+                this.particles.rotation.y = elapsedTime * 0.2;
+              }
+              break;
+            case 1:
+              // Анимация космической станции
+              if (this.station) {
+                this.station.rotation.y = elapsedTime * 0.1;
+              }
+              break;
+            case 2:
+              // Анимация природной сцены (например, покачивание деревьев)
+              this.scene.children.forEach(child => {
+                if (child.isGroup) {  // Это дерево
+                  child.position.y = Math.sin(elapsedTime + child.position.x) * 0.1;
+                }
+              });
+              break;
+          }
+
+          // Рендеринг с постобработкой
+          this.composer.render();
+        }
+
+        resize() {
+          this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+          this.camera.updateProjectionMatrix();
+          
+          this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+          this.composer.setSize(this.container.clientWidth, this.container.clientHeight);
+        }
+      }
+
       document.addEventListener('DOMContentLoaded', function() {
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        const loadingProgress = document.querySelector('.loading-progress');
+
         // Инициализация Swiper
         const swiper = new Swiper('.swiper', {
           loop: true,
@@ -111,123 +418,40 @@
           },
         });
 
-        // Массив для хранения сцен
+        // Создаем массив сцен
         const scenes = [];
+        let loadedScenes = 0;
 
-        // Функция для создания базовой сцены
-        function createBaseScene(element) {
-          const scene = new THREE.Scene();
-          scene.background = new THREE.Color(0x1a1a1a);
-          
-          const camera = new THREE.PerspectiveCamera(
-            75,
-            element.clientWidth / element.clientHeight,
-            0.1,
-            1000
-          );
-          camera.position.z = 5;
-
-          const renderer = new THREE.WebGLRenderer({ antialias: true });
-          renderer.setSize(element.clientWidth, element.clientHeight);
-          renderer.setPixelRatio(window.devicePixelRatio);
-          element.appendChild(renderer.domElement);
-
-          // Освещение
-          const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-          scene.add(ambientLight);
-
-          const pointLight = new THREE.PointLight(0xffffff, 1);
-          pointLight.position.set(5, 5, 5);
-          scene.add(pointLight);
-
-          return { scene, camera, renderer };
-        }
-
-        // Создание различных геометрий для каждой сцены
-        function createGeometry(index) {
-          switch(index) {
-            case 0:
-              return new THREE.BoxGeometry(2, 2, 2);
-            case 1:
-              return new THREE.SphereGeometry(1.5, 32, 32);
-            case 2:
-              return new THREE.TorusGeometry(1.5, 0.5, 16, 100);
-            default:
-              return new THREE.BoxGeometry(1, 1, 1);
-          }
-        }
-
-        // Создание материалов для каждой сцены
-        function createMaterial(index) {
-          const colors = [0x31baeb, 0x31eb7d, 0xeb3173];
-          return new THREE.MeshPhongMaterial({
-            color: colors[index],
-            shininess: 100,
-            specular: 0xffffff
-          });
-        }
-
-        // Создаем сцены
+        // Инициализируем сцены
         document.querySelectorAll('.three-scene').forEach((element, index) => {
-          const { scene, camera, renderer } = createBaseScene(element);
+          const scene = new SceneManager(element, index);
+          scenes.push(scene);
           
-          // Создаем объект
-          const geometry = createGeometry(index);
-          const material = createMaterial(index);
-          const mesh = new THREE.Mesh(geometry, material);
-          scene.add(mesh);
-
-          // Сохраняем объект сцены
-          const sceneObj = {
-            scene,
-            camera,
-            renderer,
-            mesh,
-            animate: function() {
-              if (swiper.activeIndex === index) {
-                this.mesh.rotation.x += 0.01;
-                this.mesh.rotation.y += 0.01;
-                this.renderer.render(this.scene, this.camera);
-              }
-            }
-          };
-
-          scenes.push(sceneObj);
-
-          // Добавляем интерактивность
-          element.addEventListener('mousemove', (event) => {
-            if (swiper.activeIndex === index) {
-              const rect = element.getBoundingClientRect();
-              const x = ((event.clientX - rect.left) / element.clientWidth) * 2 - 1;
-              const y = -((event.clientY - rect.top) / element.clientHeight) * 2 + 1;
-              
-              mesh.rotation.y = x * Math.PI;
-              mesh.rotation.x = y * Math.PI;
-            }
-          });
+          loadedScenes++;
+          loadingProgress.style.width = (loadedScenes / 3 * 100) + '%';
+          
+          if (loadedScenes === 3) {
+            loadingOverlay.style.display = 'none';
+          }
         });
 
         // Анимационный цикл
         function animate() {
           requestAnimationFrame(animate);
-          scenes.forEach(scene => scene.animate());
+          scenes.forEach((scene, index) => {
+            if (swiper.activeIndex === index) {
+              scene.update();
+            }
+          });
         }
         animate();
 
         // Обработка изменения размера окна
         window.addEventListener('resize', function() {
-          scenes.forEach(scene => {
-            const element = scene.renderer.domElement.parentElement;
-            const width = element.clientWidth;
-            const height = element.clientHeight;
-            
-            scene.camera.aspect = width / height;
-            scene.camera.updateProjectionMatrix();
-            scene.renderer.setSize(width, height);
-          });
+          scenes.forEach(scene => scene.resize());
         });
 
-        // Обновляем размер при инициализации
+        // Начальный ресайз
         window.dispatchEvent(new Event('resize'));
       });
     </script>
