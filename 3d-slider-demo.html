@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3D Models Slider - KUV плагины</title>
+    <title>3D Scenes Slider</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     
@@ -30,19 +30,6 @@
         height: 100%;
       }
 
-      .swiper-button-next,
-      .swiper-button-prev {
-        color: #31baeb;
-      }
-
-      .swiper-pagination-bullet {
-        background: #31baeb;
-      }
-
-      .swiper-pagination-bullet-active {
-        background: #31baeb;
-      }
-      
       .loading-screen {
         position: fixed;
         top: 0;
@@ -90,20 +77,13 @@
 
       .model-info h3 {
         margin: 0;
-        font-size: 1.2em;
         color: #31baeb;
-      }
-
-      .model-info p {
-        margin: 5px 0 0;
-        font-size: 0.9em;
-        opacity: 0.8;
       }
     </style>
   </head>
   <body>
     <div class="loading-screen">
-      <div class="loading-text">Загрузка моделей...</div>
+      <div class="loading-text">Загрузка сцен...</div>
       <div class="progress-bar">
         <div class="progress"></div>
       </div>
@@ -112,24 +92,24 @@
     <div class="swiper">
       <div class="swiper-wrapper">
         <div class="swiper-slide">
-          <div class="three-scene" id="scene1"></div>
+          <div class="three-scene"></div>
           <div class="model-info">
-            <h3>Duck</h3>
-            <p>Классическая тестовая модель</p>
+            <h3>Flamingo</h3>
+            <p>Анимированная модель фламинго</p>
           </div>
         </div>
         <div class="swiper-slide">
-          <div class="three-scene" id="scene2"></div>
+          <div class="three-scene"></div>
           <div class="model-info">
-            <h3>Damaged Helmet</h3>
-            <p>Модель с PBR материалами</p>
+            <h3>Horse</h3>
+            <p>Анимированная модель лошади</p>
           </div>
         </div>
         <div class="swiper-slide">
-          <div class="three-scene" id="scene3"></div>
+          <div class="three-scene"></div>
           <div class="model-info">
-            <h3>Flight Helmet</h3>
-            <p>Сложная модель с текстурами</p>
+            <h3>Stork</h3>
+            <p>Анимированная модель аиста</p>
           </div>
         </div>
       </div>
@@ -141,8 +121,9 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/libs/stats.min.js"></script>
     
     <script>
       document.addEventListener('DOMContentLoaded', function() {
@@ -154,7 +135,6 @@
         const swiper = new Swiper('.swiper', {
           loop: true,
           speed: 1000,
-          spaceBetween: 30,
           effect: 'fade',
           fadeEffect: {
             crossFade: true
@@ -174,29 +154,25 @@
         const totalModels = 3;
         let loadedModels = 0;
 
-        // Массив моделей
+        // Модели из Three.js examples
         const models = [
           {
-            url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf',
-            scale: 2,
-            position: { x: 0, y: 0, z: 0 },
-            rotation: { x: 0, y: 0, z: 0 }
+            url: 'https://threejs.org/examples/models/gltf/Flamingo.glb',
+            scale: 0.35,
+            position: { x: 0, y: 0, z: 0 }
           },
           {
-            url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf',
-            scale: 2,
-            position: { x: 0, y: 0, z: 0 },
-            rotation: { x: 0, y: 0, z: 0 }
+            url: 'https://threejs.org/examples/models/gltf/Horse.glb',
+            scale: 0.01,
+            position: { x: 0, y: 0, z: 0 }
           },
           {
-            url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/FlightHelmet/glTF/FlightHelmet.gltf',
-            scale: 3,
-            position: { x: 0, y: -1, z: 0 },
-            rotation: { x: 0, y: 0, z: 0 }
+            url: 'https://threejs.org/examples/models/gltf/Stork.glb',
+            scale: 0.35,
+            position: { x: 0, y: 0, z: 0 }
           }
         ];
 
-        // Создаем сцены
         document.querySelectorAll('.three-scene').forEach((element, index) => {
           const scene = new THREE.Scene();
           scene.background = new THREE.Color(0x1a1a1a);
@@ -204,105 +180,93 @@
           const camera = new THREE.PerspectiveCamera(
             45,
             element.clientWidth / element.clientHeight,
-            0.1,
-            1000
+            0.25,
+            100
           );
-          camera.position.set(0, 0, 5);
+          camera.position.set(0, 2, 5);
 
-          const renderer = new THREE.WebGLRenderer({ 
-            antialias: true 
-          });
-          renderer.setSize(element.clientWidth, element.clientHeight);
+          const renderer = new THREE.WebGLRenderer({ antialias: true });
           renderer.setPixelRatio(window.devicePixelRatio);
+          renderer.setSize(element.clientWidth, element.clientHeight);
           renderer.outputEncoding = THREE.sRGBEncoding;
-          renderer.toneMapping = THREE.ACESFilmicToneMapping;
           element.appendChild(renderer.domElement);
 
           // Освещение
-          const light1 = new THREE.DirectionalLight(0xffffff, 1);
-          light1.position.set(1, 1, 1);
-          scene.add(light1);
+          const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+          hemiLight.position.set(0, 20, 0);
+          scene.add(hemiLight);
 
-          const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
-          light2.position.set(-1, -1, -1);
-          scene.add(light2);
-
-          const ambientLight = new THREE.AmbientLight(0x404040, 2);
-          scene.add(ambientLight);
+          const dirLight = new THREE.DirectionalLight(0xffffff);
+          dirLight.position.set(0, 20, 10);
+          scene.add(dirLight);
 
           // Контролы
           const controls = new THREE.OrbitControls(camera, renderer.domElement);
           controls.enableDamping = true;
           controls.dampingFactor = 0.05;
           controls.screenSpacePanning = false;
-          controls.minDistance = 2;
+          controls.minDistance = 3;
           controls.maxDistance = 10;
-          controls.maxPolarAngle = Math.PI / 1.5;
 
           // Загрузка модели
           const loader = new THREE.GLTFLoader();
           
-          loader.load(
-            models[index].url,
-            function(gltf) {
-              const model = gltf.scene;
-              scene.add(model);
+          loader.load(models[index].url, function(gltf) {
+            const model = gltf.scene;
+            model.scale.setScalar(models[index].scale);
+            model.position.set(
+              models[index].position.x,
+              models[index].position.y,
+              models[index].position.z
+            );
+            scene.add(model);
 
-              // Центрируем и масштабируем модель
-              const box = new THREE.Box3().setFromObject(model);
-              const center = box.getCenter(new THREE.Vector3());
-              const size = box.getSize(new THREE.Vector3());
-              
-              const maxDim = Math.max(size.x, size.y, size.z);
-              const scale = models[index].scale / maxDim;
-              model.scale.multiplyScalar(scale);
-              
-              model.position.sub(center.multiplyScalar(scale));
-              model.position.add(new THREE.Vector3(
-                models[index].position.x,
-                models[index].position.y,
-                models[index].position.z
-              ));
+            // Настройка анимации
+            const mixer = new THREE.AnimationMixer(model);
+            const clips = gltf.animations;
+            clips.forEach(clip => {
+              mixer.clipAction(clip).play();
+            });
 
-              loadedModels++;
-              progressBar.style.width = (loadedModels / totalModels * 100) + '%';
-              
-              if (loadedModels === totalModels) {
-                loadingScreen.style.display = 'none';
-              }
-
-              // Создаем объект сцены
-              const sceneObj = {
-                scene,
-                camera,
-                renderer,
-                controls,
-                model,
-                animate: function() {
-                  if (!document.hidden && swiper.activeIndex === index) {
-                    this.model.rotation.y += 0.005;
-                    this.controls.update();
-                    this.renderer.render(this.scene, this.camera);
-                  }
-                }
-              };
-
-              scenes.push(sceneObj);
-            },
-            function(xhr) {
-              // Прогресс загрузки для каждой модели
-              const modelProgress = xhr.loaded / xhr.total;
-              const totalProgress = ((loadedModels + modelProgress) / totalModels * 100).toFixed(0);
-              loadingText.textContent = `Загрузка моделей... ${totalProgress}%`;
-            },
-            function(error) {
-              console.error('Ошибка загрузки модели:', error);
-              loadedModels++;
-              if (loadedModels === totalModels) {
-                loadingScreen.style.display = 'none';
-              }
+            loadedModels++;
+            progressBar.style.width = (loadedModels / totalModels * 100) + '%';
+            
+            if (loadedModels === totalModels) {
+              loadingScreen.style.display = 'none';
             }
-          );
+
+            // Создаем объект сцены
+            const sceneObj = {
+              scene,
+              camera,
+              renderer,
+              controls,
+              mixer,
+              clock: new THREE.Clock(),
+              animate: function() {
+                if (!document.hidden && swiper.activeIndex === index) {
+                  const delta = this.clock.getDelta();
+                  if (this.mixer) this.mixer.update(delta);
+                  this.controls.update();
+                  this.renderer.render(this.scene, this.camera);
+                }
+              }
+            };
+
+            scenes.push(sceneObj);
+          }, 
+          function(xhr) {
+            const progress = xhr.loaded / xhr.total;
+            const totalProgress = ((loadedModels + progress) / totalModels * 100).toFixed(0);
+            loadingText.textContent = `Загрузка сцен... ${totalProgress}%`;
+          },
+          function(error) {
+            console.error('Ошибка загрузки:', error);
+            loadedModels++;
+            if (loadedModels === totalModels) {
+              loadingScreen.style.display = 'none';
+            }
+          });
         });
 
         // Анимационный цикл
@@ -323,16 +287,6 @@
             scene.camera.updateProjectionMatrix();
             scene.renderer.setSize(width, height);
           });
-        });
-
-        // Обработка видимости вкладки
-        document.addEventListener('visibilitychange', () => {
-          if (!document.hidden) {
-            scenes.forEach(scene => {
-              scene.controls.update();
-              scene.renderer.render(scene.scene, scene.camera);
-            });
-          }
         });
       });
     </script>
