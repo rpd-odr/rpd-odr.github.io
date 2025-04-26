@@ -25,39 +25,69 @@
         return $('body').hasClass('orientation--portrait') || window.innerHeight > window.innerWidth;
     }
 
-    function getMovieImages(movie, callback) {
-        console.log('Getting images for movie:', movie);
-        var type = movie.name ? 'tv' : 'movie';
-        var cacheKey = 'images_' + type + '_' + movie.id;
-        var cachedData = cache.get(cacheKey);
-        
-        if (cachedData) {
-            console.log('Found cached images:', cachedData);
-            return callback(cachedData);
-        }
+function getMovieImages(movie, callback) {
+    console.log('Getting images for movie:', movie);
+    var type = movie.name ? 'tv' : 'movie';
+    var cacheKey = 'images_' + type + '_' + movie.id;
+    var cachedData = cache.get(cacheKey);
+    
+    if (cachedData) {
+        console.log('Found cached images:', cachedData);
+        return callback(cachedData);
+    }
 
-        var url = Lampa.TMDB.api(type + '/' + movie.id + '/images');
-        console.log('Fetching images from URL:', url);
-        
-        network.silent(url, 
-            function(data) {
-                console.log('Received images data:', data);
-                if (data && data.logos && data.logos.length) {
-                    data.logos = data.logos.filter(function(logo) {
-                        return logo.iso_639_1 === null || logo.iso_639_1 === 'en' || logo.iso_639_1 === 'ru';
-                    });
-                    cache.set(cacheKey, data);
-                    callback(data);
-                } else {
-                    callback(null);
-                }
-            },
-            function(error) {
-                console.log('Error fetching images:', error);
+    var url = Lampa.TMDB.api(type + '/' + movie.id + '/images') + '?api_key=' + Lampa.TMDB.key();
+    console.log('Fetching images from URL:', url);
+    
+    network.silent(url, 
+        function(data) {
+            console.log('Received images data:', data);
+            if (data && data.logos && data.logos.length) {
+                data.logos = data.logos.filter(function(logo) {
+                    return logo.iso_639_1 === null || logo.iso_639_1 === 'en' || logo.iso_639_1 === 'ru';
+                });
+                cache.set(cacheKey, data);
+                callback(data);
+            } else if (data && data.images && data.images.logos && data.images.logos.length) {
+                // В некоторых случаях логотипы могут быть вложены в объект images
+                var logos = data.images.logos.filter(function(logo) {
+                    return logo.iso_639_1 === null || logo.iso_639_1 === 'en' || logo.iso_639_1 === 'ru';
+                });
+                var result = { logos: logos };
+                cache.set(cacheKey, result);
+                callback(result);
+            } else {
                 callback(null);
             }
-        );
-    }
+        },
+        function(error) {
+            console.log('Error fetching images:', error);
+            // Попробуем альтернативный URL
+            var altUrl = Lampa.TMDB.api(type + '/' + movie.id) + '?append_to_response=images&api_key=' + Lampa.TMDB.key();
+            console.log('Trying alternative URL:', altUrl);
+            
+            network.silent(altUrl,
+                function(data) {
+                    console.log('Received data from alternative URL:', data);
+                    if (data && data.images && data.images.logos && data.images.logos.length) {
+                        var logos = data.images.logos.filter(function(logo) {
+                            return logo.iso_639_1 === null || logo.iso_639_1 === 'en' || logo.iso_639_1 === 'ru';
+                        });
+                        var result = { logos: logos };
+                        cache.set(cacheKey, result);
+                        callback(result);
+                    } else {
+                        callback(null);
+                    }
+                },
+                function(error) {
+                    console.log('Error fetching from alternative URL:', error);
+                    callback(null);
+                }
+            );
+        }
+    );
+}
 
     function addTitleLogo(render, card) {
         console.log('Adding title logo, card:', card);
