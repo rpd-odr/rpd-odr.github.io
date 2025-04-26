@@ -1,473 +1,293 @@
-// Плагин KUV style для Lampa.
-// Заменяет большинство иконок и шрифты в интерфейсе.
-// Частично переработан интерфейс.
-// Добавлена кнопка перезагрузки в шапку.
+// Плагин KUV studios для Lampa.
 
-// Для корректной работы из локального источника необходима папка kuv со всеми подпапками.
-// А также нужно заменить gitpath на localpath в коде ниже!
+// Добавляет кнопку студии/телесети (источник — TMDb) в карточку.
+// Добавляет оригинальное название второй строкой в карточку.
+// Подходит как для отдельного использования, так и в комплексе с kuv-style.
+
+// Частично основано на плагине tmdb-networks v2.0.3 от levende (https://t.me/levende)
+// https://levende.github.io/lampa-plugins/tmdb-networks.js
 
 (function () {
-    "use strict";
+    'use strict';
 
-    // const localpath = "/plugins/kuv/"; // раскомментировать и заменить gitpath на localpath, если расположен локально
-    var gitpath = "https://rpd-odr.github.io/kuv/";
-    var CACHE_VERSION = '1.0';
-    var CACHE_PREFIX = 'kuv_icon_';
-
-    // Карта иконок: ключ — часть класса, значения — пути к SVG
-    var ICONS = {
-        "head__logo-icon": { main: gitpath + "img/logo-icon.svg" },
-        "open--search": { main: gitpath + "icons/magnifying-glass-duotone.svg" },
-        "n-search": { main: gitpath + "icons/magnifying-glass-duotone.svg" },
-        "-settings": { main: gitpath + "icons/gear-duotone.svg" },
-        "reload-icon": { main: gitpath + "icons/arrows-clockwise-duotone.svg" },
-        "full-screen": { main: gitpath + "icons/arrows-out-simple-duotone.svg" },
-        "head__menu-icon": { main: gitpath + "icons/list-bullets-duotone.svg" },
-        "-main": { main: gitpath + "icons/house-duotone.svg" },
-        "n-movie": { main: gitpath + "icons/film-slate-duotone.svg" },
-        "n-tv": { main: gitpath + "icons/television-duotone.svg" },
-        "n-cartoons": { main: gitpath + "icons/rabbit-duotone.svg" },
-        "-favorite": { main: gitpath + "icons/list-heart-duotone.svg" },
-        "-relise": { main: gitpath + "icons/high-definition-duotone.svg" },
-        "-mytorrents": { main: gitpath + "icons/magnet-duotone.svg" },
-        "-console": { main: gitpath + "icons/terminal-window-duotone.svg" },
-        "n-back": { main: gitpath + "icons/arrow-u-up-left-duotone.svg" },
-        "nt-interface": { main: gitpath + "icons/layout-duotone.svg" },
-        "nt-player": { main: gitpath + "icons/play-circle-duotone.svg" },
-        "nt-server": { main: gitpath + "icons/hard-drives-duotone.svg" },
-        "nt-more": { main: gitpath + "icons/sliders-horizontal-duotone.svg" },
-        "nt-backup": { main: gitpath + "icons/vault-duotone.svg" },
-        "button--book": { main: gitpath + "icons/heart-fill.svg", alt: gitpath + "icons/heart-duotone.svg" },
-        "button--play": { main: gitpath + "icons/play-duotone.svg" },
-        "button--subscribe": { main: gitpath + "icons/bell-duotone.svg"},
-        "view--trailer": { main: gitpath + "icons/youtube-logo-duotone.svg" },
-        "view--online": { main: gitpath + "icons/queue-duotone.svg" },
-        "view--torrent": { main: gitpath + "icons/download-simple-duotone.svg" },
-        "filter--back": { main: gitpath + "icons/arrow-left-duotone.svg" },
-        "filter--search": { main: gitpath + "icons/magnifying-glass-duotone.svg" },
-        "watched__icon": { main: gitpath + "icons/play-circle-duotone.svg" },
-        "prestige__viewed": { main: gitpath + "icons/eye-duotone.svg" },
-        "item__viewed": { main: gitpath + "icons/play-duotone.svg" },
-        "head-rate": { main: gitpath + "icons/star-duotone.svg" },
-        "open--premium": { main: gitpath + "icons/star-duotone.svg" },
-        "open--feed": { main: gitpath + "icons/star-four-duotone.svg" },
-        "open--notice": { main: gitpath + "icons/bell-duotone.svg" },
-        "n-about": { main: gitpath + "icons/info-duotone.svg" },
-        "open--broadcast": { main: gitpath + "icons/broadcast-duotone.svg" },
-        "button--reaction": { main: gitpath + "icons/smiley-sticker-duotone.svg" },
-        "nt-account": { main: gitpath + "icons/user-gear-duotone.svg" },
-        "nt-parser": { main: gitpath + "icons/list-magnifying-glass-duotone.svg" },
-        "nt-tmdb": { main: gitpath + "icons/database-duotone.svg" },
-        "nt-plugins": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
-        "nt-parental_control": { main: gitpath + "icons/lock-duotone.svg" },
-        "nt-add_plugin": { main: gitpath + "icons/skull-duotone.svg" },
-        "nt-pirate_store": { main: gitpath + "icons/puzzle-piece-duotone.svg" },
-        "simple-keyboard-mic": { main: gitpath + "icons/microphone-duotone.svg" },
-        "close-button": { main: gitpath + "icons/x-circle-duotone.svg" }
-    };
-
-    var RATE_STAR_ICON = { main: gitpath + "icons/star-duotone.svg" };
-
-    // Иконки возрастных рейтингов
-    var AGE_ICONS = {
-        "0+": gitpath + "icons/age0.svg",
-        "6+": gitpath + "icons/age6.svg",
-        "12+": gitpath + "icons/age12.svg",
-        "16+": gitpath + "icons/age16.svg",
-        "18+": gitpath + "icons/age18.svg"
-    };
-
-    // Диапазоны для возрастных рейтингов
-    var RATING_RANGES = [
-        { min: 0, max: 5, rating: "0+" },
-        { min: 6, max: 11, rating: "6+" },
-        { min: 12, max: 15, rating: "12+" },
-        { min: 16, max: 17, rating: "16+" },
-        { min: 18, max: Infinity, rating: "18+" }
-    ];
-
-    var iconCache = {}; // Кэш иконок
-
-    // Загружает иконку с кэшированием
-    function fetchIcon(path) {
-        return new Promise(function(resolve, reject) {
-            if (iconCache[path]) {
-                resolve(iconCache[path]);
-                return;
-            }
-
-            var cacheKey = CACHE_PREFIX + CACHE_VERSION + '_' + path;
-            try {
-                var cached = localStorage.getItem(cacheKey);
-                if (cached) {
-                    iconCache[path] = cached;
-                    resolve(cached);
-                    return;
-                }
-            } catch (e) {
-                console.warn('Ошибка чтения кэша:', e);
-            }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', path, true);
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    var svgContent = xhr.responseText;
-                    var tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = svgContent;
-                    var svgElement = tempDiv.querySelector('svg');
-                    
-                    if (svgElement) {
-                        svgElement.classList.add('kuvicon');
-                        var processedSvg = svgElement.outerHTML;
-                        iconCache[path] = processedSvg;
-                        
-                        try {
-                            localStorage.setItem(cacheKey, processedSvg);
-                        } catch (e) {
-                            if (e.name === 'QuotaExceededError') {
-                                clearOldCache();
-                                try {
-                                    localStorage.setItem(cacheKey, processedSvg);
-                                } catch (e) {
-                                    console.error('Не удалось сохранить в кэш:', e);
-                                }
-                            }
-                        }
-                        
-                        resolve(processedSvg);
-                    } else {
-                        reject(new Error('SVG не найден'));
-                    }
-                } else {
-                    reject(new Error('Ошибка загрузки SVG: ' + xhr.status));
-                }
-            };
-
-            xhr.onerror = function() {
-                reject(new Error('Сетевая ошибка'));
-            };
-
-            xhr.send();
-        });
-    }
-
-    function clearOldCache() {
-        var keys = [];
-        for (var i = 0; i < localStorage.length; i++) {
-            var key = localStorage.key(i);
-            if (key.indexOf(CACHE_PREFIX) === 0) {
-                keys.push(key);
-            }
-        }
-        
-        var deleteCount = Math.floor(keys.length / 2);
-        for (var j = 0; j < deleteCount; j++) {
-            localStorage.removeItem(keys[j]);
-        }
-    }
-
-    function processRateStars() {
-        var rateBlocks = document.querySelectorAll(".full-start__rate");
-        Array.prototype.forEach.call(rateBlocks, function(block) {
-            if (block.dataset.kuvStarProcessed) return;
-            block.dataset.kuvStarProcessed = "true";
-
-            var divs = block.querySelectorAll("div");
-            if (divs.length >= 2) {
-                var secondDiv = divs[1];
-                
-                fetchIcon(RATE_STAR_ICON.main)
-                    .then(function(svg) {
-                        if (!svg) return;
-
-                        var iconContainer = document.createElement("span");
-                        iconContainer.className = "kuv-rate-star";
-                        iconContainer.innerHTML = svg;
-
-                        secondDiv.insertBefore(iconContainer, secondDiv.firstChild);
-                    })
-                    .catch(function(error) {
-                        console.error("KUV Rating: Ошибка при добавлении звезды:", error);
-                    });
-            }
-        });
-    }
-
-    // Присваивает классы по data-action
-    function assignActionClasses(targetElement) {
-        var elements = targetElement.querySelectorAll("[data-action]");
-        Array.prototype.forEach.call(elements, function(parentElement) {
-            var action = parentElement.dataset.action;
-            if (action) {
-                var childElement = parentElement.querySelector(".menu__ico, .navigation-bar__icon");
-                if (childElement) {
-                    Array.prototype.forEach.call(childElement.classList, function(className) {
-                        if (className.indexOf("data-action-") === 0) {
-                            childElement.classList.remove(className);
-                        }
-                    });
-                    childElement.classList.add("data-action-" + action);
-                }
-            }
-        });
-    }
-
-    // Присваивает классы по data-component
-    function assignComponentClasses(targetElement) {
-        var elements = targetElement.querySelectorAll("[data-component]");
-        Array.prototype.forEach.call(elements, function(parentElement) {
-            var component = parentElement.dataset.component;
-            if (component) {
-                var childElement = parentElement.querySelector(".settings-folder__icon");
-                if (childElement) {
-                    Array.prototype.forEach.call(childElement.classList, function(className) {
-                        if (className.indexOf("data-component-") === 0) {
-                            childElement.classList.remove(className);
-                        }
-                    });
-                    childElement.classList.add("data-component-" + component);
-                }
-            }
-        });
-    }
-
-    // Заменяет иконки на SVG
-    function replaceIcons(targetElement) {
-        return new Promise(function(resolve) {
-            var promises = [];
-            Object.keys(ICONS).forEach(function(key) {
-                var elements = targetElement.querySelectorAll('[class*="' + key + '"]');
-                if (elements.length === 0) return;
-
-                Array.prototype.forEach.call(elements, function(element) {
-                    var existingSvg = element.querySelector("svg");
-                    var existingImg = element.querySelector("img");
-
-                    if (!existingSvg && !existingImg) return;
-
-                    if (existingSvg) existingSvg.parentNode.removeChild(existingSvg);
-                    if (existingImg) existingImg.parentNode.removeChild(existingImg);
-
-                    var paths = ICONS[key];
-                    var mainPath = paths.main;
-                    var altPath = paths.alt;
-                    var pathToUse = mainPath;
-
-                    // Проверка на fill="transparent" у старого SVG
-                    if (existingSvg) {
-                        var elements = existingSvg.getElementsByTagName("*");
-                        for (var i = 0; i < elements.length; i++) {
-                            if (elements[i].getAttribute("fill") === "transparent") {
-                                if (altPath) {
-                                    pathToUse = altPath;
-                                }
-                                break;
-                            }
-                        }
-                    }
-
-                    promises.push(
-                        fetchIcon(pathToUse).then(function(svgContent) {
-                            if (svgContent) {
-                                element.insertAdjacentHTML("afterbegin", svgContent);
-                            }
-                        })
-                    );
-                });
+    var network = new Lampa.Reguest();
+    var cache = {
+        data: new Map(),
+        ttl: 3600000, // 1 час в миллисекундах
+        set: function(key, value) {
+            this.data.set(key, {
+                value: value,
+                timestamp: Date.now()
             });
-
-            Promise.all(promises).then(resolve);
-        });
-    }
-
-    // Получение нормализованного рейтинга по диапазону
-    function getNormalizedRating(ageText) {
-        var match = ageText.match(/^(\d+)\+?$/);
-        if (!match) return null;
-
-        var age = parseInt(match[1], 10);
-        for (var i = 0; i < RATING_RANGES.length; i++) {
-            var range = RATING_RANGES[i];
-            if (age >= range.min && age <= range.max) {
-                return range.rating;
+        },
+        get: function(key) {
+            var item = this.data.get(key);
+            if (item && Date.now() - item.timestamp < this.ttl) {
+                return item.value;
             }
+            this.data.delete(key);
+            return null;
         }
-        return null;
-    }
+    };
 
-    // Обработка возрастных рейтингов
-    function processRatings() {
-        var ratingBlocks = document.querySelectorAll(".full-start__pg, [class*='pg']");
-        Array.prototype.forEach.call(ratingBlocks, function(block) {
-            if (block.dataset.kuvProcessed) return;
-            block.dataset.kuvProcessed = "true";
+    function getMovieProviders(movie, callback) {
+        var cacheKey = 'providers_' + movie.id;
+        var cachedData = cache.get(cacheKey);
+        if (cachedData) {
+            return callback(cachedData);
+        }
 
-            var ageText = block.textContent.trim();
-            var normalizedRating = getNormalizedRating(ageText);
-            if (!normalizedRating || !AGE_ICONS[normalizedRating]) return;
+        var url = Lampa.TMDB.api('movie/' + movie.id + '/watch/providers');
+        network.silent(url, 
+            function(data) {
+                var providers = [];
+                var allowedCountryCodes = ['US', 'RU'];
 
-            fetchIcon(AGE_ICONS[normalizedRating])
-                .then(function(svg) {
-                    if (!svg) return;
-
-                    var iconContainer = document.createElement("div");
-                    iconContainer.className = "kuv-age-icon";
-                    iconContainer.innerHTML = svg;
-
-                    var targetElement = block.closest(".full-start-new__rate-line, .full-start__rate-line, [class*='rate-line']");
-                    if (!targetElement) {
-                        targetElement = block.parentNode;
+                allowedCountryCodes.forEach(function(countryCode) {
+                    var countryData = data.results && data.results[countryCode];
+                    if (countryData) {
+                        if (countryData.flatrate) providers = providers.concat(countryData.flatrate);
+                        if (countryData.rent) providers = providers.concat(countryData.rent);
+                        if (countryData.buy) providers = providers.concat(countryData.buy);
                     }
-
-                    targetElement.insertBefore(iconContainer, targetElement.firstChild);
-                    block.style.display = "none";
-                })
-                .catch(function(error) {
-                    console.error("KUV Rating: Ошибка при обработке рейтинга:", error);
                 });
-        });
-    }
 
-    // Добавляет кнопку "Перезагрузить" в шапку
-    function addReloadButton() {
-        var reloadButton = $(
-            '<div id="RELOAD" class="head__action selector reload-screen">' +
-            '<div class="reload-icon"><svg></svg></div>' +
-            '</div>'
+                var filteredProviders = providers.filter(function(p) {
+                    return p.logo_path;
+                });
+                cache.set(cacheKey, filteredProviders);
+                callback(filteredProviders);
+            },
+            function() {
+                callback([]);
+            }
         );
-        replaceIcons(reloadButton[0]);
-        $('.head__actions').append(reloadButton);
-        $('#RELOAD').on('hover:enter hover:click hover:touch', function() {
-            location.reload();
-        });
     }
 
-    // Добавляет кастомные стили
-    function addStyles() {
-        if (!document.querySelector('link[href="' + gitpath + 'styles/kuv-style.css"]')) {
-            var link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = gitpath + "styles/kuv-style.css";
-            document.head.appendChild(link);
+    function getNetworks(object, callback) {
+        if (!object || !object.card || object.card.source !== 'tmdb') {
+            return callback([]);
         }
 
-        var ratingStyle = document.createElement("style");
-        ratingStyle.textContent = [
-            '.kuv-age-icon {',
-            '    display: inline-block;',
-            '    margin-right: 1.5em!important;',
-            '    vertical-align: middle;',
-            '}',
-            '.kuv-age-icon svg {',
-            '    width: 2.2em;',
-            '    height: 2.2em;',
-            '}',
-            '.kuv-rate-star {',
-            '    display: inline-block;',
-            '    margin-right: 0.3em;',
-            '    vertical-align: middle;',
-            '}',
-            '.kuv-rate-star svg {',
-            '    width: 0.5em;',
-            '    height: 0.5em;',
-            '}',
-            '.full-start__pg, .full-start__status {',
-            '    background: rgba(0, 0, 0, 0.15);',
-            '    border-radius: 0.3em;',
-            '    border: none!important;',
-            '}'
-        ].join('\n');
-        document.head.appendChild(ratingStyle);
+        if (object.card.networks && object.card.networks.length) {
+            return callback(object.card.networks);
+        }
+        if (object.card.production_companies && object.card.production_companies.length) {
+            return callback(object.card.production_companies);
+        }
+
+        getMovieProviders(object.card, callback);
     }
 
-    // Настраивает левое меню
-    function customizeMenu() {
-        Lampa.Storage.set("menu_hide", JSON.stringify(["Персоны", "Аниме", "Лента", "История", "Расписание", "Подписки", "Фильтр", "Каталог"]));
-        Lampa.Storage.set("menu_sort", JSON.stringify(["Главная", "Фильмы", "Сериалы", "Мультики", "Избранное", "Релизы", "Торренты"]));
-    }
+    function showNetworkMenu(network, type, element) {
+        var isTv = type === 'tv';
+        var controller = Lampa.Controller.enabled().name;
+        var dateField = isTv ? 'first_air_date' : 'primary_release_date';
+        var currentDate = new Date().toISOString().split('T')[0];
 
-    // Следим за DOM и заменяем иконки при динамических изменениях
-    function observeDOMChanges() {
-        if (typeof MutationObserver === "undefined") return;
-        
-        var timeout;
-        var observer = new MutationObserver(function(mutations) {
-            if (timeout) return;
-            
-            timeout = setTimeout(function() {
-                var nodes = [];
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === "childList") {
-                        Array.prototype.forEach.call(mutation.addedNodes, function(node) {
-                            if (node.nodeType === 1) {
-                                nodes.push(node);
-                            }
-                        });
-                    }
-                });
+        var menuItems = [
+            { 
+                title: 'Популярные', 
+                sort: '', 
+                filter: { 'vote_count.gte': 10 } 
+            },
+            { 
+                title: 'Новые', 
+                sort: dateField + '.desc', 
+                filter: { 
+                    'vote_count.gte': 10
+                } 
+            }
+        ];
+        // Добавляем дату динамически для избежания проблем с ES5
+        menuItems[1].filter[dateField + '.lte'] = currentDate;
 
-                if (nodes.length) {
-                    nodes.forEach(function(node) {
-                        assignActionClasses(node);
-                        assignComponentClasses(node);
-                        replaceIcons(node);
-                    });
-                    processRatings();
-                    processRateStars();
+        Lampa.Select.show({
+            title: network.name || 'Network',
+            items: menuItems,
+            onBack: function() {
+                Lampa.Controller.toggle(controller);
+                if (element) {
+                    Lampa.Controller.collectionFocus(
+                        element, 
+                        Lampa.Activity.active().activity.render()
+                    );
+                }
+            },
+            onSelect: function(action) {
+                var filter = { 'vote_count.gte': action.filter['vote_count.gte'] };
+                filter[isTv ? 'with_networks' : 'with_companies'] = network.id;
+                if (action.filter[dateField + '.lte']) {
+                    filter[dateField + '.lte'] = action.filter[dateField + '.lte'];
                 }
 
-                timeout = null;
-            }, 100);
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
+                Lampa.Activity.push({
+                    url: 'discover/' + type,
+                    title: (network.name || 'Network') + ' ' + action.title,
+                    component: 'category_full',
+                    source: 'tmdb',
+                    card_type: true,
+                    page: 1,
+                    sort_by: action.sort,
+                    filter: filter
+                });
+            }
         });
     }
 
-    // Инициализация плагина
+    function addNetworkButton(render, networks, type) {
+        $('.button--network, .button--studio', render).remove();
+
+        if (!networks || !networks.length || !networks[0] || !networks[0].logo_path) return;
+
+        var network = networks[0];
+        var imgSrc = Lampa.TMDB.image('t/p/w154' + network.logo_path);
+        var imgAlt = (network.name || '').replace(/"/g, '"');
+
+        var $networkButton = $('<div>')
+            .addClass('full-start__button selector button--network')
+            .append(
+                $('<div>')
+                    .addClass('network-innie')
+                    .append(
+                        $('<img>')
+                            .attr('src', imgSrc)
+                            .attr('alt', imgAlt)
+                            .on('error', function() {
+                                $(this).parent().parent().remove();
+                            })
+                    )
+            );
+
+        $networkButton.on('hover:enter', function() {
+            showNetworkMenu(network, type, this);
+        });
+
+        $('.full-start-new__buttons', render).append($networkButton);
+    }
+
+    function addTitleLogo(render, card) {
+        if (!card || !$('body').hasClass('orientation--portrait')) return;
+
+        // Удаляем предыдущий стиль логотипа, если он есть
+        $('#title-logo-style').remove();
+
+        var logoPath = card.logo_path;
+        if (!logoPath && card.images && card.images.logos && card.images.logos.length > 0) {
+            // Берем первый доступный логотип
+            logoPath = card.images.logos[0].file_path;
+        }
+
+        if (logoPath) {
+            var imgUrl = Lampa.TMDB.image('w500' + logoPath);
+            
+            // Добавляем стиль с background-image для pseudo-элемента
+            $('<style>')
+                .attr('id', 'title-logo-style')
+                .html(
+                    'body.orientation--portrait .full-start-new__img.full--poster::before {' +
+                    '    background-image: url("' + imgUrl + '");' +
+                    '}'
+                )
+                .appendTo('head');
+        }
+    }
+
+    function addOriginalTitle(render, card) {
+        var $titleElement = $('.full-start-new__title', render);
+        if (!card || !$titleElement.length) return;
+
+        var originalTitle = card.original_title || card.original_name;
+        var currentTitle = card.title || card.name;
+
+        if (originalTitle && originalTitle !== currentTitle) {
+            $titleElement.find('.original-title').remove();
+            $('<div>')
+                .addClass('original-title')
+                .text(originalTitle)
+                .appendTo($titleElement);
+        }
+    }
+
     function initPlugin() {
-        Promise.resolve()
-            .then(function() {
-                addReloadButton();
-                addStyles();
-                customizeMenu();
-                assignActionClasses(document.body);
-                assignComponentClasses(document.body);
-                processRatings();
-                processRateStars();
-                return replaceIcons(document.body);
-            })
-            .then(function() {
-                observeDOMChanges();
-            });
+        // Добавление CSS-стилей для логотипа фильма/сериала (однократно)
+        if ($('style#portrait-title-logo').length === 0) {
+            $('<style>')
+                .attr('id', 'portrait-title-logo')
+                .html([
+                    'body.orientation--portrait .full-start-new__img.full--poster::before {',
+                    '    content: "";',
+                    '    position: absolute;',
+                    '    top: -2em;',
+                    '    left: 50%;',
+                    '    transform: translateX(-50%);',
+                    '    background: center / contain no-repeat;',
+                    '    width: 80%;',
+                    '    height: 2em;',
+                    '    z-index: 2;',
+                    '}'
+                ].join('\n'))
+                .appendTo('head');
+        }
 
-        Lampa.Listener.follow("activity:start", function() {
-            assignActionClasses(document.body);
-            assignComponentClasses(document.body);
-            replaceIcons(document.body);
-            processRatings();
-            processRateStars();
-        });
+        // Добавление CSS-стилей для студии (однократно)
+        if ($('style#network-plugin').length === 0) {
+            $('<style>')
+                .attr('id', 'network-plugin')
+                .html([
+                    '.button--network, .button--studio { padding: .3em; }',
+                    '.network-innie {',
+                    '    background-color: #fff;',
+                    '    width: 100%;',
+                    '    height: 100%;',
+                    '    border-radius: .7em;',
+                    '    display: flex;',
+                    '    align-items: center;',
+                    '    padding: 0 1em;',
+                    '}',
+                    '.button--network img, .button--studio img {',
+                    '    height: 100%;',
+                    '    max-height: 1.5em;',
+                    '    max-width: 4.5em;',
+                    '    object-fit: contain;',
+                    '}',
+                    '.full-start-new__title {',
+                    '    position: relative;',
+                    '    margin-bottom: 0.6em !important;',
+                    '}',
+                    '.full--tagline {',
+                    '    margin-bottom: 0.6em !important;',
+                    '}',
+                    '.original-title {',
+                    '    font-size: 0.8em;',
+                    '    color: rgba(255, 255, 255, 0.7);',
+                    '    font-weight: normal;',
+                    '}'
+                ].join('\n'))
+                .appendTo('head');
+        }
 
-        Lampa.Listener.follow("activity:archive", function() {
-            assignActionClasses(document.body);
-            assignComponentClasses(document.body);
-            replaceIcons(document.body);
-            processRatings();
-            processRateStars();
+        Lampa.Listener.follow('full', function(e) {
+            if (e.type === 'complite') {
+                var render = e.object.activity.render();
+                
+                addOriginalTitle(render, e.object.card);
+                addTitleLogo(render, e.object.card);
+                
+                getNetworks(e.object, function(networks) {
+                    if (networks.length) {
+                        addNetworkButton(render, networks, e.object.method);
+                    }
+                });
+            }
         });
     }
 
-    // Запуск при готовности приложения
     if (window.appready) {
         initPlugin();
     } else {
-        Lampa.Listener.follow("app", function(e) {
-            if (e.type === "ready") {
+        Lampa.Listener.follow('app', function(e) {
+            if (e.type === 'ready') {
                 initPlugin();
             }
         });
