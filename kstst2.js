@@ -2,6 +2,7 @@
 
 // Добавляет кнопку студии/телесети (источник — TMDb) в карточку.
 // Добавляет оригинальное название второй строкой в карточку.
+// Добавляет логотип фильма/сериала над постером в портретном режиме.
 // Подходит как для отдельного использования, так и в комплексе с kuv-style.
 
 // Частично основано на плагине tmdb-networks v2.0.3 от levende (https://t.me/levende)
@@ -29,6 +30,10 @@
             return null;
         }
     };
+
+    function isPortraitMode() {
+        return $('body').hasClass('orientation--portrait') || window.innerHeight > window.innerWidth;
+    }
 
     function getMovieProviders(movie, callback) {
         var cacheKey = 'providers_' + movie.id;
@@ -60,6 +65,34 @@
             },
             function() {
                 callback([]);
+            }
+        );
+    }
+
+    function getMovieImages(movie, callback) {
+        var type = movie.name ? 'tv' : 'movie';
+        var cacheKey = 'images_' + type + '_' + movie.id;
+        var cachedData = cache.get(cacheKey);
+        if (cachedData) {
+            return callback(cachedData);
+        }
+
+        var url = Lampa.TMDB.api(type + '/' + movie.id + '/images');
+        network.silent(url, 
+            function(data) {
+                if (data && data.logos && data.logos.length) {
+                    // Фильтруем только английские и русские логотипы
+                    data.logos = data.logos.filter(function(logo) {
+                        return logo.iso_639_1 === null || logo.iso_639_1 === 'en' || logo.iso_639_1 === 'ru';
+                    });
+                    cache.set(cacheKey, data);
+                    callback(data);
+                } else {
+                    callback(null);
+                }
+            },
+            function() {
+                callback(null);
             }
         );
     }
@@ -99,7 +132,6 @@
                 } 
             }
         ];
-        // Добавляем дату динамически для избежания проблем с ES5
         menuItems[1].filter[dateField + '.lte'] = currentDate;
 
         Lampa.Select.show({
@@ -167,57 +199,62 @@
     }
 
     function addTitleLogo(render, card) {
-        if (!card || !$('body').hasClass('orientation--portrait')) return;
+        if (!card || !isPortraitMode()) return;
 
-        // Удаляем предыдущий стиль логотипа, если он есть
-        $('#title-logo-style').remove();
+        var $poster = $('.full-start-new__poster', render);
+        if (!$poster.length) return;
 
-        var logoPath = card.logo_path;
-        if (!logoPath && card.images && card.images.logos && card.images.logos.length > 0) {
-            // Берем первый доступный логотип
-            logoPath = card.images.logos[0].file_path;
+        // Удаляем существующий логотип, если есть
+        $('.title-logo', $poster).remove();
+
+        // Проверяем наличие логотипа
+        var logoPath = null;
+        if (card.images && card.images.logos && card.images.logos.length) {
+            // Предпочитаем русский логотип, затем английский, затем любой другой
+            var ruLogo = card.images.logos.find(function(l) { return l.iso_639_1 === 'ru'; });
+            var enLogo = card.images.logos.find(function(l) { return l.iso_639_1 === 'en'; });
+            var anyLogo = card.images.logos[0];
+            
+            logoPath = (ruLogo || enLogo || anyLogo).file_path;
         }
 
-        if (logoPath) {
-            var imgUrl = Lampa.TMDB.image('w500' + logoPath);
-            
-            // Создаем и добавляем элемент логотипа
-            var $logoContainer = $('<div>')
-                .addClass('title-logo')
-                .css({
-                    'position': 'absolute',
-                    'top': '-2em',
-                    'left': '50%',
-                    'transform': 'translateX(-50%)',
-                    'background': '#fff',
-                    'padding': '0.3em 1em',
-                    'border-radius': '0.7em',
-                    'z-index': '2'
-                });
+        if (!logoPath) return;
 
-            var $logo = $('<img>')
-                .attr('src', imgUrl)
-                .css({
-                    'height': '1.5em',
-                    'max-width': '4.5em',
-                    'object-fit': 'contain'
-                })
-                .on('error', function() {
-                    $(this).parent().remove();
-                });
+        var imgUrl = Lampa.TMDB.image('w500' + logoPath);
 
-            $logoContainer.append($logo);
-            
-            // Добавляем логотип к постеру
-            var $poster = $('.full-start-new__poster', render);
-            if ($poster.length) {
-                if ($poster.css('position') !== 'relative') {
-                    $poster.css('position', 'relative');
-                }
-                $('.title-logo', $poster).remove();
-                $poster.append($logoContainer);
-            }
+        // Создаем контейнер для логотипа
+        var $logoContainer = $('<div>')
+            .addClass('title-logo')
+            .css({
+                'position': 'absolute',
+                'top': '-2em',
+                'left': '50%',
+                'transform': 'translateX(-50%)',
+                'background-color': '#1e1e1e',
+                'padding': '0.3em 1em',
+                'border-radius': '0.7em',
+                'z-index': '2'
+            });
+
+        // Создаем изображение логотипа
+        var $logo = $('<img>')
+            .attr('src', imgUrl)
+            .css({
+                'height': '2em',
+                'max-width': '200px',
+                'object-fit': 'contain'
+            })
+            .on('error', function() {
+                $logoContainer.remove();
+            });
+
+        $logoContainer.append($logo);
+
+        // Добавляем логотип к постеру
+        if ($poster.css('position') !== 'relative') {
+            $poster.css('position', 'relative');
         }
+        $poster.append($logoContainer);
     }
 
     function addOriginalTitle(render, card) {
@@ -237,7 +274,7 @@
     }
 
     function initPlugin() {
-        // Добавление CSS-стилей для студии (однократно)
+        // Добавление CSS-стилей (однократно)
         if ($('style#network-plugin').length === 0) {
             $('<style>')
                 .attr('id', 'network-plugin')
@@ -277,9 +314,21 @@
         Lampa.Listener.follow('full', function(e) {
             if (e.type === 'complite') {
                 var render = e.object.activity.render();
+                var card = e.object.card;
                 
-                addOriginalTitle(render, e.object.card);
-                addTitleLogo(render, e.object.card);
+                addOriginalTitle(render, card);
+                
+                // Получаем изображения перед добавлением логотипа
+                if (card && !card.images) {
+                    getMovieImages(card, function(images) {
+                        if (images) {
+                            card.images = images;
+                        }
+                        addTitleLogo(render, card);
+                    });
+                } else {
+                    addTitleLogo(render, card);
+                }
                 
                 getNetworks(e.object, function(networks) {
                     if (networks.length) {
