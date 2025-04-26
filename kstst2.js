@@ -181,15 +181,42 @@
         if (logoPath) {
             var imgUrl = Lampa.TMDB.image('w500' + logoPath);
             
-            // Добавляем стиль с background-image для pseudo-элемента
-            $('<style>')
-                .attr('id', 'title-logo-style')
-                .html(
-                    'body.orientation--portrait .full-start-new__img.full--poster::before {' +
-                    '    background-image: url("' + imgUrl + '");' +
-                    '}'
-                )
-                .appendTo('head');
+            // Создаем и добавляем элемент логотипа
+            var $logoContainer = $('<div>')
+                .addClass('title-logo')
+                .css({
+                    'position': 'absolute',
+                    'top': '-2em',
+                    'left': '50%',
+                    'transform': 'translateX(-50%)',
+                    'background': '#fff',
+                    'padding': '0.3em 1em',
+                    'border-radius': '0.7em',
+                    'z-index': '2'
+                });
+
+            var $logo = $('<img>')
+                .attr('src', imgUrl)
+                .css({
+                    'height': '1.5em',
+                    'max-width': '4.5em',
+                    'object-fit': 'contain'
+                })
+                .on('error', function() {
+                    $(this).parent().remove();
+                });
+
+            $logoContainer.append($logo);
+            
+            // Добавляем логотип к постеру
+            var $poster = $('.full-start-new__poster', render);
+            if ($poster.length) {
+                if ($poster.css('position') !== 'relative') {
+                    $poster.css('position', 'relative');
+                }
+                $('.title-logo', $poster).remove();
+                $poster.append($logoContainer);
+            }
         }
     }
 
@@ -210,26 +237,6 @@
     }
 
     function initPlugin() {
-        // Добавление CSS-стилей для логотипа фильма/сериала (однократно)
-        if ($('style#portrait-title-logo').length === 0) {
-            $('<style>')
-                .attr('id', 'portrait-title-logo')
-                .html([
-                    'body.orientation--portrait .full-start-new__img.full--poster::before {',
-                    '    content: "";',
-                    '    position: absolute;',
-                    '    top: -2em;',
-                    '    left: 50%;',
-                    '    transform: translateX(-50%);',
-                    '    background: center / contain no-repeat;',
-                    '    width: 80%;',
-                    '    height: 2em;',
-                    '    z-index: 2;',
-                    '}'
-                ].join('\n'))
-                .appendTo('head');
-        }
-
         // Добавление CSS-стилей для студии (однократно)
         if ($('style#network-plugin').length === 0) {
             $('<style>')
