@@ -3,9 +3,7 @@
 
     function addTitleLogo(render, card) {
         console.log('=== Starting addTitleLogo ===');
-        console.log('Card:', card);
-        console.log('Render:', render);
-
+        
         // Проверяем наличие постера
         var $poster = $('.full-start-new__poster', render);
         console.log('Poster found:', $poster.length > 0);
@@ -18,13 +16,15 @@
         // Пытаемся найти логотип в данных карточки
         var logoPath = null;
         
-        // Проверка production_companies
-        if (card.production_companies && card.production_companies.length > 0) {
-            console.log('Found production_companies:', card.production_companies);
-            var company = card.production_companies[0];
-            if (company.logo_path) {
-                logoPath = company.logo_path;
-                console.log('Using company logo:', logoPath);
+        if (card.images && card.images.logos && card.images.logos.length > 0) {
+            // Пытаемся найти русский или английский логотип
+            var ruLogo = card.images.logos.find(function(l) { return l.iso_639_1 === 'ru'; });
+            var enLogo = card.images.logos.find(function(l) { return l.iso_639_1 === 'en'; });
+            var anyLogo = card.images.logos[0];
+            
+            if (ruLogo || enLogo || anyLogo) {
+                logoPath = (ruLogo || enLogo || anyLogo).file_path;
+                console.log('Found logo in card.images.logos:', logoPath);
             }
         }
 
@@ -33,34 +33,35 @@
             return;
         }
 
-        console.log('Creating logo container');
-        
+        // Удаляем старый логотип если есть
+        $('.title-logo', $poster).remove();
+
         // Создаем контейнер для логотипа
         var $logoContainer = $('<div>')
-            .addClass('network-innie title-logo')
+            .addClass('title-logo')
             .css({
                 'position': 'absolute',
-                'top': '-2em',
+                'top': '50%',
                 'left': '50%',
-                'transform': 'translateX(-50%)',
-                'background-color': '#fff',
-                'padding': '0.3em 1em',
-                'border-radius': '0.7em',
-                'z-index': '2'
+                'transform': 'translate(-50%, -50%)',
+                'width': '80%',
+                'height': '25%',
+                'z-index': '2',
+                'pointer-events': 'none'
             });
 
-        console.log('Creating logo image');
-        
         // Создаем изображение
-        var imgUrl = Lampa.TMDB.image('t/p/w154' + logoPath);
+        var imgUrl = Lampa.TMDB.image('w500' + logoPath);
         console.log('Logo URL:', imgUrl);
         
         var $logo = $('<img>')
             .attr('src', imgUrl)
             .css({
-                'height': '1.5em',
-                'max-width': '4.5em',
-                'object-fit': 'contain'
+                'width': '100%',
+                'height': '100%',
+                'object-fit': 'contain',
+                'opacity': '0.7',
+                'filter': 'drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.5))'
             })
             .on('load', function() {
                 console.log('Logo image loaded successfully');
@@ -73,16 +74,11 @@
         // Добавляем изображение в контейнер
         $logoContainer.append($logo);
 
-        console.log('Setting poster position');
-        
         // Устанавливаем position: relative для постера
-        $poster.css('position', 'relative');
+        if ($poster.css('position') !== 'relative') {
+            $poster.css('position', 'relative');
+        }
 
-        console.log('Removing old logo if exists');
-        // Удаляем старый логотип если есть
-        $('.title-logo', $poster).remove();
-
-        console.log('Appending new logo');
         // Добавляем логотип
         $poster.append($logoContainer);
         
@@ -103,11 +99,8 @@
 
         // Следим за событием
         Lampa.Listener.follow('full', function(e) {
-            console.log('Full event caught:', e.type);
-            
             if (e.type === 'complite') {
                 console.log('=== Processing complete event ===');
-                console.log('Event object:', e);
                 
                 var render = e.object.activity.render();
                 var card = e.object.card;
@@ -117,27 +110,33 @@
                     return;
                 }
                 
-                if (!render) {
-                    console.log('No render found');
-                    return;
+                // Проверяем наличие данных с логотипами
+                if (!card.images) {
+                    console.log('No images data, fetching...');
+                    var url = card.name ? 
+                        Lampa.TMDB.api('tv/' + card.id + '/images') : 
+                        Lampa.TMDB.api('movie/' + card.id + '/images');
+                        
+                    var network = new Lampa.Reguest();
+                    network.silent(url, function(data) {
+                        if (data && data.logos) {
+                            card.images = data;
+                            addTitleLogo(render, card);
+                        }
+                    });
+                } else {
+                    addTitleLogo(render, card);
                 }
-                
-                addTitleLogo(render, card);
             }
         });
-        
-        console.log('=== Plugin initialization completed ===');
     }
 
     // Запускаем плагин
     if (window.appready) {
-        console.log('Window ready - initializing immediately');
         initPlugin();
     } else {
-        console.log('Waiting for window ready event');
         Lampa.Listener.follow('app', function(e) {
             if (e.type === 'ready') {
-                console.log('Got window ready event - initializing');
                 initPlugin();
             }
         });
