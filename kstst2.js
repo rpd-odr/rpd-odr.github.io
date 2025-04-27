@@ -1,11 +1,30 @@
 (function () {
     'use strict';
 
+    function getCardLogo(element) {
+        var movie = element.data || element;
+        var logo = movie.logo_path;
+
+        if (!logo && movie.images) {
+            if (movie.images.logos && movie.images.logos.length) {
+                var preferredLogo = movie.images.logos.find(function (l) {
+                    return l.iso_639_1 === 'ru';
+                }) || movie.images.logos.find(function (l) {
+                    return l.iso_639_1 === 'en';
+                }) || movie.images.logos[0];
+
+                if (preferredLogo) logo = preferredLogo.file_path;
+            }
+        }
+
+        return logo;
+    }
+
     function addTitleLogo(render, card) {
         console.log('=== Starting addTitleLogo ===');
         
         // Проверяем наличие постера
-        var $img = $('.full-start-new__img', render);
+        var $img = $('.full-start-new__poster', render).find('img');
         console.log('Poster image found:', $img.length > 0);
         
         if (!$img.length) {
@@ -13,20 +32,9 @@
             return;
         }
 
-        // Пытаемся найти логотип в данных карточки
-        var logoPath = null;
-        
-        if (card.images && card.images.logos && card.images.logos.length > 0) {
-            // Пытаемся найти русский или английский логотип
-            var ruLogo = card.images.logos.find(function(l) { return l.iso_639_1 === 'ru'; });
-            var enLogo = card.images.logos.find(function(l) { return l.iso_639_1 === 'en'; });
-            var anyLogo = card.images.logos[0];
-            
-            if (ruLogo || enLogo || anyLogo) {
-                logoPath = (ruLogo || enLogo || anyLogo).file_path;
-                console.log('Found logo in card.images.logos:', logoPath);
-            }
-        }
+        // Получаем путь к логотипу
+        var logoPath = getCardLogo(card);
+        console.log('Logo path:', logoPath);
 
         if (!logoPath) {
             console.log('No logo found');
@@ -36,57 +44,67 @@
         // Удаляем старый логотип если есть
         $('.title-logo').remove();
 
-        // Устанавливаем position: relative для родительского элемента
-        $img.css('position', 'relative');
-
         // Создаем контейнер для логотипа
-        var $logoContainer = $('<div>')
-            .addClass('title-logo')
-            .css({
-                'position': 'absolute',
-                'top': '0',
-                'left': '0',
-                'width': '100%',
-                'height': '100%',
-                'display': 'flex',
+        var $wrap = $('<div>', {
+            class: 'title-logo',
+            css: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
                 'align-items': 'center',
                 'justify-content': 'center',
-                'z-index': '2'
-            });
+                'z-index': 2
+            }
+        });
 
-        // Создаем изображение
-        var imgUrl = Lampa.TMDB.image('w500' + logoPath);
-        console.log('Logo URL:', imgUrl);
-        
-        var $logo = $('<img>')
-            .attr('src', imgUrl)
-            .css({
-                'width': '80%',
-                'height': 'auto',
-                'max-height': '30%',
+        // Создаем изображение логотипа
+        var $logo = $('<img>', {
+            src: Lampa.TMDB.image('w300' + logoPath),
+            css: {
+                width: '80%',
                 'object-fit': 'contain'
-            })
-            .on('load', function() {
-                console.log('Logo image loaded successfully');
-            })
-            .on('error', function() {
-                console.log('Logo image failed to load');
-                $logoContainer.remove();
-            });
-
-        // Добавляем изображение в контейнер
-        $logoContainer.append($logo);
+            }
+        }).on('error', function() {
+            $wrap.remove();
+        });
 
         // Добавляем логотип
-        $img.append($logoContainer);
+        $wrap.append($logo);
+
+        // Добавляем обертку к постеру
+        var $poster = $('.full-start-new__poster', render);
+        $poster.css('position', 'relative');
+        $poster.append($wrap);
         
         console.log('=== Logo addition completed ===');
+    }
+
+    function getImages(card) {
+        return new Promise(function(resolve, reject) {
+            if (!card.id) return reject();
+            
+            var url = Lampa.TMDB.api((card.name ? 'tv' : 'movie') + '/' + card.id + '/images');
+            
+            var network = new Lampa.Reguest();
+            network.silent(url, function(images) {
+                if (images && images.logos) {
+                    card.images = images;
+                    resolve();
+                } else {
+                    reject();
+                }
+            }, function() {
+                reject();
+            });
+        });
     }
 
     function initPlugin() {
         console.log('=== Plugin initialization started ===');
 
-        // Следим за событием
         Lampa.Listener.follow('full', function(e) {
             if (e.type === 'complite') {
                 console.log('=== Processing complete event ===');
@@ -99,19 +117,11 @@
                     return;
                 }
                 
-                // Проверяем наличие данных с логотипами
                 if (!card.images) {
-                    console.log('No images data, fetching...');
-                    var url = card.name ? 
-                        Lampa.TMDB.api('tv/' + card.id + '/images') : 
-                        Lampa.TMDB.api('movie/' + card.id + '/images');
-                        
-                    var network = new Lampa.Reguest();
-                    network.silent(url, function(data) {
-                        if (data && data.logos) {
-                            card.images = data;
-                            addTitleLogo(render, card);
-                        }
+                    getImages(card).then(function() {
+                        addTitleLogo(render, card);
+                    }).catch(function() {
+                        console.log('Failed to get images');
                     });
                 } else {
                     addTitleLogo(render, card);
@@ -120,7 +130,6 @@
         });
     }
 
-    // Запускаем плагин
     if (window.appready) {
         initPlugin();
     } else {
