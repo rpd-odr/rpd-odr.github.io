@@ -5,11 +5,11 @@
         console.log('=== Starting addTitleLogo ===');
         
         // Проверяем наличие постера
-        var $poster = $('.full-start-new__poster', render);
-        console.log('Poster found:', $poster.length > 0);
+        var $img = $('.full-start-new__img', render);
+        console.log('Poster image found:', $img.length > 0);
         
-        if (!$poster.length) {
-            console.log('No poster element found');
+        if (!$img.length) {
+            console.log('No poster image found');
             return;
         }
 
@@ -34,20 +34,24 @@
         }
 
         // Удаляем старый логотип если есть
-        $('.title-logo', $poster).remove();
+        $('.title-logo').remove();
+
+        // Устанавливаем position: relative для родительского элемента
+        $img.css('position', 'relative');
 
         // Создаем контейнер для логотипа
         var $logoContainer = $('<div>')
             .addClass('title-logo')
             .css({
                 'position': 'absolute',
-                'top': '50%',
-                'left': '50%',
-                'transform': 'translate(-50%, -50%)',
-                'width': '80%',
-                'height': '25%',
-                'z-index': '2',
-                'pointer-events': 'none'
+                'top': '0',
+                'left': '0',
+                'width': '100%',
+                'height': '100%',
+                'display': 'flex',
+                'align-items': 'center',
+                'justify-content': 'center',
+                'z-index': '2'
             });
 
         // Создаем изображение
@@ -57,11 +61,10 @@
         var $logo = $('<img>')
             .attr('src', imgUrl)
             .css({
-                'width': '100%',
-                'height': '100%',
-                'object-fit': 'contain',
-                'opacity': '0.7',
-                'filter': 'drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.5))'
+                'width': '80%',
+                'height': 'auto',
+                'max-height': '30%',
+                'object-fit': 'contain'
             })
             .on('load', function() {
                 console.log('Logo image loaded successfully');
@@ -74,28 +77,14 @@
         // Добавляем изображение в контейнер
         $logoContainer.append($logo);
 
-        // Устанавливаем position: relative для постера
-        if ($poster.css('position') !== 'relative') {
-            $poster.css('position', 'relative');
-        }
-
         // Добавляем логотип
-        $poster.append($logoContainer);
+        $img.append($logoContainer);
         
         console.log('=== Logo addition completed ===');
     }
 
     function initPlugin() {
         console.log('=== Plugin initialization started ===');
-
-        // Добавляем базовые стили
-        if (!$('#title-logo-style').length) {
-            $('<style>')
-                .attr('id', 'title-logo-style')
-                .text('.title-logo img { display: block !important; }')
-                .appendTo('head');
-            console.log('Base styles added');
-        }
 
         // Следим за событием
         Lampa.Listener.follow('full', function(e) {
