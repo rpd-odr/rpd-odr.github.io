@@ -34,6 +34,12 @@
                     // Добавляем relative к постеру
                     $poster.css('position', 'relative');
 
+                    // Устанавливаем отступы для tagline
+                    $('.full-start-new__tagline', render).css({
+                        'margin-top': '0.5em !important',
+                        'margin-bottom': '0.5em !important'
+                    });
+
                     // Создаем контейнер для логотипа
                     var $container = $('<div>')
                         .addClass('logo-container')
@@ -45,7 +51,7 @@
                             zIndex: '999'
                         });
 
-                    // Создаем изображение логотипа
+                    // Создаем изображение логотипа с обновленными стилями
                     var $logo = $('<img>')
                         .attr('src', Lampa.TMDB.image('/t/p/w300' + logoPath))
                         .css({
@@ -92,6 +98,11 @@
                 console.log('Switched to landscape mode');
                 $('.logo-container').remove();
                 $('.full-start-new__title').show();
+                // Сбрасываем отступы tagline
+                $('.full-start-new__tagline').css({
+                    'margin-top': '',
+                    'margin-bottom': ''
+                });
             }
         });
     }
