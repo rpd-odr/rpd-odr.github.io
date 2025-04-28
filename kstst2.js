@@ -254,22 +254,23 @@ function applyLogo(render, $poster, logoPath) {
     }
 
     // Обработчик изменения ориентации экрана
-    function handleOrientation() {
-        if ($('body').hasClass('orientation--portrait')) {
-            var e = Lampa.Activity.active();
-            if (e && e.activity.render()) {
-                addLogo(e.activity.render(), e.card);
-            }
-        } else {
-            $('.logo-container').remove();
-            $('.full-start-new__title').show();
-            var $tagline = $('.full-start-new__tagline');
-            if ($tagline.length) {
-                $tagline[0].style.removeProperty('margin-top');
-                $tagline[0].style.removeProperty('margin-bottom');
-            }
+function handleOrientation() {
+    if ($('body').hasClass('orientation--portrait')) {
+        var e = Lampa.Activity.active();
+        if (e && e.activity.render()) {
+            addLogo(e.activity.render(), e.card);
+        }
+    } else {
+        $('.logo-container').remove();
+        // Показываем все элементы внутри title, кроме original-title (он и так виден)
+        $('.full-start-new__title').children().show();
+        var $tagline = $('.full-start-new__tagline');
+        if ($tagline.length) {
+            $tagline[0].style.removeProperty('margin-top');
+            $tagline[0].style.removeProperty('margin-bottom');
         }
     }
+}
 
     function initPlugin() {
         // Добавление CSS-стилей (однократно)
