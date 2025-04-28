@@ -52,7 +52,7 @@
                             'max-width': '12.5em',
                             'max-height': '6.25em',
                             'object-fit': 'contain',
-                            'filter': 'drop-shadow(0px 0px 0.6em rgba(0,0,0,0.5))'
+                            'filter': 'drop-shadow(0px 0px 0.7em rgba(0,0,0,0.6))'
                         });
 
                     // Добавляем логотип в контейнер
