@@ -49,10 +49,10 @@
                     var $logo = $('<img>')
                         .attr('src', Lampa.TMDB.image('/t/p/w300' + logoPath))
                         .css({
-                            'max-width': '15em',
-                            'max-height': '7em',
+                            'max-width': '20em',
+                            'max-height': '10em',
                             'object-fit': 'contain',
-                            'filter': 'drop-shadow(0px 0px 0.7em rgba(0,0,0,0.6))'
+                            'filter': 'drop-shadow(0px 0px 1em rgba(0,0,0,0.8))'
                         });
 
                     // Добавляем логотип в контейнер
