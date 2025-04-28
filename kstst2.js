@@ -5,8 +5,13 @@
         console.log('=== Adding logo ===');
         
         // Проверяем, находимся ли мы в портретном режиме
-        var $portrait = $('.full-start-new__poster', render);
-        if (!$portrait.length) return;
+        if (!$('body').hasClass('orientation--portrait')) {
+            console.log('Not in portrait mode, skipping logo');
+            return;
+        }
+
+        var $poster = $('.full-start-new__poster', render);
+        if (!$poster.length) return;
 
         // Получаем URL для запроса изображений
         var url = Lampa.TMDB.api((movie.name ? 'tv' : 'movie') + '/' + movie.id + '/images?api_key=' + Lampa.TMDB.key() + '&language=' + Lampa.Storage.get('language'));
@@ -27,7 +32,7 @@
                     $('.logo-container').remove();
 
                     // Добавляем relative к постеру
-                    $portrait.css('position', 'relative');
+                    $poster.css('position', 'relative');
 
                     // Создаем контейнер для логотипа
                     var $container = $('<div>')
@@ -44,17 +49,17 @@
                     var $logo = $('<img>')
                         .attr('src', Lampa.TMDB.image('/t/p/w300' + logoPath))
                         .css({
-                            'max-width': '12.5em',    // 200px -> 12.5em (при базовом размере 16px)
-                            'max-height': '6.25em',   // 100px -> 6.25em
+                            'max-width': '12.5em',
+                            'max-height': '6.25em',
                             'object-fit': 'contain',
-                            'filter': 'drop-shadow(0px 0px 0.125em rgba(0,0,0,0.5))'  // 2px -> 0.125em
+                            'filter': 'drop-shadow(0px 0px 0.125em rgba(0,0,0,0.5))'
                         });
 
                     // Добавляем логотип в контейнер
                     $container.append($logo);
 
                     // Добавляем контейнер к постеру
-                    $portrait.append($container);
+                    $poster.append($container);
                     
                     console.log('=== Logo added ===');
                 }
@@ -70,6 +75,23 @@
                 if (movie) {
                     addLogo(render, movie);
                 }
+            }
+        });
+
+        // Добавляем слушатель изменения ориентации
+        $('body').on('class', function() {
+            if ($('body').hasClass('orientation--portrait')) {
+                // В портретном режиме
+                console.log('Switched to portrait mode');
+                var e = Lampa.Activity.active();
+                if (e && e.activity.render()) {
+                    addLogo(e.activity.render(), e.card);
+                }
+            } else {
+                // В ландшафтном режиме
+                console.log('Switched to landscape mode');
+                $('.logo-container').remove();
+                $('.full-start-new__title').show();
             }
         });
     }
