@@ -183,42 +183,51 @@
         }
     }
 
-// Функция для применения логотипа к карточке
-function applyLogo(render, $poster, logoPath) {
-    // Находим основное название и скрываем только его, оставляя original-title видимым
-    $('.full-start-new__title', render).children().not('.original-title').hide();
-    $('.logo-container').remove();
-    
-    $poster.css('position', 'relative');
+    // Функция для применения логотипа к карточке
+    function applyLogo(render, $poster, logoPath) {
+        var $titleElement = $('.full-start-new__title', render);
+        
+        // Удаляем старый логотип если есть
+        $('.logo-container').remove();
+        
+        // Находим именно название (первый текстовый узел)
+        $titleElement.contents().filter(function() {
+            return this.nodeType === 3;
+        }).wrap('<span class="title-text"></span>');
+        
+        // Скрываем только обёрнутый текст
+        $('.title-text', $titleElement).hide();
+        
+        $poster.css('position', 'relative');
 
-    var $tagline = $('.full-start-new__tagline', render);
-    if ($tagline.length) {
-        $tagline[0].style.setProperty('margin-top', '0.5em', 'important');
-        $tagline[0].style.setProperty('margin-bottom', '0', 'important');
+        var $tagline = $('.full-start-new__tagline', render);
+        if ($tagline.length) {
+            $tagline[0].style.setProperty('margin-top', '0.5em', 'important');
+            $tagline[0].style.setProperty('margin-bottom', '0', 'important');
+        }
+
+        var $container = $('<div>')
+            .addClass('logo-container')
+            .css({
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: '999'
+            });
+
+        $('<img>')
+            .attr('src', Lampa.TMDB.image('/t/p/w300' + logoPath))
+            .css({
+                'max-width': '20em',
+                'max-height': '10em',
+                'object-fit': 'contain',
+                'filter': 'drop-shadow(0px 0px 1em rgba(0,0,0,0.8))'
+            })
+            .appendTo($container);
+
+        $poster.append($container);
     }
-
-    var $container = $('<div>')
-        .addClass('logo-container')
-        .css({
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: '999'
-        });
-
-    $('<img>')
-        .attr('src', Lampa.TMDB.image('/t/p/w300' + logoPath))
-        .css({
-            'max-width': '20em',
-            'max-height': '10em',
-            'object-fit': 'contain',
-            'filter': 'drop-shadow(0px 0px 1em rgba(0,0,0,0.8))'
-        })
-        .appendTo($container);
-
-    $poster.append($container);
-}
 
     // Функция добавления логотипа с кэшированием
     function addLogo(render, movie) {
@@ -254,23 +263,23 @@ function applyLogo(render, $poster, logoPath) {
     }
 
     // Обработчик изменения ориентации экрана
-function handleOrientation() {
-    if ($('body').hasClass('orientation--portrait')) {
-        var e = Lampa.Activity.active();
-        if (e && e.activity.render()) {
-            addLogo(e.activity.render(), e.card);
-        }
-    } else {
-        $('.logo-container').remove();
-        // Показываем все элементы внутри title, кроме original-title (он и так виден)
-        $('.full-start-new__title').children().show();
-        var $tagline = $('.full-start-new__tagline');
-        if ($tagline.length) {
-            $tagline[0].style.removeProperty('margin-top');
-            $tagline[0].style.removeProperty('margin-bottom');
+    function handleOrientation() {
+        if ($('body').hasClass('orientation--portrait')) {
+            var e = Lampa.Activity.active();
+            if (e && e.activity.render()) {
+                addLogo(e.activity.render(), e.card);
+            }
+        } else {
+            $('.logo-container').remove();
+            // Показываем только основное название
+            $('.title-text').show();
+            var $tagline = $('.full-start-new__tagline');
+            if ($tagline.length) {
+                $tagline[0].style.removeProperty('margin-top');
+                $tagline[0].style.removeProperty('margin-bottom');
+            }
         }
     }
-}
 
     function initPlugin() {
         // Добавление CSS-стилей (однократно)
