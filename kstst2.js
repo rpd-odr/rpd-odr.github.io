@@ -35,10 +35,11 @@
                     $poster.css('position', 'relative');
 
                     // Устанавливаем отступы для tagline
-                    $('.full-start-new__tagline', render).css({
-                        'margin-top': '0.5em !important',
-                        'margin-bottom': '0.5em !important'
-                    });
+                    var $tagline = $('.full-start-new__tagline', render);
+                    if ($tagline.length) {
+                        $tagline[0].style.setProperty('margin-top', '0.5em', 'important');
+                        $tagline[0].style.setProperty('margin-bottom', '0.5em', 'important');
+                    }
 
                     // Создаем контейнер для логотипа
                     var $container = $('<div>')
@@ -51,7 +52,7 @@
                             zIndex: '999'
                         });
 
-                    // Создаем изображение логотипа с обновленными стилями
+                    // Создаем изображение логотипа
                     var $logo = $('<img>')
                         .attr('src', Lampa.TMDB.image('/t/p/w300' + logoPath))
                         .css({
@@ -99,10 +100,11 @@
                 $('.logo-container').remove();
                 $('.full-start-new__title').show();
                 // Сбрасываем отступы tagline
-                $('.full-start-new__tagline').css({
-                    'margin-top': '',
-                    'margin-bottom': ''
-                });
+                var $tagline = $('.full-start-new__tagline');
+                if ($tagline.length) {
+                    $tagline[0].style.removeProperty('margin-top');
+                    $tagline[0].style.removeProperty('margin-bottom');
+                }
             }
         });
     }
