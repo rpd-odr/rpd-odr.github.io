@@ -200,12 +200,6 @@
         
         $poster.css('position', 'relative');
 
-        var $tagline = $('.full-start-new__tagline', render);
-        if ($tagline.length) {
-            $tagline[0].style.setProperty('margin-top', '0.5em', 'important');
-            $tagline[0].style.setProperty('margin-bottom', '0', 'important');
-        }
-
         var $container = $('<div>')
             .addClass('logo-container')
             .css({
@@ -271,13 +265,7 @@
             }
         } else {
             $('.logo-container').remove();
-            // Показываем только основное название
             $('.title-text').show();
-            var $tagline = $('.full-start-new__tagline');
-            if ($tagline.length) {
-                $tagline[0].style.removeProperty('margin-top');
-                $tagline[0].style.removeProperty('margin-bottom');
-            }
         }
     }
 
