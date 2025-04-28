@@ -49,8 +49,8 @@
                     var $logo = $('<img>')
                         .attr('src', Lampa.TMDB.image('/t/p/w300' + logoPath))
                         .css({
-                            'max-width': '12.5em',
-                            'max-height': '6.25em',
+                            'max-width': '15em',
+                            'max-height': '7em',
                             'object-fit': 'contain',
                             'filter': 'drop-shadow(0px 0px 0.7em rgba(0,0,0,0.6))'
                         });
