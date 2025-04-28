@@ -2,6 +2,7 @@
 
 // Добавляет кнопку студии/телесети (источник — TMDb) в карточку.
 // Добавляет оригинальное название второй строкой в карточку.
+// Добавляет логотип фильма/сериала (источник — TMDb) в карточку в портретном режиме.
 // Подходит как для отдельного использования, так и в комплексе с kuv-style.
 
 // Частично основано на плагине tmdb-networks v2.0.3 от levende (https://t.me/levende)
@@ -182,6 +183,92 @@
         }
     }
 
+    // Функция для применения логотипа к карточке
+    function applyLogo(render, $poster, logoPath) {
+        var $titleElement = $('.full-start-new__title', render);
+        
+        // Удаляем старый логотип если есть
+        $('.logo-container').remove();
+        
+        // Находим именно название (первый текстовый узел)
+        $titleElement.contents().filter(function() {
+            return this.nodeType === 3;
+        }).wrap('<span class="title-text"></span>');
+        
+        // Скрываем только обёрнутый текст
+        $('.title-text', $titleElement).hide();
+        
+        $poster.css('position', 'relative');
+
+        var $container = $('<div>')
+            .addClass('logo-container')
+            .css({
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: '999'
+            });
+
+        $('<img>')
+            .attr('src', Lampa.TMDB.image('/t/p/w300' + logoPath))
+            .css({
+                'max-width': '20em',
+                'max-height': '10em',
+                'object-fit': 'contain',
+                'filter': 'drop-shadow(0px 0px 1em rgba(0,0,0,0.8))'
+            })
+            .appendTo($container);
+
+        $poster.append($container);
+    }
+
+    // Функция добавления логотипа с кэшированием
+    function addLogo(render, movie) {
+        if (!$('body').hasClass('orientation--portrait')) return;
+
+        var $poster = $('.full-start-new__poster', render);
+        if (!$poster.length) return;
+
+        // Проверяем кэш для логотипа
+        var cacheKey = 'logo_' + movie.id;
+        var cachedLogo = cache.get(cacheKey);
+        
+        if (cachedLogo) {
+            if (cachedLogo.logo_path) {
+                applyLogo(render, $poster, cachedLogo.logo_path);
+            }
+            return;
+        }
+
+        var url = Lampa.TMDB.api((movie.name ? 'tv' : 'movie') + '/' + movie.id + '/images?api_key=' + Lampa.TMDB.key() + '&language=' + Lampa.Storage.get('language'));
+        
+        $.get(url, function(response) {
+            var logoData = { logo_path: null };
+            if (response.logos && response.logos[0]) {
+                logoData.logo_path = response.logos[0].file_path;
+            }
+            cache.set(cacheKey, logoData);
+
+            if (logoData.logo_path) {
+                applyLogo(render, $poster, logoData.logo_path);
+            }
+        });
+    }
+
+    // Обработчик изменения ориентации экрана
+    function handleOrientation() {
+        if ($('body').hasClass('orientation--portrait')) {
+            var e = Lampa.Activity.active();
+            if (e && e.activity.render()) {
+                addLogo(e.activity.render(), e.card);
+            }
+        } else {
+            $('.logo-container').remove();
+            $('.title-text').show();
+        }
+    }
+
     function initPlugin() {
         // Добавление CSS-стилей (однократно)
         if ($('style#network-plugin').length === 0) {
@@ -225,6 +312,7 @@
                 var render = e.object.activity.render();
                 
                 addOriginalTitle(render, e.object.card);
+                addLogo(render, e.data.movie);
                 
                 getNetworks(e.object, function(networks) {
                     if (networks.length) {
@@ -232,6 +320,11 @@
                     }
                 });
             }
+        });
+
+        // Слушатель изменения ориентации
+        $('body').on('class', function() {
+            handleOrientation();
         });
     }
 
