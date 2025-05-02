@@ -225,7 +225,7 @@
 
     // Функция добавления логотипа с кэшированием
     function addLogo(render, movie) {
-        if (!$('body').hasClass('orientation--portrait')) return;
+        if (!$('body').hasClass('orientation--portrait') || !$('body').hasClass('true--mobile')) return;
 
         var $poster = $('.full-start-new__poster', render);
         if (!$poster.length) return;
