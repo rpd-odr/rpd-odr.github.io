@@ -229,7 +229,7 @@
                     return kuv_src;
                 }
             });
-            Lampa.Params.select('source', Object.assign({}, Lampa.Params.values['source'], {'kuv_src': 'kuv_src'}), 'tmdb');
+            Lampa.Params.select('source', Object.assign({}, Lampa.Params.values['source'], {'kuv_src': 'KUV'}), 'tmdb');
         }
 
         if (window.appready) add(); else {
