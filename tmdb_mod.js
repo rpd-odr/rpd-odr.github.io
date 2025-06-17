@@ -2,7 +2,7 @@
     'use strict';
 
     function startPlugin() {
-        window.plugin_kuv_src_ready = true;
+        window.plugin_kuv_ready = true;
 
         var Episode = function (data) {
             var card = data.card || data;
@@ -222,14 +222,14 @@
         }
 
         function add() {
-            var kuv_src = Object.assign({}, Lampa.Api.sources.tmdb, new SourceTMDB(Lampa.Api.sources.tmdb));
-            Lampa.Api.sources.kuv_src = kuv_src;
-            Object.defineProperty(Lampa.Api.sources, 'kuv_src', {
+            var kuv = Object.assign({}, Lampa.Api.sources.tmdb, new SourceTMDB(Lampa.Api.sources.tmdb));
+            Lampa.Api.sources.kuv = kuv;
+            Object.defineProperty(Lampa.Api.sources, 'kuv', {
                 get: function get() {
-                    return kuv_src;
+                    return kuv;
                 }
             });
-            Lampa.Params.select('source', Object.assign({}, Lampa.Params.values['source'], {'kuv_src': 'KUV'}), 'tmdb');
+            Lampa.Params.select('source', Object.assign({}, Lampa.Params.values['source'], {'kuv': 'KUV'}), 'tmdb');
         }
 
         if (window.appready) add(); else {
@@ -239,6 +239,6 @@
         }
     }
 
-    if (!window.plugin_kuv_src_ready) startPlugin();
+    if (!window.plugin_kuv_ready) startPlugin();
 
 })();
