@@ -1,101 +1,63 @@
 (function() {
     'use strict';
 
-    // Проверка на повторную загрузку
-    if (window.__tmdbOriginalLangPluginLoaded) return;
-    window.__tmdbOriginalLangPluginLoaded = true;
+    if (window.__tmdbLangForcePlugin) return;
+    window.__tmdbLangForcePlugin = true;
 
-    // Ждем готовности Lampa
-    function initPlugin() {
-        // Проверяем доступность необходимых API
-        if (!window.XMLHttpRequest || !window.fetch) {
-            console.error('[TMDB Original Lang] Required APIs not available');
-            return;
-        }
-
-        // Основная логика плагина
-        class TMDBLangInterceptor {
-            constructor() {
-                this.originalLang = null;
-                this.patchXHR();
-                this.patchFetch();
-                console.log('[TMDB Original Lang] Plugin activated');
-            }
-
-            patchXHR() {
-                const originalOpen = XMLHttpRequest.prototype.open;
-                const self = this;
-
-                XMLHttpRequest.prototype.open = function() {
-                    this._url = arguments[1];
-                    return originalOpen.apply(this, arguments);
-                };
-
-                const originalSend = XMLHttpRequest.prototype.send;
+    function init() {
+        const IMAGE_REGEX = /\/tmdb\/img\/t\/p\/([^/]+)\/(.+\.(jpg|png))(\?|$)/;
+        const API_REGEX = /\/tmdb\/api\/3\/(movie|tv)\/\d+/;
+        
+        // Главный перехватчик
+        const intercept = () => {
+            const originalFetch = window.fetch;
+            
+            window.fetch = async function(input, init) {
+                const url = typeof input === 'string' ? input : input.url;
+                let newUrl = url;
                 
-                XMLHttpRequest.prototype.send = function() {
-                    if (this._url && this._url.includes('api.themoviedb.org/3/')) {
-                        const originalOnload = this.onload;
-                        
-                        this.onload = function() {
-                            try {
-                                if (this.responseText) {
-                                    const data = JSON.parse(this.responseText);
-                                    if (data.original_language) {
-                                        self.originalLang = data.original_language;
-                                    }
-                                }
-                            } catch (e) {
-                                console.warn('[TMDB Original Lang] XHR parse error', e);
-                            }
-                            
-                            if (originalOnload) {
-                                return originalOnload.apply(this, arguments);
-                            }
-                        };
+                // Обработка API запросов
+                if (API_REGEX.test(url)) {
+                    newUrl = modifyApiUrl(url);
+                }
+                // Обработка изображений
+                else if (IMAGE_REGEX.test(url)) {
+                    newUrl = modifyImageUrl(url);
+                }
+                
+                if (newUrl !== url) {
+                    console.log('[LangForce] Modified URL:', newUrl);
+                    if (typeof input !== 'string') {
+                        return originalFetch(new Request(newUrl, input), init);
                     }
-                    return originalSend.apply(this, arguments);
-                };
-            }
-
-            patchFetch() {
-                const originalFetch = window.fetch;
-                const self = this;
-
-                window.fetch = async function(input, init) {
-                    let url = (typeof input === 'string') ? input : input.url;
-                    let modifiedUrl = url;
-
-                    if (url.includes('api.themoviedb.org/3/')) {
-                        if (url.includes('/movie/') || url.includes('/tv/')) {
-                            modifiedUrl = url.replace(/([?&])language=[^&]*/, '$1language=original');
-                        }
-                    } else if (url.includes('image.tmdb.org') && self.originalLang) {
-                        modifiedUrl = url.includes('?') 
-                            ? `${url}&language=${self.originalLang}`
-                            : `${url}?language=${self.originalLang}`;
-                    }
-
-                    if (url !== modifiedUrl) {
-                        console.debug('[TMDB Original Lang] Modified URL:', modifiedUrl);
-                    }
-
-                    return originalFetch(modifiedUrl, init);
-                };
-            }
-        }
-
-        new TMDBLangInterceptor();
-    }
-
-    // Запуск с разными сценариями загрузки
-    if (window.Lampa && window.Lampa.ready) {
-        initPlugin();
-    } else {
-        const listener = () => {
-            document.removeEventListener('lampa_ready', listener);
-            initPlugin();
+                    return originalFetch(newUrl, init);
+                }
+                
+                return originalFetch(input, init);
+            };
         };
-        document.addEventListener('lampa_ready', listener);
+        
+        // Модификация URL API
+        const modifyApiUrl = (url) => {
+            return url.replace(/([?&])language=[^&]*/, '$1language=original')
+                     .replace(/([?&]include_image_language)=[^&]*/, '');
+        };
+        
+        // Модификация URL изображений
+        const modifyImageUrl = (url) => {
+            // Удаляем все существующие параметры языка
+            let cleanUrl = url.split('?')[0];
+            
+            // Добавляем приоритетные языки
+            return cleanUrl + '?language=original,en,null&' + (url.split('?')[1] || '');
+        };
+        
+        // Запускаем перехватчик
+        intercept();
+        console.log('[LangForce] Plugin activated');
     }
+
+    // Инициализация
+    if (window.Lampa?.ready) init();
+    else document.addEventListener('lampa_ready', init);
 })();
