@@ -1,121 +1,101 @@
 (function() {
     'use strict';
 
-    // Проверяем, загружен ли уже плагин
-    if (window.TMDBOriginalLangLoaded) return;
-    window.TMDBOriginalLangLoaded = true;
+    // Проверка на повторную загрузку
+    if (window.__tmdbOriginalLangPluginLoaded) return;
+    window.__tmdbOriginalLangPluginLoaded = true;
 
-    // Основной класс плагина
-    class TMDBOriginalLang {
-        constructor() {
-            // Сохраняем оригинальный язык интерфейса
-            this.interfaceLang = 'ru';
-            
-            // Инициализируем перехватчики
-            this.initInterceptors();
-            
-            console.log('[TMDB Original Lang] Plugin initialized');
+    // Ждем готовности Lampa
+    function initPlugin() {
+        // Проверяем доступность необходимых API
+        if (!window.XMLHttpRequest || !window.fetch) {
+            console.error('[TMDB Original Lang] Required APIs not available');
+            return;
         }
 
-        initInterceptors() {
-            // Перехватчик для XMLHttpRequest
-            this.interceptXHR();
-            
-            // Перехватчик для Fetch API
-            this.interceptFetch();
-        }
+        // Основная логика плагина
+        class TMDBLangInterceptor {
+            constructor() {
+                this.originalLang = null;
+                this.patchXHR();
+                this.patchFetch();
+                console.log('[TMDB Original Lang] Plugin activated');
+            }
 
-        interceptXHR() {
-            const originalOpen = XMLHttpRequest.prototype.open;
-            const that = this;
-            
-            XMLHttpRequest.prototype.open = function(method, url) {
-                // Сохраняем URL для последующего использования
-                this._requestUrl = url;
-                return originalOpen.apply(this, arguments);
-            };
+            patchXHR() {
+                const originalOpen = XMLHttpRequest.prototype.open;
+                const self = this;
 
-            const originalSend = XMLHttpRequest.prototype.send;
-            
-            XMLHttpRequest.prototype.send = function(body) {
-                if (this._requestUrl && this._requestUrl.includes('api.themoviedb.org')) {
-                    const originalOnload = this.onload;
-                    
-                    this.onload = function() {
-                        if (this.responseText) {
+                XMLHttpRequest.prototype.open = function() {
+                    this._url = arguments[1];
+                    return originalOpen.apply(this, arguments);
+                };
+
+                const originalSend = XMLHttpRequest.prototype.send;
+                
+                XMLHttpRequest.prototype.send = function() {
+                    if (this._url && this._url.includes('api.themoviedb.org/3/')) {
+                        const originalOnload = this.onload;
+                        
+                        this.onload = function() {
                             try {
-                                const response = JSON.parse(this.responseText);
-                                if (response.original_language) {
-                                    // Сохраняем язык оригинала для последующих запросов
-                                    that.currentOriginalLang = response.original_language;
+                                if (this.responseText) {
+                                    const data = JSON.parse(this.responseText);
+                                    if (data.original_language) {
+                                        self.originalLang = data.original_language;
+                                    }
                                 }
                             } catch (e) {
-                                console.error('[TMDB Original Lang] Error parsing response', e);
+                                console.warn('[TMDB Original Lang] XHR parse error', e);
                             }
-                        }
-                        
-                        if (originalOnload) {
-                            return originalOnload.apply(this, arguments);
-                        }
-                    };
-                }
-                
-                return originalSend.apply(this, arguments);
-            };
-        }
-
-        interceptFetch() {
-            const originalFetch = window.fetch;
-            const that = this;
-            
-            window.fetch = async function(input, init) {
-                let url = typeof input === 'string' ? input : input.url;
-                let modified = false;
-                
-                // Модифицируем запросы к TMDB API
-                if (url.includes('api.themoviedb.org')) {
-                    // Для основных запросов метаданных
-                    if (url.includes('/movie/') || url.includes('/tv/')) {
-                        url = that.modifyUrlLang(url, 'original');
-                        modified = true;
+                            
+                            if (originalOnload) {
+                                return originalOnload.apply(this, arguments);
+                            }
+                        };
                     }
-                    // Для запросов изображений
-                    else if (url.includes('image.tmdb.org')) {
-                        if (that.currentOriginalLang) {
-                            url = that.addImageLanguage(url, that.currentOriginalLang);
-                            modified = true;
+                    return originalSend.apply(this, arguments);
+                };
+            }
+
+            patchFetch() {
+                const originalFetch = window.fetch;
+                const self = this;
+
+                window.fetch = async function(input, init) {
+                    let url = (typeof input === 'string') ? input : input.url;
+                    let modifiedUrl = url;
+
+                    if (url.includes('api.themoviedb.org/3/')) {
+                        if (url.includes('/movie/') || url.includes('/tv/')) {
+                            modifiedUrl = url.replace(/([?&])language=[^&]*/, '$1language=original');
                         }
+                    } else if (url.includes('image.tmdb.org') && self.originalLang) {
+                        modifiedUrl = url.includes('?') 
+                            ? `${url}&language=${self.originalLang}`
+                            : `${url}?language=${self.originalLang}`;
                     }
-                }
-                
-                // Возвращаем оригинальный fetch с модифицированным URL при необходимости
-                return originalFetch(modified ? url : input, init);
-            };
+
+                    if (url !== modifiedUrl) {
+                        console.debug('[TMDB Original Lang] Modified URL:', modifiedUrl);
+                    }
+
+                    return originalFetch(modifiedUrl, init);
+                };
+            }
         }
 
-        modifyUrlLang(url, newLang) {
-            // Заменяем параметр language в URL
-            if (url.includes('language=')) {
-                return url.replace(/([?&])language=[^&]*/, `$1language=${newLang}`);
-            }
-            return url + (url.includes('?') ? '&' : '?' + `language=${newLang}`;
-        }
-
-        addImageLanguage(url, lang) {
-            // Добавляем параметр языка для изображений
-            if (url.includes('?')) {
-                return `${url}&language=${lang}`;
-            }
-            return `${url}?language=${lang}`;
-        }
+        new TMDBLangInterceptor();
     }
 
-    // Запускаем плагин после полной загрузки Lampa
+    // Запуск с разными сценариями загрузки
     if (window.Lampa && window.Lampa.ready) {
-        new TMDBOriginalLang();
+        initPlugin();
     } else {
-        document.addEventListener('lampa_ready', () => {
-            new TMDBOriginalLang();
-        });
+        const listener = () => {
+            document.removeEventListener('lampa_ready', listener);
+            initPlugin();
+        };
+        document.addEventListener('lampa_ready', listener);
     }
 })();
