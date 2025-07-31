@@ -76,7 +76,7 @@
 .downloads-tab__item.downloading .downloads-tab__icon svg {
   /*clip-path: inset(0 0 100% 0);*/
   filter: opacity (1);
-  animation: pulseColor 2s infinite ease-in-out;
+  animation: pulseColor 3s infinite ease-in-out;
 }
 .downloads-tab__item.paused .downloads-tab__icon {
   visibility: visible;
@@ -106,8 +106,8 @@
 }
 
 .downloads-tab__icon {
-  width: 2.8em;
-  height: 2.8em;
+  width: 3em;
+  height: 3em;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -176,7 +176,7 @@
 
 .downloads-tab__progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #31baeb, #357ab8);
+  background: linear-gradient(90deg, #31baeb, #31baeb);
   transition: width 0.3s ease;
 }
 
@@ -238,7 +238,7 @@
 }
 .download-card__progress-bar-progress {
   height: 100%;
-  background: linear-gradient(90deg, #31baeb, #357ab8);
+  background: linear-gradient(90deg, #31baeb, #31baeb);
   transition: width 0.5s ease;
 }
 .download-card__stats {
@@ -379,8 +379,8 @@
 }
 .download-complete__down-arrow svg,
 .download-circle__down-arrow svg {
-  width: 1em;
-  height: 1em;
+  width: .9em;
+  height: .9em;
 }
 .download-complete__down-arrow-svg_in-progress,
 .download-circle__down-arrow-svg_in-progress {
@@ -393,7 +393,8 @@
 .download-complete__down-arrow-svg-animated_in-progress,
 .download-circle__down-arrow-svg-animated_in-progress {
   position: absolute;
-  clip-path: inset(0 0 100% 0);
+  /*clip-path: inset(0 0 100% 0);*/
+  filter: opacity(1);
   animation: pulseColor 2s ease-out infinite;
 }
 .download-complete__down-arrow-svg-animated_complete,
