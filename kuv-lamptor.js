@@ -210,7 +210,7 @@
 `; var W = `.download-card {
   all: unset;
   display: block;
-  width: 90%;
+  width: calc(100% - 3em);
   height: auto;
   margin: 0;
   margin-top: 0.75em;
