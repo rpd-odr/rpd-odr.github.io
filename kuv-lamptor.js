@@ -325,20 +325,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 40px;
-  height: 40px;
+  width: 2em;
+  height: 2em;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(2);
+  transform: translate(-50%, -50%) scale(1);
 }
 .download-complete__circle,
 .download-circle__circle {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 40px;
-  height: 40px;
+  width: 2em;
+  height: 2em;
   cursor: pointer;
   position: relative;
 }
@@ -380,8 +380,8 @@
 }
 .download-complete__down-arrow svg,
 .download-circle__down-arrow svg {
-  width: 24px;
-  height: 24px;
+  width: 1em;
+  height: 1em;
 }
 .download-complete__down-arrow-svg_in-progress,
 .download-circle__down-arrow-svg_in-progress {
