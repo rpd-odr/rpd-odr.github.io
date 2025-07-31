@@ -414,8 +414,6 @@
     clip-path: inset(100% 0 0 0);
   }
 }`; 
-
-(() => {
   function V(a, e) {
     let t = $(e);
     if (!t.find(".download-circle").length) {
