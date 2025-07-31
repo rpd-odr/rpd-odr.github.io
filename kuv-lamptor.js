@@ -328,9 +328,8 @@
   width: 2em;
   height: 2em;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(1);
+  bottom: .3em;
+  right: 4em;
 }
 .download-complete__circle,
 .download-circle__circle {
