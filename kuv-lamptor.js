@@ -281,7 +281,7 @@
             <circle\r
                 class="download-circle__full_{status}"\r
                 stroke-width=".1em"\r
-                r=".8em"\r
+                r=".7em"\r
                 cx="0.9em"\r
                 cy="0.9em"\r
             ></circle>\r
