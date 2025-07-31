@@ -74,7 +74,8 @@
   color: #fff;
 }
 .downloads-tab__item.downloading .downloads-tab__icon svg {
-  clip-path: inset(0 0 100% 0);
+  /*clip-path: inset(0 0 100% 0);*/
+  filter: opacity (1);
   animation: pulseColor 2s infinite ease-in-out;
 }
 .downloads-tab__item.paused .downloads-tab__icon {
