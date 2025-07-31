@@ -467,7 +467,7 @@ var u = class a {
 				for (let o of e.torrents) B(o), H(o), J(o);
 			r.isConnected = !0;
 			let t = r.getClient().url;
-			T("Connected to " + t), //a.notifyFirstTime(Lampa.Lang.translate("background-worker.connection-success") + ": " + t)
+			T("Connected to " + t), a.notifyFirstTime(Lampa.Lang.translate("background-worker.connection-success") + ": " + t)
 		} catch (e) {
 			T("Error:", e), r.isConnected = !1, a.errorCount++, a.errorCount > 10 && (clearInterval(a.subscription), T("Stopping background worker due to too many errors"), a.notifyFirstTime(Lampa.Lang.translate("background-worker.error-detected")))
 		}
