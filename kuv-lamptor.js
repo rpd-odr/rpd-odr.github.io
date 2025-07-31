@@ -274,7 +274,7 @@
         <svg class="download-circle__circle-svg" xmlns="http://www.w3.org/2000/svg">\r
             <circle\r
                 fill="rgba(0, 0, 0, 0.60)"\r
-                r="1em"\r
+                r=".9em"\r
                 cx="0.9em"\r
                 cy="0.9em"\r
             ></circle>\r
@@ -288,7 +288,7 @@
             <circle\r
                 class="download-circle__partial_{status}"\r
                 fill="none"\r
-                stroke="#fff"\r
+                stroke="#31baeb"\r
                 stroke-width=".1em"\r
                 stroke-dasharray="100"\r
                 stroke-dashoffset="{progress}"\r
@@ -304,6 +304,7 @@
         <svg\r
             class="download-circle__down-arrow-svg_{status}"\r
             xmlns="http://www.w3.org/2000/svg"\r
+            viewBox="0 0 256 256"\r
         >\r
             <path\r
                 d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"\r
@@ -312,6 +313,7 @@
         <svg\r
             class="download-circle__down-arrow-svg-animated_{status}"\r
             fill="white"\r
+             viewBox="0 0 256 256"\r
             xmlns="http://www.w3.org/2000/svg"\r
         >\r
             <path\r
