@@ -275,15 +275,15 @@
             <circle\r
                 fill="rgba(0, 0, 0, 0.60)"\r
                 r="1em"\r
-                cx="1.2em"\r
-                cy="1.2em"\r
+                cx="0.9em"\r
+                cy="0.9em"\r
             ></circle>\r
             <circle\r
                 class="download-circle__full_{status}"\r
                 stroke-width=".1em"\r
                 r=".8em"\r
-                cx="1.2em"\r
-                cy="1.2em"\r
+                cx="0.9em"\r
+                cy="0.9em"\r
             ></circle>\r
             <circle\r
                 class="download-circle__partial_{status}"\r
@@ -294,8 +294,8 @@
                 stroke-dashoffset="{progress}"\r
                 transition="stroke-dasharray 0.7s linear 0s"\r
                 r=".8em"\r
-                cx="1.2em"\r
-                cy="1.2em"\r
+                cx="0.9em"\r
+                cy="0.9em"\r
                 pathlength="100"\r
             ></circle>\r
         </svg>\r
@@ -325,8 +325,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 2em;
-  height: 2em;
+  width: 1.8em;
+  height: 1.8em;
   position: absolute;
   bottom: .3em;
   right: 4em;
@@ -336,8 +336,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 2em;
-  height: 2em;
+  width: 1.8em;
+  height: 1.8em;
   cursor: pointer;
   position: relative;
 }
@@ -372,9 +372,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  bottom: .7em;
+  left: 4.4em;
   overflow: hidden;
 }
 .download-complete__down-arrow svg,
