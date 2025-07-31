@@ -35,16 +35,16 @@
 </li>\r
 `; var U = `@keyframes pulseColor {
   0% {
-    opacity: 0 !important;
+    filter: opacity(0);
   }
   30% {
-    opacity: 1 !important;
+    filter: opacity(1);
   }
   70% {
-    opacity: 1 !important;
+    filter: opacity(1);
   }
   100% {
-    opacity: 0 !important;
+    filter: opacity(0);
   }
 }
 .downloads-tab__list {
@@ -105,16 +105,16 @@
 }
 
 .downloads-tab__icon {
-  width: 2em;
-  height: 2em;
+  width: 2.8em;
+  height: 2.8em;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .downloads-tab__icon svg {
-  width: 1.5em;
-  height: 1.5em;
+  width: 2em;
+  height: 2em;
   display: block;
   fill: currentColor;
 }
@@ -402,16 +402,16 @@
 
 @keyframes pulseColor {
   0% {
-    opacity: 0 !important;
+    filter: opacity(0);
   }
   30% {
-    opacity: 1 !important;
+    filter: opacity(1);
   }
   70% {
-    opacity: 1 !important;
+    filter: opacity(1);
   }
   100% {
-    opacity: 0 !important;
+    filter: opacity(0);
   }
 }`; 
 function V(a, e) {
