@@ -175,7 +175,7 @@
 
 .downloads-tab__progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4a90e2, #357ab8);
+  background: linear-gradient(90deg, #31baeb, #357ab8);
   transition: width 0.3s ease;
 }
 
@@ -237,7 +237,7 @@
 }
 .download-card__progress-bar-progress {
   height: 100%;
-  background: linear-gradient(90deg, #4a90e2, #357ab8);
+  background: linear-gradient(90deg, #31baeb, #357ab8);
   transition: width 0.5s ease;
 }
 .download-card__stats {
