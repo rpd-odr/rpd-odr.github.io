@@ -402,16 +402,16 @@
 
 @keyframes pulseColor {
   0% {
-    clip-path: inset(0 0 100% 0);
+    opacity: 0;
   }
   30% {
-    clip-path: inset(0 0 0 0);
+    opacity: 1;
   }
   70% {
-    clip-path: inset(0 0 0 0);
+    opacity: 1;
   }
   100% {
-    clip-path: inset(100% 0 0 0);
+    opacity: 0;
   }
 }`; 
 function V(a, e) {
