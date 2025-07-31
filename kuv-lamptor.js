@@ -330,8 +330,8 @@
   width: 1.8em;
   height: 1.8em;
   position: absolute;
-  bottom: .3em;
-  right: 4em;
+  bottom: .4em;
+  right: 3.8em;
 }
 .download-complete__circle,
 .download-circle__circle {
@@ -374,8 +374,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  bottom: .7em;
-  left: 4.4em;
   overflow: hidden;
 }
 .download-complete__down-arrow svg,
