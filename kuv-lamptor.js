@@ -50,18 +50,18 @@
 .downloads-tab__list {
   display: flex;
   flex-direction: column;
-  row-gap: 16px;
-  padding: 16px 24px;
+  row-gap: 1em;
+  padding: 1em 1.5em;
 }
 
 .downloads-tab__item {
   display: flex;
   align-items: center;
-  column-gap: 24px;
-  padding: 16px 24px;
+  column-gap: 1.5em;
+  padding: 1em 1.5em;
   background: rgba(47, 47, 47, 0.6);
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
+  border-radius: 1em;
   transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 .downloads-tab__item:hover, .downloads-tab__item.focus {
@@ -105,16 +105,16 @@
 }
 
 .downloads-tab__icon {
-  width: 32px;
-  height: 32px;
+  width: 2em;
+  height: 2em;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .downloads-tab__icon svg {
-  width: 24px;
-  height: 24px;
+  width: 1.5em;
+  height: 1.5em;
   display: block;
   fill: currentColor;
 }
@@ -129,14 +129,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: .3em;
 }
 
 .downloads-tab__header-title-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: .3em;
 }
 
 .downloads-tab__header-title {
@@ -167,9 +167,9 @@
 
 .downloads-tab__progress-wrapper {
   width: 100%;
-  height: 6px;
+  height: .3em;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  border-radius: .2em;
   overflow: hidden;
 }
 
@@ -228,9 +228,9 @@
   font-size: 1.5em;
 }
 .download-card__progress-bar {
-  height: 6px;
+  height: .3em;
   background: #ddd;
-  border-radius: 6px;
+  border-radius: .3em;
   overflow: hidden;
   margin-top: 0.7em;
   margin-bottom: 0.5em;
@@ -274,28 +274,28 @@
         <svg class="download-circle__circle-svg" xmlns="http://www.w3.org/2000/svg">\r
             <circle\r
                 fill="rgba(0, 0, 0, 0.60)"\r
-                r="17px"\r
-                cx="20"\r
-                cy="20"\r
+                r="1em"\r
+                cx="1.2em"\r
+                cy="1.2em"\r
             ></circle>\r
             <circle\r
                 class="download-circle__full_{status}"\r
-                stroke-width="2px"\r
-                r="12px"\r
-                cx="20"\r
-                cy="20"\r
+                stroke-width=".1em"\r
+                r=".8em"\r
+                cx="1.2em"\r
+                cy="1.2em"\r
             ></circle>\r
             <circle\r
                 class="download-circle__partial_{status}"\r
                 fill="none"\r
                 stroke="#fff"\r
-                stroke-width="2px"\r
+                stroke-width=".1em"\r
                 stroke-dasharray="100"\r
                 stroke-dashoffset="{progress}"\r
                 transition="stroke-dasharray 0.7s linear 0s"\r
-                r="12px"\r
-                cx="20"\r
-                cy="20"\r
+                r=".8em"\r
+                cx="1.2em"\r
+                cy="1.2em"\r
                 pathlength="100"\r
             ></circle>\r
         </svg>\r
@@ -306,7 +306,7 @@
             xmlns="http://www.w3.org/2000/svg"\r
         >\r
             <path\r
-                d="M17.71,12.71a1,1,0,0,0-1.42,0L13,16V6a1,1,0,0,0-2,0V16L7.71,12.71a1,1,0,0,0-1.42,0,1,1,0,0,0,0,1.41l4.3,4.29A2,2,0,0,0,12,19h0a2,2,0,0,0,1.4-.59l4.3-4.29A1,1,0,0,0,17.71,12.71Z"\r
+                d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"\r
             />\r
         </svg>\r
         <svg\r
@@ -315,7 +315,7 @@
             xmlns="http://www.w3.org/2000/svg"\r
         >\r
             <path\r
-                d="M17.71,12.71a1,1,0,0,0-1.42,0L13,16V6a1,1,0,0,0-2,0V16L7.71,12.71a1,1,0,0,0-1.42,0,1,1,0,0,0,0,1.41l4.3,4.29A2,2,0,0,0,12,19h0a2,2,0,0,0,1.4-.59l4.3-4.29A1,1,0,0,0,17.71,12.71Z"\r
+                d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"\r
             />\r
         </svg>\r
     </div>\r
