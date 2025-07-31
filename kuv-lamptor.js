@@ -35,16 +35,16 @@
 </li>\r
 `; var U = `@keyframes pulseColor {
   0% {
-    opacity: 0;
+    opacity: 0 !important;
   }
   30% {
-    opacity: 1;
+    opacity: 1 !important;
   }
   70% {
-    opacity: 1;
+    opacity: 1 !important;
   }
   100% {
-    opacity: 0;
+    opacity: 0 !important;
   }
 }
 .downloads-tab__list {
@@ -402,16 +402,16 @@
 
 @keyframes pulseColor {
   0% {
-    opacity: 0;
+    opacity: 0 !important;
   }
   30% {
-    opacity: 1;
+    opacity: 1 !important;
   }
   70% {
-    opacity: 1;
+    opacity: 1 !important;
   }
   100% {
-    opacity: 0;
+    opacity: 0 !important;
   }
 }`; 
 function V(a, e) {
