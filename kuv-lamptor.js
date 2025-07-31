@@ -213,7 +213,7 @@
   height: auto;
   margin: 0;
   margin-top: 0.75em;
-  padding: 0.75em;
+  padding: 1.5em;
   background-color: rgba(0, 0, 0, 0.3);
   color: white;
   transition: background-color 0.3s;
@@ -225,7 +225,7 @@
   margin-bottom: 0.5em;
 }
 .download-card__file-info .file-name, .download-card__file-info .speed {
-  font-size: 1.5em;
+  /*font-size: 1.5em;*/
 }
 .download-card__progress-bar {
   height: .3em;
@@ -245,7 +245,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-  font-size: 1.1em;
+  /*font-size: 1.1em;*/
 }
 .download-card__stats .speed {
   position: absolute;
