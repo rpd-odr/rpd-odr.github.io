@@ -114,24 +114,44 @@ services:
       - default
       - ${USER_NET}
 
-  transmission:
-    image: linuxserver/transmission
-    container_name: transmission
-    ports:
-      - "9091:9091"
-      - "51413:51413"
-      - "51413:51413/udp"
+#  transmission:
+#    image: linuxserver/transmission
+#    container_name: transmission
+#    ports:
+#      - "9091:9091"
+#      - "51413:51413"
+#      - "51413:51413/udp"
+#    environment:
+#      - PUID=${PUID}
+#      - PGID=${PGID}
+#      - UMASK=${UMASK}
+#      - USER=admin
+#      - PASS=admin
+#      - TZ=${TZ}
+#    volumes:
+#      - ${USER_PATH}/servarr/transmission/config:/config
+#      - ${USER_PATH}/transmission/config/settings.json:/config/settings.json:ro
+#      - ${LIB_PATH}/Downloads:/data/downloads
+#    restart: unless-stopped
+#    networks:
+#      - default
+#      - ${USER_NET}
+
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - UMASK=${UMASK}
-      - USER=admin
-      - PASS=admin
       - TZ=${TZ}
+      - WEBUI_PORT=8080
     volumes:
-      - ${USER_PATH}/servarr/transmission/config:/config
-      - ${USER_PATH}/transmission/config/settings.json:/config/settings.json:ro
+      - ${USER_PATH}/servarr/qbittorrent/config:/config
       - ${LIB_PATH}/Downloads:/data/downloads
+    ports:
+      - "8080:8080"       # WebUI
+      - "6881:6881"       # TCP
+      - "6881:6881/udp"   # UDP
     restart: unless-stopped
     networks:
       - default
