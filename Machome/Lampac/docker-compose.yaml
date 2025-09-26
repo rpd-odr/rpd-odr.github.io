@@ -1,0 +1,44 @@
+services:
+  lampac:
+    image: immisterio/lampac:latest
+    container_name: lampac
+    ports:
+      - "9118:9118"
+    volumes:
+      - ${USER_PATH}/lampac/config/init.conf:/home/init.conf
+      - ${USER_PATH}/lampac/config/users.json:/home/users.json
+      - ${USER_PATH}/lampac/config/passwd:/home/passwd:ro
+      - ${USER_PATH}/lampac/module/manifest.json:/home/module/manifest.json
+      - ${USER_PATH}/lampac/plugins/lampainit.my.js:/home/plugins/lampainit.my.js:ro
+      - ${USER_PATH}/lampac/plugins/privateinit.my.js:/home/plugins/privateinit.my.js:ro
+      - ${USER_PATH}/lampac/wwwroot/plugins/kuv-style.js:/home/wwwroot/plugins/kuv-style.js:ro
+      - ${USER_PATH}/lampac/wwwroot/plugins/kuv-studios.js:/home/wwwroot/plugins/kuv-studios.js:ro
+      - ${USER_PATH}/lampac/wwwroot/plugins/kuv-mult.js:/home/wwwroot/plugins/kuv-mult.js:ro
+      - ${USER_PATH}/lampac/wwwroot/plugins/kuv-lampac.js:/home/wwwroot/plugins/kuv-lampac.js:ro
+      - ${USER_PATH}/lampac/wwwroot/plugins/kuv-lamptor.js:/home/wwwroot/plugins/kuv-lamptor.js:ro
+      - ${USER_PATH}/lampac/wwwroot/plugins/kuv:/home/wwwroot/plugins/kuv:ro
+      - ${USER_PATH}/lampac/cache:/home/cache:cached
+      - ${USER_PATH}/lampac/torrserver:/home/torrserver
+      #- /Volumes/Storage/Lampac/dlna:/home/dlna
+      - ${USER_PATH}/playwright:/home/.playwright
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '2.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - LAMPAC_PORT=9118
+      - TZ=${TZ}
+    networks:
+      - default
+      - machome_net
+networks:
+  default:
+    driver: bridge
+  machome_net:
+    external: true
