@@ -1,0 +1,144 @@
+services:
+
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    ports:
+      - "7575:7575"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${USER_PATH}/servarr/homarr/appdata:/appdata
+    environment:
+      - TZ=${TZ}
+      - SECRET_ENCRYPTION_KEY=78c12506dbb2f8e6b01d85ce91862311eb92e3341288c477460e901b79180eec
+    restart: unless-stopped
+    networks:
+      - default
+      - ${USER_NET}
+
+  prowlarr:
+    image: linuxserver/prowlarr:latest
+    container_name: prowlarr
+    ports:
+      - "9696:9696"
+    volumes:
+      - ${USER_PATH}/servarr/prowlarr/config:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - TZ=${TZ}
+    restart: unless-stopped
+    networks:
+      - default
+      - ${USER_NET}
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    ports:
+      - "7878:7878"
+    volumes:
+      - ${USER_PATH}/servarr/radarr/config:/config
+      - ${LIB_PATH}:/data
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - TZ=${TZ}
+    restart: unless-stopped
+    depends_on:
+      - prowlarr
+    networks:
+      - default
+      - ${USER_NET}
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    ports:
+      - "8989:8989"
+    volumes:
+      - ${USER_PATH}/servarr/sonarr/config:/config
+      - ${LIB_PATH}:/data
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - TZ=${TZ}
+    restart: unless-stopped
+    depends_on:
+      - prowlarr
+    networks:
+      - default
+      - ${USER_NET}
+  
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    ports:
+      - "5055:5055"
+    volumes:
+      - ${USER_PATH}/servarr/jellyseerr/config:/app/config
+    environment:
+      #- PUID=${PUID}
+      #- PGID=${PGID}
+      #- UMASK=${UMASK}
+      - TZ=${TZ}
+      - PORT=5055
+    restart: unless-stopped
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    networks:
+      - default
+      - ${USER_NET}
+
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    ports:
+      - "1717:9117"
+    volumes:
+      - ${USER_PATH}/servarr/jackett/config:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - TZ=${TZ}
+    restart: unless-stopped
+    networks:
+      - default
+      - ${USER_NET}
+
+  transmission:
+    image: linuxserver/transmission
+    container_name: transmission
+    ports:
+      - "9091:9091"
+      - "51413:51413"
+      - "51413:51413/udp"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - USER=admin
+      - PASS=admin
+      - TZ=${TZ}
+    volumes:
+      - ${USER_PATH}/servarr/transmission/config:/config
+      - ${USER_PATH}/transmission/config/settings.json:/config/settings.json:ro
+      - ${LIB_PATH}/Downloads:/data/downloads
+    restart: unless-stopped
+    networks:
+      - default
+      - ${USER_NET}
+
+networks:
+  default:
+    driver: bridge
+  ${USER_NET}:
+    external: true
