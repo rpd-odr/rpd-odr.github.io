@@ -1,2 +1,2 @@
-${USER_PATH}=/Users/vadimbystrykin/lampac
-${TZ}=Asia/Yekaterinburg
+USER_PATH=/Users/vadimbystrykin/lampac
+TZ=Asia/Yekaterinburg
