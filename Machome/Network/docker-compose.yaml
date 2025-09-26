@@ -41,5 +41,5 @@ services:
 networks:
   default:
     driver: bridge
-  ${USER_NET}:
+  machome_net:
     external: true
