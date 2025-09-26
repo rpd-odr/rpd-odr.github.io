@@ -1,0 +1,14 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    ports:
+      - "9898:80"   # внешний порт 9898 → внутренний 80
+    volumes:
+      - ${USER_PATH}/bitwarden/vw-data:/data
+    environment:
+      - SIGNUPS_ALLOWED=true              # включаем регистрацию
+      - WEBSOCKET_ENABLED=true            # для мгновенной синхронизации
+      - DOMAIN=http://192.168.0.247:9898  # IP сервера в локальной сети
+      - ADMIN_TOKEN=114576                # токен для доступа к админке
