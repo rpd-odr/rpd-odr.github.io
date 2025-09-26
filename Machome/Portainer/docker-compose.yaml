@@ -29,3 +29,6 @@ networks:
     driver: bridge
   ${USER_NET}:
     external: true
+
+env_file:
+  - ./machome.env
