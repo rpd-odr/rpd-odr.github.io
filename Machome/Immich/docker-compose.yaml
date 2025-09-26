@@ -62,5 +62,5 @@ volumes:
 networks:
   default:
     driver: bridge  # Стандартная сеть Docker
-  ${USER_NET}:
+  machome_net:
     external: true  # Внешняя сеть для reverse proxy
