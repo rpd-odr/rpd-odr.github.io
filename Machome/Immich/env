@@ -5,3 +5,4 @@ IMMICH_VERSION=release
 DB_PASSWORD=postgres
 DB_USERNAME=postgres
 DB_DATABASE_NAME=immich
+USER_NET=machome_net
