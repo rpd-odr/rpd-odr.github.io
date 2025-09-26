@@ -1,0 +1,7 @@
+USER_PATH=/Users/vadimbystrykin/machome
+LIB_PATH=/Volumes/Storage/Data
+PUID=501
+PGID=20
+UMASK=022
+TZ=Asia/Yekaterinburg
+USER_NET=machome_net
