@@ -144,14 +144,15 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=8123
+      - TORRENTING_PORT=6887
     volumes:
       - ${USER_PATH}/servarr/qbittorrent/config:/config
       - ${LIB_PATH}/Downloads:/data/downloads
     ports:
-      - "8080:8080"       # WebUI
-      - "6881:6881"       # TCP
-      - "6881:6881/udp"   # UDP
+      - "8123:8123"       # WebUI
+      - "6887:6887"       # TCP
+      - "6887:6887/udp"   # UDP
     restart: unless-stopped
     networks:
       - default
