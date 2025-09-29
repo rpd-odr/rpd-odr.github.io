@@ -160,6 +160,7 @@ services:
 
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: abshelf
     ports:
       - 13378:80
     volumes:
