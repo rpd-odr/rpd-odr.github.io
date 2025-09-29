@@ -158,6 +158,25 @@ services:
       - default
       - ${USER_NET}
 
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    ports:
+      - 13378:80
+    volumes:
+      - ${LIB_PATH}/Audiobooks:/audiobooks
+      - ${LIB_PATH}/Podcasts:/podcasts
+      - ${USER_PATH}/servarr/abshelf/config:/config
+      - ${USER_PATH}/servarr/abshelf/meta:/metadata
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - TZ=${TZ}
+    restart: unless-stopped
+    networks:
+      - default
+      - ${USER_NET}
+
 networks:
   default:
     driver: bridge
