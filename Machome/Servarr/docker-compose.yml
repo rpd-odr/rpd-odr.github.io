@@ -72,6 +72,24 @@ services:
     networks:
       - default
       - ${USER_NET}
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${USER_PATH}/servarr/bazarr/config:/config
+      - ${LIB_PATH}/Movies:/movies
+      - ${LIB_PATH}/TV:/tv
+    ports:
+      - "6767:6767"
+    restart: unless-stopped
+    networks:
+      - default
+      - ${USER_NET}
   
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
