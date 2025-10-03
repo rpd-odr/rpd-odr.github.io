@@ -82,8 +82,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${USER_PATH}/servarr/bazarr/config:/config
-      - ${LIB_PATH}/Movies:/movies
-      - ${LIB_PATH}/TV:/tv
+      - ${LIB_PATH}:/data
     ports:
       - "6767:6767"
     restart: unless-stopped
