@@ -101,6 +101,7 @@ services:
       #- PUID=${PUID}
       #- PGID=${PGID}
       #- UMASK=${UMASK}
+      - GITHUB_TOKEN=${GHT}
       - TZ=${TZ}
       - PORT=5055
     restart: unless-stopped
