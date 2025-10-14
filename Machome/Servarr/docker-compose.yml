@@ -1,20 +1,20 @@
 services:
 
-  homarr:
-    image: ghcr.io/homarr-labs/homarr:latest
-    container_name: homarr
-    ports:
-      - "7575:7575"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${USER_PATH}/servarr/homarr/appdata:/appdata
-    environment:
-      - TZ=${TZ}
-      - SECRET_ENCRYPTION_KEY=78c12506dbb2f8e6b01d85ce91862311eb92e3341288c477460e901b79180eec
-    restart: unless-stopped
-    networks:
-      - default
-      - ${USER_NET}
+#  homarr:
+#    image: ghcr.io/homarr-labs/homarr:latest
+#    container_name: homarr
+#    ports:
+#      - "7575:7575"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - ${USER_PATH}/servarr/homarr/appdata:/appdata
+#    environment:
+#      - TZ=${TZ}
+#      - SECRET_ENCRYPTION_KEY=78c12506dbb2f8e6b01d85ce91862311eb92e3341288c477460e901b79180eec
+#    restart: unless-stopped
+#    networks:
+#      - default
+#      - ${USER_NET}
 
   prowlarr:
     image: linuxserver/prowlarr:latest
