@@ -72,6 +72,26 @@ services:
     networks:
       - default
       - ${USER_NET}
+  
+  lidarr:
+    image: hotio/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - TZ=${TZ}
+    volumes:
+      - ${USER_PATH}/servarr/lidarr/config:/config
+      - ${LIB_PATH}:/data
+    ports:
+      - 8686:8686
+    restart: unless-stopped
+    depends_on:
+      - prowlarr
+    networks:
+      - default
+      - ${USER_NET}
 
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
