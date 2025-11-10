@@ -1,3 +1,6 @@
 DOMAIN-KEYWORD,tplinkdns,DIRECT
 DOMAIN-KEYWORD,tplinkcloud,DIRECT
 DOMAIN-KEYWORD,tplinknbu,DIRECT
+
+#на всякий случай ру напрямую
+GEOIP,RU
