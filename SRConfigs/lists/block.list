@@ -14,3 +14,6 @@ DOMAIN-WILDCARD,metrika.*
 DOMAIN-WILDCARD,adfox.*
 DOMAIN-WILDCARD,api-adservices.*
 DOMAIN-WILDCARD,adservices.*
+DOMAIN-WILDCARD,*analytics-events*
+DOMAIN-WILDCARD,*mistat*
+DOMAIN-WILDCARD,*.ad.*
