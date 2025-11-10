@@ -1,6 +1,7 @@
 
-DOMAIN-SUFFIX,doubleclick.net
-DOMAIN,pagead2.googlesyndication.com
+DOMAIN-KEYWORD,doubleclick
+DOMAIN-WILDCARD,pagead.*
+DOMAIN-WILDCARD,pagead2.*
 DOMAIN-WILDCARD,ads.*
 DOMAIN-WILDCARD,ads-api.*
 DOMAIN-WILDCARD,ads-sg.*
