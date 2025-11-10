@@ -8,4 +8,7 @@ DOMAIN-SUFFIX,adguard.com
 DOMAIN-KEYWORD,thetvdb
 DOMAIN-KEYWORD,theaudiodb
 DOMAIN-KEYWORD,musicbrainz
+DOMAIN-KEYWORD,pornhub
+DOMAIN-SUFFIX,archive.org
+DOMAIN-KEYWORD,coverartarchive
 IP-ASN,16509
