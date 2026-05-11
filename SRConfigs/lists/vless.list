@@ -17,6 +17,8 @@ DOMAIN-SUFFIX,archive.org
 DOMAIN-KEYWORD,coverartarchive
 DOMAIN-SUFFIX,ajay.app
 DOMAIN-KEYWORD,retroachievements
+DOMAIN-KEYWORD,rustorka
+DOMAIN-KEYWORD,rutracker
 
 #Spotify
 DOMAIN,audio4-ak-spotify-com.akamaized.net
